@@ -34,8 +34,8 @@ import de.lucaswerkmeister.code.fiar.framework.event.PlayerAction;
  * unspecified, but the {@link UnknownClientException} class is provided for
  * uniform behavior if servers wish to throw such an exception.
  * <p>
- * If, for any reason (e.�g., the client �spams� the server with requests), the
- * server decides to �fire� a client, the preferred way for it to do so is to
+ * If, for any reason (e. g., the client "spams" the server with requests), the
+ * server decides to "fire" a client, the preferred way for it to do so is to
  * throw a {@link ClientFiredException}.
  * 
  * @author Lucas Werkmeister
@@ -56,8 +56,8 @@ public interface Server {
 	 * <ol start="0">
 	 * <li>Initialization</li>
 	 * <ol start="0">
-	 * <li>Choose field size. This phase ends as soon as all players have
-	 * proposed the same field size.</li>
+	 * <li>Choose board size. This phase ends as soon as all players have
+	 * proposed the same board size.</li>
 	 * <li>Block fields. This phase ends as soon as all players have indicated
 	 * that they are happy with the current distribution of blocked fields.</li>
 	 * <li>Set Joker fields. This phase ends as soon as all players have

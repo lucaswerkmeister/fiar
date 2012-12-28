@@ -21,7 +21,7 @@ package de.lucaswerkmeister.code.fiar.framework;
  * Provides access to the game board.
  * 
  * @author Lucas Werkmeister
- * @version 1.0
+ * @version 1.1
  */
 public interface Board {
 	/**
@@ -35,6 +35,18 @@ public interface Board {
 	 * @return The player at this position, or <code>null</code>.
 	 */
 	public Player getPlayerAt(int x, int y);
+
+	/**
+	 * Sets the player that occupies the field at (x,y) to the specified player.
+	 * 
+	 * @param x
+	 *            The x coordinate of the field.
+	 * @param y
+	 *            The y coordinate of the field.
+	 * @param p
+	 *            The player that is to occupy this field.
+	 */
+	public void setPlayerAt(int x, int y, Player p);
 
 	/**
 	 * Gets the width of the board.

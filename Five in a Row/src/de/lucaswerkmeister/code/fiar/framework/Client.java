@@ -25,9 +25,9 @@ import de.lucaswerkmeister.code.fiar.framework.event.PlayerAction;
  * players or computer players.
  * 
  * @author Lucas Werkmeister
- * @version 1.0
+ * @version 1.1
  */
-public interface Client {
+public abstract class Client {
 	/**
 	 * Sends a {@link GameEvent} to the client.
 	 * <p>
@@ -40,7 +40,7 @@ public interface Client {
 	 * @param e
 	 *            The game event.
 	 */
-	public void gameEvent(GameEvent e);
+	public abstract void gameEvent(GameEvent e);
 
 	/**
 	 * Gets the client's unique ID. If two different {@link Client} instances
@@ -48,22 +48,26 @@ public interface Client {
 	 * 
 	 * @return The client's ID.
 	 */
-	public int getID();
+	public abstract int getID();
 
 	/**
 	 * Two clients are equal if and only if they are the same instance.
 	 * 
-	 * @param ojb
+	 * @param other
 	 *            The other Client instance.
 	 * @return <code>true</code> if this instance and the other instance are the
 	 *         same instance, <code>false</code> otherwise.
 	 */
-	public boolean equals(Object ojb);
+	public final boolean equals(Object other) {
+		return this == other;
+	}
 
 	/**
 	 * A client's hash code is its {@link #getID() ID}.
 	 * 
 	 * @return The client's ID.
 	 */
-	public int hashCode();
+	public final int hashCode() {
+		return getID();
+	}
 }
