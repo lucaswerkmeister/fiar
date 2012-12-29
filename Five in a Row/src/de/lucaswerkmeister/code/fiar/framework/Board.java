@@ -17,13 +17,15 @@
  */
 package de.lucaswerkmeister.code.fiar.framework;
 
+import java.awt.Point;
+
 /**
  * Provides access to the game board.
  * 
  * @author Lucas Werkmeister
- * @version 1.1
+ * @version 1.2
  */
-public interface Board {
+public abstract class Board {
 	/**
 	 * Gets the player that occupies the field at (x,y), or <code>null</code> if
 	 * that field is still free.
@@ -34,7 +36,17 @@ public interface Board {
 	 *            The y coordinate of the field.
 	 * @return The player at this position, or <code>null</code>.
 	 */
-	public Player getPlayerAt(int x, int y);
+	public abstract Player getPlayerAt(int x, int y);
+
+	/**
+	 * Gets the player that occupies the field at the specified position, or
+	 * <code>null</code> if that field is still free.
+	 * 
+	 * @param position
+	 *            The position of the field.
+	 * @return The player at this position, or <code>null</code>.
+	 */
+	public abstract Player getPlayerAt(Point position);
 
 	/**
 	 * Sets the player that occupies the field at (x,y) to the specified player.
@@ -46,19 +58,56 @@ public interface Board {
 	 * @param p
 	 *            The player that is to occupy this field.
 	 */
-	public void setPlayerAt(int x, int y, Player p);
+	public abstract void setPlayerAt(int x, int y, Player p);
+
+	/**
+	 * Sets the player that occupies the field at the specified position to the
+	 * specified player.
+	 * 
+	 * @param position
+	 *            The position of the field.
+	 * @param p
+	 *            The player that is to occupy this field.
+	 */
+	public abstract void setPlayerAt(Point position, Player p);
 
 	/**
 	 * Gets the width of the board.
 	 * 
 	 * @return The width of the board.
 	 */
-	public int getWidth();
+	public abstract int getWidth();
 
 	/**
 	 * Gets the height of the board.
 	 * 
 	 * @return The height of the board.
 	 */
-	public int getHeight();
+	public abstract int getHeight();
+
+	@Override
+	public abstract Board clone();
+
+	/**
+	 * Two boards are equal if and only if they have the same size and return
+	 * the same player at every field.
+	 */
+	@Override
+	public boolean equals(Object other) {
+		if (!(other instanceof Board))
+			return false;
+		Board otherBoard = (Board) other;
+		if (getWidth() != otherBoard.getWidth()
+				|| getHeight() != otherBoard.getHeight())
+			return false;
+		for (int x = 0; x < getWidth(); x++)
+			for (int y = 0; y < getHeight(); y++) {
+				final Player p1 = getPlayerAt(x, y);
+				final Player p2 = otherBoard.getPlayerAt(x, y);
+				if ((p1 == null && p2 != null) || (p1 != null && p2 == null)
+						|| !p1.equals(p2))
+					return false;
+			}
+		return true;
+	}
 }

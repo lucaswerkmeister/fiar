@@ -15,39 +15,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lucaswerkmeister.code.fiar.framework;
+package de.lucaswerkmeister.code.fiar.framework.event;
 
-import java.awt.Color;
+import de.lucaswerkmeister.code.fiar.framework.Board;
+import de.lucaswerkmeister.code.fiar.framework.Player;
 
 /**
- * This player holds all fields that are "Joker" fields.
+ * Indicates that the player accepts the distribution of "joker" fields as it is
+ * saved in this instance.
  * 
  * @author Lucas Werkmeister
  * @version 1.0
  */
-public class Joker extends Player {
-	private static final Joker instance = new Joker();
+public class JokerDistributionAccepted extends StoneDistributionAccepted {
 
-	private Joker() {
-		// hide the constructor
-	}
-
-	@Override
-	public String getName() {
-		return "Joker";
-	}
-
-	@Override
-	public Color getColor() {
-		return Color.green;
-	}
-
-	@Override
-	public int getID() {
-		return -1;
-	}
-
-	public static Joker getInstance() {
-		return instance;
+	/**
+	 * A new {@link JokerDistributionAccepted} by the specified player with the
+	 * specified board.
+	 * 
+	 * @param acceptingPlayer
+	 *            The player that accepts the distribution.
+	 * @param acceptedBoard
+	 *            The board that the player accepts.
+	 */
+	public JokerDistributionAccepted(Player acceptingPlayer, Board acceptedBoard) {
+		super(acceptingPlayer, acceptedBoard);
 	}
 }

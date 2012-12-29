@@ -17,16 +17,28 @@
  */
 package de.lucaswerkmeister.code.fiar.defaultServer;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import de.lucaswerkmeister.code.fiar.framework.Block;
 import de.lucaswerkmeister.code.fiar.framework.Board;
 import de.lucaswerkmeister.code.fiar.framework.Client;
 import de.lucaswerkmeister.code.fiar.framework.Player;
 import de.lucaswerkmeister.code.fiar.framework.Server;
 import de.lucaswerkmeister.code.fiar.framework.UnknownClientException;
+import de.lucaswerkmeister.code.fiar.framework.event.BlockField;
+import de.lucaswerkmeister.code.fiar.framework.event.BoardSizeProposal;
+import de.lucaswerkmeister.code.fiar.framework.event.FieldAction;
+import de.lucaswerkmeister.code.fiar.framework.event.GameEvent;
+import de.lucaswerkmeister.code.fiar.framework.event.JokerField;
+import de.lucaswerkmeister.code.fiar.framework.event.PlaceStone;
 import de.lucaswerkmeister.code.fiar.framework.event.PlayerAction;
+import de.lucaswerkmeister.code.fiar.framework.event.UnblockField;
+import de.lucaswerkmeister.code.fiar.framework.event.UnjokerField;
 
 /**
  * A server with a fixed {@link Client} and {@link Player} set, where each
@@ -37,18 +49,18 @@ import de.lucaswerkmeister.code.fiar.framework.event.PlayerAction;
  * @author Lucas Werkmeister
  * @version 1.0
  */
-public class FixedServer implements Server {
+public class FixedServer extends Server {
 	private final ClientPlayerPair[] pairs;
-	private final Client[] watchingClients;
+	private final Client[] allClients;
 	private ArrayBoard board;
+	private int[] phase;
 
 	/**
 	 * Creates a new {@link FixedServer} instance. The players in
-	 * <code>players[i]</code> are bound to client <code>clients[i]</code> for
-	 * <code>int i < players.length</code>. The condition
-	 * <code>players.length == clients.length</code> must be fulfilled; any
-	 * clients where the according players array is empty are "watching"
-	 * clients.
+	 * <code>players[i]</code> are bound to client <code>clients[i]</code>. The
+	 * condition <code>players.length == clients.length</code> must be
+	 * fulfilled; any clients where the according players array is empty are
+	 * "watching" clients.
 	 * 
 	 * @param clients
 	 *            The clients that this server recognizes.
@@ -57,52 +69,127 @@ public class FixedServer implements Server {
 	 */
 	public FixedServer(Client[] clients, Player[][] players) {
 		List<ClientPlayerPair> pairsL = new LinkedList<>();
-		List<Client> watchingClientsL = new LinkedList<>();
 		for (int i = 0; i < clients.length; i++)
-			if (players[i].length == 0)
-				watchingClientsL.add(clients[i]);
-			else
+			if (players[i].length > 0)
 				for (int j = 0; j < players[i].length; j++)
 					pairsL.add(new ClientPlayerPair(clients[i], players[i][j]));
 		pairs = (ClientPlayerPair[]) pairsL.toArray();
-		watchingClients = (Client[]) watchingClientsL.toArray();
+		allClients = new Client[clients.length];
+		System.arraycopy(clients, 0, allClients, 0, clients.length);
+		phase = new int[] { 0, 0 };
 	}
 
 	@Override
 	public int[] getPhase(Client requester) {
-		// TODO Auto-generated method stub
-		return null;
+		if (knowsClient(requester))
+			return Arrays.copyOf(phase, phase.length);
+		throw new UnknownClientException(requester);
 	}
 
 	@Override
 	public int getPhasesVersion(Client requester) {
-		return 0;
+		if (knowsClient(requester))
+			return 0;
+		throw new UnknownClientException(requester);
 	}
 
 	@Override
 	public boolean canAct(Client requester, Player p) {
-		// TODO Auto-generated method stub
-		return false;
+		return phase[0] == 0
+				|| (phase[0] == 1 && phase[1] == 1 && phase[2] == p.getID());
 	}
 
 	@Override
-	public Set<Class<PlayerAction>> getAllowedActions(Client requester, Player p) {
-		// TODO Auto-generated method stub
-		return null;
+	public Set<Class<? extends PlayerAction>> getAllowedActions(
+			Client requester, Player p) {
+		HashSet<Class<? extends PlayerAction>> ret = new HashSet<>();
+		try {
+			switch (phase[0]) {
+			case 0:
+				switch (phase[1]) {
+				case 0:
+					ret.add(BoardSizeProposal.class);
+					return ret;
+				case 1:
+					ret.add(BlockField.class);
+					ret.add(UnblockField.class);
+					return ret;
+				case 2:
+					ret.add(JokerField.class);
+					ret.add(UnjokerField.class);
+					return ret;
+				}
+			case 1:
+				switch (phase[1]) {
+				case 0:
+					return Collections.emptySet();
+				case 1:
+					if (p.getID() != phase[2])
+						return Collections.emptySet();
+					ret.add(PlaceStone.class);
+					return ret;
+				}
+			case 2:
+				return Collections.emptySet();
+			}
+		} catch (ArrayIndexOutOfBoundsException e) {
+			// Let control fall through to the IllegalStateException below
+		}
+		throw new IllegalStateException(
+				"Server is in unknown phase. This is a serious programming error!");
 	}
 
 	@Override
 	public void action(Client requester, PlayerAction action)
 			throws IllegalStateException {
-		// TODO Auto-generated method stub
-
+		if (!getAllowedActions(requester, action.getActingPlayer()).contains(
+				action.getClass()))
+			throw new IllegalStateException(
+					"This action is currently not permissible for this player!");
+		try {
+			switch (phase[0]) {
+			case 0:
+				switch (phase[1]) {
+				case 0:
+					ret.add(BoardSizeProposal.class);
+					return ret;
+				case 1:
+					FieldAction a = (FieldAction) action;
+					if (action.getClass() == BlockField.class)
+						board.setPlayerAt(a.getField(), Block.getInstance());
+					else
+						board.setPlayerAt(a.getField(), null);
+					break;
+				case 2:
+					ret.add(JokerField.class);
+					ret.add(UnjokerField.class);
+					return ret;
+				}
+			case 1:
+				switch (phase[1]) {
+				case 0:
+					return Collections.emptySet();
+				case 1:
+					if (p.getID() != phase[2])
+						return Collections.emptySet();
+					ret.add(PlaceStone.class);
+					return ret;
+				}
+			case 2:
+				return Collections.emptySet();
+			}
+		} catch (ArrayIndexOutOfBoundsException e) {
+			// Let control fall through to the IllegalStateException below
+		}
+		throw new IllegalStateException(
+				"Server is in unknown phase. This is a serious programming error!");
 	}
 
 	@Override
 	public Board getCurrentBoard(Client requester) {
-		if (!knowsClient(requester))
-			throw new UnknownClientException(requester);
-		return board == null ? null : board.clone();
+		if (knowsClient(requester))
+			return board == null ? null : board.clone();
+		throw new UnknownClientException(requester);
 	}
 
 	private boolean knowsClient(Client c) {
@@ -126,6 +213,11 @@ public class FixedServer implements Server {
 		return false;
 	}
 
+	private void sendEvent(GameEvent e) {
+		for (Client c : allClients)
+			c.gameEvent(e);
+	}
+
 	/**
 	 * A Client-Player pair.
 	 * 
@@ -133,7 +225,6 @@ public class FixedServer implements Server {
 	 * @version 1.0
 	 */
 	private class ClientPlayerPair {
-
 		Client client;
 		Player player;
 
@@ -146,7 +237,7 @@ public class FixedServer implements Server {
 		 * @param player
 		 *            The player.
 		 */
-		public ClientPlayerPair(Client client, Player player) {
+		ClientPlayerPair(Client client, Player player) {
 			this.client = client;
 			this.player = player;
 		}

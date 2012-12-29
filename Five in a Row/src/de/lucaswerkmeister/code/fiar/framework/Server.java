@@ -39,9 +39,9 @@ import de.lucaswerkmeister.code.fiar.framework.event.PlayerAction;
  * throw a {@link ClientFiredException}.
  * 
  * @author Lucas Werkmeister
- * @version 1.0
+ * @version 1.1
  */
-public interface Server {
+public abstract class Server {
 	/**
 	 * Gets the current phase of the server.
 	 * <p>
@@ -89,7 +89,7 @@ public interface Server {
 	 *            The requesting client.
 	 * @return The current phase.
 	 */
-	public int[] getPhase(Client requester);
+	public abstract int[] getPhase(Client requester);
 
 	/**
 	 * Gets the version of the Phases list that the server is using. This method
@@ -102,7 +102,7 @@ public interface Server {
 	 *            The requesting client.
 	 * @return The Phases list version.
 	 */
-	public int getPhasesVersion(Client requester);
+	public abstract int getPhasesVersion(Client requester);
 
 	/**
 	 * Determines if the specified player can currently perform any actions.
@@ -117,9 +117,9 @@ public interface Server {
 	 * @return <code>true</code> if the player can currently perform any
 	 *         actions, <code>false</code> otherwise.
 	 */
-	public boolean canAct(Client requester, Player p);// default {
-	// return getAllowedActions.size() != 0; // Java 8 will allow default bodies
-	// }
+	public boolean canAct(Client requester, Player p) {
+		return getAllowedActions(requester, p).size() != 0;
+	}
 
 	/**
 	 * Determines which actions the specified player can currently perform.
@@ -131,7 +131,8 @@ public interface Server {
 	 * @return A {@link Set} containing all classes of actions that the player,
 	 *         at the time of the method invocation, is allowed to perform.
 	 */
-	public Set<Class<PlayerAction>> getAllowedActions(Client requester, Player p);
+	public abstract Set<Class<? extends PlayerAction>> getAllowedActions(
+			Client requester, Player p);
 
 	/**
 	 * Performs an action to the game.
@@ -143,7 +144,7 @@ public interface Server {
 	 * @throws IllegalStateException
 	 *             If the action is currently not allowed.
 	 */
-	public void action(Client requester, PlayerAction action)
+	public abstract void action(Client requester, PlayerAction action)
 			throws IllegalStateException;
 
 	/**
@@ -161,5 +162,5 @@ public interface Server {
 	 *            The requesting client.
 	 * @return The current board, or <code>null</code>.
 	 */
-	public Board getCurrentBoard(Client requester);
+	public abstract Board getCurrentBoard(Client requester);
 }

@@ -17,6 +17,8 @@
  */
 package de.lucaswerkmeister.code.fiar.defaultServer;
 
+import java.awt.Point;
+
 import de.lucaswerkmeister.code.fiar.framework.Board;
 import de.lucaswerkmeister.code.fiar.framework.Player;
 
@@ -27,7 +29,7 @@ import de.lucaswerkmeister.code.fiar.framework.Player;
  * @author Lucas Werkmeister
  * @version 1.0
  */
-public class ArrayBoard implements Board {
+public class ArrayBoard extends Board {
 	private final Player[][] board;
 
 	/**
@@ -48,8 +50,18 @@ public class ArrayBoard implements Board {
 	}
 
 	@Override
+	public Player getPlayerAt(Point position) {
+		return board[position.x][position.y];
+	}
+
+	@Override
 	public void setPlayerAt(int x, int y, Player p) {
 		board[x][y] = p;
+	}
+
+	@Override
+	public void setPlayerAt(Point position, Player p) {
+		board[position.x][position.y] = p;
 	}
 
 	@Override

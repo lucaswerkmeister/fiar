@@ -23,9 +23,14 @@ import java.awt.Color;
  * This player holds all fields that are blocked.
  * 
  * @author Lucas Werkmeister
- * @version 1.0 *
+ * @version 1.0
  */
 public class Block extends Player {
+	private static final Block instance = new Block();
+
+	private Block() {
+		// hide the constructor
+	}
 
 	@Override
 	public String getName() {
@@ -40,5 +45,9 @@ public class Block extends Player {
 	@Override
 	public int getID() {
 		return 0;
+	}
+
+	public static Block getInstance() {
+		return instance;
 	}
 }
