@@ -27,7 +27,7 @@ import de.lucaswerkmeister.code.fiar.framework.Player;
  * @author Lucas Werkmeister
  * @version 1.0
  */
-public class ArrayBoard implements Board, Cloneable {
+public class ArrayBoard implements Board {
 	private final Player[][] board;
 
 	/**
@@ -64,12 +64,9 @@ public class ArrayBoard implements Board, Cloneable {
 
 	@Override
 	public Board clone() {
-		try {
-			return (Board) super.clone();
-		} catch (CloneNotSupportedException e) {
-			// ArrayBoard implements Cloneable, so this should never happen
-			e.printStackTrace();
-			return null;
-		}
+		ArrayBoard ret = new ArrayBoard(getWidth(), getHeight());
+		for (int i = 0; i < ret.board.length; i++)
+			System.arraycopy(board[0], 0, ret.board[i], 0, board[i].length);
+		return ret;
 	}
 }

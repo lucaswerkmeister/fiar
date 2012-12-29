@@ -17,6 +17,8 @@
  */
 package de.lucaswerkmeister.code.fiar.defaultServer;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import de.lucaswerkmeister.code.fiar.framework.Board;
@@ -29,18 +31,24 @@ import de.lucaswerkmeister.code.fiar.framework.event.PlayerAction;
 /**
  * A server with a fixed {@link Client} and {@link Player} set, where each
  * player is bound to one client.
+ * <p>
+ * This server is not thread-safe.
  * 
  * @author Lucas Werkmeister
  * @version 1.0
  */
 public class FixedServer implements Server {
 	private final ClientPlayerPair[] pairs;
+	private final Client[] watchingClients;
 	private ArrayBoard board;
 
 	/**
 	 * Creates a new {@link FixedServer} instance. The players in
 	 * <code>players[i]</code> are bound to client <code>clients[i]</code> for
-	 * <code>int i < clients.length</code>.
+	 * <code>int i < players.length</code>. The condition
+	 * <code>players.length == clients.length</code> must be fulfilled; any
+	 * clients where the according players array is empty are "watching"
+	 * clients.
 	 * 
 	 * @param clients
 	 *            The clients that this server recognizes.
@@ -48,13 +56,16 @@ public class FixedServer implements Server {
 	 *            The players that this server recognizes.
 	 */
 	public FixedServer(Client[] clients, Player[][] players) {
-		pairs = new ClientPlayerPair[clients.length];
-		int c = 0;
-		for (int i = 0; i < pairs.length; i++) {
-			for (int j = 0; j < players[i].length; j++) {
-				pairs[c++] = new ClientPlayerPair(clients[i], players[i][j]);
-			}
-		}
+		List<ClientPlayerPair> pairsL = new LinkedList<>();
+		List<Client> watchingClientsL = new LinkedList<>();
+		for (int i = 0; i < clients.length; i++)
+			if (players[i].length == 0)
+				watchingClientsL.add(clients[i]);
+			else
+				for (int j = 0; j < players[i].length; j++)
+					pairsL.add(new ClientPlayerPair(clients[i], players[i][j]));
+		pairs = (ClientPlayerPair[]) pairsL.toArray();
+		watchingClients = (Client[]) watchingClientsL.toArray();
 	}
 
 	@Override
