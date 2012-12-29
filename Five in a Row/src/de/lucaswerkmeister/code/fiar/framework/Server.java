@@ -143,9 +143,11 @@ public abstract class Server {
 	 *            The action to perform.
 	 * @throws IllegalStateException
 	 *             If the action is currently not allowed.
+	 * @throws IllegalMoveException
+	 *             If an illegal move was made.
 	 */
 	public abstract void action(Client requester, PlayerAction action)
-			throws IllegalStateException;
+			throws IllegalStateException, IllegalMoveException;
 
 	/**
 	 * Gets the current board.

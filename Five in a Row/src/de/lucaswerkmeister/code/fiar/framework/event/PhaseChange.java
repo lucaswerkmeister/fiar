@@ -17,6 +17,8 @@
  */
 package de.lucaswerkmeister.code.fiar.framework.event;
 
+import java.util.Arrays;
+
 /**
  * Represents a change in the current game Phase.
  * 
@@ -33,7 +35,7 @@ public class PhaseChange extends GameEvent {
 	 *            The new Phase.
 	 */
 	public PhaseChange(int[] newPhase) {
-		this.newPhase = newPhase;
+		this.newPhase = Arrays.copyOf(newPhase, newPhase.length);
 	}
 
 	/**

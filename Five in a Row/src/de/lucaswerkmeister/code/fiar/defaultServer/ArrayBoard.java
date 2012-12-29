@@ -17,7 +17,9 @@
  */
 package de.lucaswerkmeister.code.fiar.defaultServer;
 
+import java.awt.Dimension;
 import java.awt.Point;
+import java.util.Arrays;
 
 import de.lucaswerkmeister.code.fiar.framework.Board;
 import de.lucaswerkmeister.code.fiar.framework.Player;
@@ -42,6 +44,16 @@ public class ArrayBoard extends Board {
 	 */
 	public ArrayBoard(int width, int height) {
 		board = new Player[width][height];
+	}
+
+	/**
+	 * Creates a new {@link ArrayBoard} with the specified dimension.
+	 * 
+	 * @param boardSize
+	 *            The size of the new ArrayBoard.
+	 */
+	public ArrayBoard(Dimension boardSize) {
+		this(boardSize.width, boardSize.height);
 	}
 
 	@Override
@@ -80,5 +92,27 @@ public class ArrayBoard extends Board {
 		for (int i = 0; i < ret.board.length; i++)
 			System.arraycopy(board[0], 0, ret.board[i], 0, board[i].length);
 		return ret;
+	}
+
+	/*
+	 * This should be a lot faster than the default implementation.
+	 * 
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.lucaswerkmeister.code.fiar.framework.Board#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object other) {
+		if (!(other instanceof ArrayBoard))
+			return super.equals(other);
+		ArrayBoard otherBoard = (ArrayBoard) other;
+		if (otherBoard.getWidth() != getWidth()
+				|| otherBoard.getHeight() != getHeight())
+			return false;
+		for (int i = 0; i < board.length; i++)
+			if (!Arrays.equals(board[i], otherBoard.board[i]))
+				return false;
+		return true;
 	}
 }

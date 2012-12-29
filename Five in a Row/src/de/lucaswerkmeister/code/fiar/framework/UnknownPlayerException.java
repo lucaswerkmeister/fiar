@@ -18,85 +18,83 @@
 package de.lucaswerkmeister.code.fiar.framework;
 
 /**
- * A {@link UnknownClientException} should be thrown by a {@link Server} method
- * to indicate that the server does not recognize the {@link Client}.
+ * A {@link UnknownPlayerException} should be thrown by a {@link Server} method
+ * to indicate that the server does not recognize the {@link Player}.
  * <p>
  * Note that the server is not required to throw this exception when
- * encountering an unknown client; it is only specified that <i>if</i> the
+ * encountering an unknown player; it is only specified that <i>if</i> the
  * server doesn't want to answer the request, it should throw this exception.
- * (For example, a server might allow anyone to poll the current phase, or adopt
- * new clients on-the-fly.)
+ * (For example, a server might adopt new players on-the-fly.)
  * 
  * @author Lucas Werkmeister
  * @version 1.0
  */
-public class UnknownClientException extends RuntimeException {
-
-	private static final long serialVersionUID = 8896967121002150097L;
-	private final Client unknownClient;
+public class UnknownPlayerException extends RuntimeException {
+	private static final long serialVersionUID = -3122140481713036479L;
+	private final Player unknownPlayer;
 
 	/**
-	 * A new {@link UnknownClientException} with the specified unknown client.
+	 * A new {@link UnknownPlayerException} with the specified unknown player.
 	 * 
-	 * @param unknownClient
-	 *            The unknown client.
+	 * @param unknownPlayer
+	 *            The unknown player.
 	 */
-	public UnknownClientException(Client unknownClient) {
+	public UnknownPlayerException(Player unknownPlayer) {
 		super();
-		this.unknownClient = unknownClient;
+		this.unknownPlayer = unknownPlayer;
 	}
 
 	/**
-	 * A new {@link UnknownClientException} with the specified unknown client
+	 * A new {@link UnknownPlayerException} with the specified unknown player
 	 * and message.
 	 * 
-	 * @param unknownClient
-	 *            The unknown client.
+	 * @param unknownPlayer
+	 *            The unknown player.
 	 * @param message
 	 *            The message.
 	 */
-	public UnknownClientException(Client unknownClient, String message) {
+	public UnknownPlayerException(Player unknownPlayer, String message) {
 		super(message);
-		this.unknownClient = unknownClient;
+		this.unknownPlayer = unknownPlayer;
 	}
 
 	/**
-	 * A new {@link UnknownClientException} with the specified unknown client
+	 * A new {@link UnknownPlayerException} with the specified unknown player
 	 * and cause.
 	 * 
-	 * @param unknownClient
-	 *            The unknown client.
+	 * @param unknownPlayer
+	 *            The unknown player.
 	 * @param cause
 	 *            The cause.
 	 */
-	public UnknownClientException(Client unknownClient, Throwable cause) {
+	public UnknownPlayerException(Player unknownPlayer, Throwable cause) {
 		super(cause);
-		this.unknownClient = unknownClient;
+		this.unknownPlayer = unknownPlayer;
 	}
 
 	/**
-	 * A new {@link UnknownClientException} with the specified unknown client,
+	 * A new {@link UnknownPlayerException} with the specified unknown player,
 	 * message and cause.
 	 * 
-	 * @param unknownClient
-	 *            The unknown client.
+	 * @param unknownPlayer
+	 *            The unknown player.
 	 * @param message
 	 *            The message.
 	 * @param cause
 	 *            The cause.
 	 */
-	public UnknownClientException(Client unknownClient, String message,
+	public UnknownPlayerException(Player unknownPlayer, String message,
 			Throwable cause) {
 		super(message, cause);
-		this.unknownClient = unknownClient;
+		this.unknownPlayer = unknownPlayer;
 	}
 
 	/**
-	 * A new {@link UnknownClientException} with the specified unknown client,
+	 * A new {@link UnknownPlayerException} with the specified unknown player,
 	 * message, cause, enableSuppression and writableStackTrace.
 	 * 
-	 * @param unknownClient
-	 *            The unknown client.
+	 * @param unknownPlayer
+	 *            The unknown player.
 	 * @param message
 	 *            The message.
 	 * @param cause
@@ -106,19 +104,19 @@ public class UnknownClientException extends RuntimeException {
 	 * @param writableStackTrace
 	 *            Whether or not the stack trace should be writable.
 	 */
-	public UnknownClientException(Client unknownClient, String message,
+	public UnknownPlayerException(Player unknownPlayer, String message,
 			Throwable cause, boolean enableSuppression,
 			boolean writableStackTrace) {
 		super(message, cause, enableSuppression, writableStackTrace);
-		this.unknownClient = unknownClient;
+		this.unknownPlayer = unknownPlayer;
 	}
 
 	/**
-	 * Gets the unknown client.
+	 * Gets the unknown player.
 	 * 
-	 * @return The unknown client.
+	 * @return The unknown player.
 	 */
-	public Client getUnknownClient() {
-		return unknownClient;
+	public Player getUnknownPlayer() {
+		return unknownPlayer;
 	}
 }
