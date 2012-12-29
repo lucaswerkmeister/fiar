@@ -93,6 +93,19 @@ public class Player {
 	}
 
 	/**
+	 * Returns <code>true</code> if this player or the other player is a Joker or if the two players are
+	 * {@link #equals(Object) equal}.
+	 * 
+	 * @param other
+	 *            The other Player instance.
+	 * @return <code>true</code> if the players are to be deemed equals when checking for winning moves,
+	 *         <code>false</code> otherwise.
+	 */
+	public boolean equalsWithJoker(Player other) {
+		return this instanceof Joker || other instanceof Joker || equals(other);
+	}
+
+	/**
 	 * A player's hash code is its {@link #getID() ID}.
 	 * 
 	 * @return The player's ID.

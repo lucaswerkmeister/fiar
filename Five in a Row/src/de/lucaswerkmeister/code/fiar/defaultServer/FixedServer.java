@@ -230,36 +230,40 @@ public class FixedServer extends Server {
 								0, equalStonesDownRight = 0, equalStonesDownLeft = 0, equalStonesUpRight = 0;
 						Point p = placeStone.getField();
 						for (; p.x - equalStonesLeft - 1 >= 0
-								&& board.getPlayerAt(p.x - equalStonesLeft - 1, p.y).equals(board.getPlayerAt(p)); equalStonesLeft++)
+								&& board.getPlayerAt(p.x - equalStonesLeft - 1, p.y).equalsWithJoker(
+										board.getPlayerAt(p)); equalStonesLeft++)
 							;
 						for (; p.x + equalStonesRight + 1 < board.getWidth()
-								&& board.getPlayerAt(p.x + equalStonesRight + 1, p.y).equals(board.getPlayerAt(p)); equalStonesRight++)
+								&& board.getPlayerAt(p.x + equalStonesRight + 1, p.y).equalsWithJoker(
+										board.getPlayerAt(p)); equalStonesRight++)
 							;
 						for (; p.y - equalStonesUp - 1 >= 0
-								&& board.getPlayerAt(p.x, p.y - equalStonesUp - 1).equals(board.getPlayerAt(p)); equalStonesUp++)
+								&& board.getPlayerAt(p.x, p.y - equalStonesUp - 1)
+										.equalsWithJoker(board.getPlayerAt(p)); equalStonesUp++)
 							;
 						for (; p.y + equalStonesDown + 1 < board.getHeight()
-								&& board.getPlayerAt(p.x, p.y + equalStonesDown + 1).equals(board.getPlayerAt(p)); equalStonesDown++)
+								&& board.getPlayerAt(p.x, p.y + equalStonesDown + 1).equalsWithJoker(
+										board.getPlayerAt(p)); equalStonesDown++)
 							;
 						for (; p.x - equalStonesUpLeft - 1 >= 0
 								&& p.y - equalStonesUpLeft - 1 >= 0
-								&& board.getPlayerAt(p.x - equalStonesUpLeft - 1, p.y - equalStonesUpLeft - 1).equals(
-										board.getPlayerAt(p)); equalStonesUpLeft++)
+								&& board.getPlayerAt(p.x - equalStonesUpLeft - 1, p.y - equalStonesUpLeft - 1)
+										.equalsWithJoker(board.getPlayerAt(p)); equalStonesUpLeft++)
 							;
 						for (; p.x + equalStonesDownRight + 1 < board.getWidth()
 								&& p.y + equalStonesDownRight + 1 < board.getHeight()
 								&& board.getPlayerAt(p.x + equalStonesDownRight + 1, p.y + equalStonesDownRight + 1)
-										.equals(board.getPlayerAt(p)); equalStonesDownRight++)
+										.equalsWithJoker(board.getPlayerAt(p)); equalStonesDownRight++)
 							;
 						for (; p.x - equalStonesDownLeft - 1 >= 0
 								&& p.y + equalStonesDownLeft + 1 < board.getHeight()
 								&& board.getPlayerAt(p.x - equalStonesDownLeft - 1, p.y + equalStonesDownLeft + 1)
-										.equals(board.getPlayerAt(p)); equalStonesDownLeft++)
+										.equalsWithJoker(board.getPlayerAt(p)); equalStonesDownLeft++)
 							;
 						for (; p.x + equalStonesUpRight + 1 < board.getWidth()
 								&& p.y - equalStonesUpRight - 1 >= 0
 								&& board.getPlayerAt(p.x + equalStonesUpRight + 1, p.y - equalStonesUpRight - 1)
-										.equals(board.getPlayerAt(p)); equalStonesUpRight++)
+										.equalsWithJoker(board.getPlayerAt(p)); equalStonesUpRight++)
 							;
 						if (equalStonesLeft + 1 + equalStonesRight >= IN_A_ROW
 								|| equalStonesUp + 1 + equalStonesDown >= IN_A_ROW

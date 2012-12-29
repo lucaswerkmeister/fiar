@@ -151,7 +151,7 @@ public class ConsoleClient extends Client implements Runnable {
 					for (Point p : parseCoordinates(input)) {
 						if (server.getCurrentBoard(this).getPlayerAt(p) == Joker.getInstance())
 							server.action(this, new UnjokerField(p1, p));
-						else if (server.getCurrentBoard(this).getPlayerAt(p) != null) {
+						else if (!server.getCurrentBoard(this).getPlayerAt(p).equals(NoPlayer.getInstance())) {
 							System.out.println("That field is already in use! Please enter another field.");
 							input = inputReader.readLine();
 							continue;
