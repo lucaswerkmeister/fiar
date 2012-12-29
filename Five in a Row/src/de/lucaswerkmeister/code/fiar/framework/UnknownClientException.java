@@ -18,14 +18,12 @@
 package de.lucaswerkmeister.code.fiar.framework;
 
 /**
- * A {@link UnknownClientException} should be thrown by a {@link Server} method
- * to indicate that the server does not recognize the {@link Client}.
+ * A {@link UnknownClientException} should be thrown by a {@link Server} method to indicate that the server does not
+ * recognize the {@link Client}.
  * <p>
- * Note that the server is not required to throw this exception when
- * encountering an unknown client; it is only specified that <i>if</i> the
- * server doesn't want to answer the request, it should throw this exception.
- * (For example, a server might allow anyone to poll the current phase, or adopt
- * new clients on-the-fly.)
+ * Note that the server is not required to throw this exception when encountering an unknown client; it is only
+ * specified that <i>if</i> the server doesn't want to answer the request, it should throw this exception. (For example,
+ * a server might allow anyone to poll the current phase, or adopt new clients on-the-fly.)
  * 
  * @author Lucas Werkmeister
  * @version 1.0
@@ -47,8 +45,7 @@ public class UnknownClientException extends RuntimeException {
 	}
 
 	/**
-	 * A new {@link UnknownClientException} with the specified unknown client
-	 * and message.
+	 * A new {@link UnknownClientException} with the specified unknown client and message.
 	 * 
 	 * @param unknownClient
 	 *            The unknown client.
@@ -61,8 +58,7 @@ public class UnknownClientException extends RuntimeException {
 	}
 
 	/**
-	 * A new {@link UnknownClientException} with the specified unknown client
-	 * and cause.
+	 * A new {@link UnknownClientException} with the specified unknown client and cause.
 	 * 
 	 * @param unknownClient
 	 *            The unknown client.
@@ -75,8 +71,7 @@ public class UnknownClientException extends RuntimeException {
 	}
 
 	/**
-	 * A new {@link UnknownClientException} with the specified unknown client,
-	 * message and cause.
+	 * A new {@link UnknownClientException} with the specified unknown client, message and cause.
 	 * 
 	 * @param unknownClient
 	 *            The unknown client.
@@ -85,15 +80,14 @@ public class UnknownClientException extends RuntimeException {
 	 * @param cause
 	 *            The cause.
 	 */
-	public UnknownClientException(Client unknownClient, String message,
-			Throwable cause) {
+	public UnknownClientException(Client unknownClient, String message, Throwable cause) {
 		super(message, cause);
 		this.unknownClient = unknownClient;
 	}
 
 	/**
-	 * A new {@link UnknownClientException} with the specified unknown client,
-	 * message, cause, enableSuppression and writableStackTrace.
+	 * A new {@link UnknownClientException} with the specified unknown client, message, cause, enableSuppression and
+	 * writableStackTrace.
 	 * 
 	 * @param unknownClient
 	 *            The unknown client.
@@ -106,8 +100,7 @@ public class UnknownClientException extends RuntimeException {
 	 * @param writableStackTrace
 	 *            Whether or not the stack trace should be writable.
 	 */
-	public UnknownClientException(Client unknownClient, String message,
-			Throwable cause, boolean enableSuppression,
+	public UnknownClientException(Client unknownClient, String message, Throwable cause, boolean enableSuppression,
 			boolean writableStackTrace) {
 		super(message, cause, enableSuppression, writableStackTrace);
 		this.unknownClient = unknownClient;

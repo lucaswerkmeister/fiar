@@ -1,9 +1,8 @@
 package de.lucaswerkmeister.code.fiar.framework;
 
 /**
- * This exception should be thrown by server methods to indicate that a move
- * made by a player is illegal - e.&thinsp;g. he tried to place a stone on a
- * field that is already occupied.
+ * This exception should be thrown by server methods to indicate that a move made by a player is illegal - e.&thinsp;g.
+ * he tried to place a stone on a field that is already occupied.
  * 
  * @author Lucas Werkmeister
  * @version 1.0

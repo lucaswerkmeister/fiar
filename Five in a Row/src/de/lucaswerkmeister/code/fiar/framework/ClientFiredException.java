@@ -18,8 +18,8 @@
 package de.lucaswerkmeister.code.fiar.framework;
 
 /**
- * A {@link ClientFiredException} should be thrown by a {@link Server} method to
- * indicate that the server no longer supports the {@link Client}.
+ * A {@link ClientFiredException} should be thrown by a {@link Server} method to indicate that the server no longer
+ * supports the {@link Client}.
  * 
  * @author Lucas Werkmeister
  * @version 1.0
@@ -39,8 +39,7 @@ public class ClientFiredException extends UnknownClientException {
 	}
 
 	/**
-	 * A new {@link ClientFiredException} with the specified fired client and
-	 * message.
+	 * A new {@link ClientFiredException} with the specified fired client and message.
 	 * 
 	 * @param firedClient
 	 *            The fired client.
@@ -52,8 +51,7 @@ public class ClientFiredException extends UnknownClientException {
 	}
 
 	/**
-	 * A new {@link ClientFiredException} with the specified fired client and
-	 * cause.
+	 * A new {@link ClientFiredException} with the specified fired client and cause.
 	 * 
 	 * @param firedClient
 	 *            The fired client.
@@ -65,8 +63,7 @@ public class ClientFiredException extends UnknownClientException {
 	}
 
 	/**
-	 * A new {@link ClientFiredException} with the specified fired client, cause
-	 * and message.
+	 * A new {@link ClientFiredException} with the specified fired client, cause and message.
 	 * 
 	 * @param firedClient
 	 *            The fired client.
@@ -75,14 +72,13 @@ public class ClientFiredException extends UnknownClientException {
 	 * @param cause
 	 *            The cause.
 	 */
-	public ClientFiredException(Client firedClient, String message,
-			Throwable cause) {
+	public ClientFiredException(Client firedClient, String message, Throwable cause) {
 		super(firedClient, message, cause);
 	}
 
 	/**
-	 * A new {@link ClientFiredException} with the specified fired client,
-	 * message, cause, enableSuppression and writableStackTrace.
+	 * A new {@link ClientFiredException} with the specified fired client, message, cause, enableSuppression and
+	 * writableStackTrace.
 	 * 
 	 * @param firedClient
 	 *            The fired client.
@@ -95,11 +91,9 @@ public class ClientFiredException extends UnknownClientException {
 	 * @param writableStackTrace
 	 *            Whether or not the stack trace should be writable.
 	 */
-	public ClientFiredException(Client firedClient, String message,
-			Throwable cause, boolean enableSuppression,
+	public ClientFiredException(Client firedClient, String message, Throwable cause, boolean enableSuppression,
 			boolean writableStackTrace) {
-		super(firedClient, message, cause, enableSuppression,
-				writableStackTrace);
+		super(firedClient, message, cause, enableSuppression, writableStackTrace);
 	}
 
 	/**

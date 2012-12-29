@@ -27,8 +27,7 @@ import java.awt.Point;
  */
 public abstract class Board {
 	/**
-	 * Gets the player that occupies the field at (x,y), or <code>null</code> if
-	 * that field is still free.
+	 * Gets the player that occupies the field at (x,y), or <code>null</code> if that field is still free.
 	 * 
 	 * @param x
 	 *            The x coordinate of the field.
@@ -39,8 +38,8 @@ public abstract class Board {
 	public abstract Player getPlayerAt(int x, int y);
 
 	/**
-	 * Gets the player that occupies the field at the specified position, or
-	 * <code>null</code> if that field is still free.
+	 * Gets the player that occupies the field at the specified position, or <code>null</code> if that field is still
+	 * free.
 	 * 
 	 * @param position
 	 *            The position of the field.
@@ -61,8 +60,7 @@ public abstract class Board {
 	public abstract void setPlayerAt(int x, int y, Player p);
 
 	/**
-	 * Sets the player that occupies the field at the specified position to the
-	 * specified player.
+	 * Sets the player that occupies the field at the specified position to the specified player.
 	 * 
 	 * @param position
 	 *            The position of the field.
@@ -89,23 +87,20 @@ public abstract class Board {
 	public abstract Board clone();
 
 	/**
-	 * Two boards are equal if and only if they have the same size and return
-	 * the same player at every field.
+	 * Two boards are equal if and only if they have the same size and return the same player at every field.
 	 */
 	@Override
 	public boolean equals(Object other) {
 		if (!(other instanceof Board))
 			return false;
 		Board otherBoard = (Board) other;
-		if (getWidth() != otherBoard.getWidth()
-				|| getHeight() != otherBoard.getHeight())
+		if (getWidth() != otherBoard.getWidth() || getHeight() != otherBoard.getHeight())
 			return false;
 		for (int x = 0; x < getWidth(); x++)
 			for (int y = 0; y < getHeight(); y++) {
 				final Player p1 = getPlayerAt(x, y);
 				final Player p2 = otherBoard.getPlayerAt(x, y);
-				if ((p1 == null && p2 != null) || (p1 != null && p2 == null)
-						|| !p1.equals(p2))
+				if ((p1 == null && p2 != null) || (p1 != null && p2 == null) || !p1.equals(p2))
 					return false;
 			}
 		return true;

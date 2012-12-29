@@ -18,13 +18,12 @@
 package de.lucaswerkmeister.code.fiar.framework;
 
 /**
- * A {@link UnknownPlayerException} should be thrown by a {@link Server} method
- * to indicate that the server does not recognize the {@link Player}.
+ * A {@link UnknownPlayerException} should be thrown by a {@link Server} method to indicate that the server does not
+ * recognize the {@link Player}.
  * <p>
- * Note that the server is not required to throw this exception when
- * encountering an unknown player; it is only specified that <i>if</i> the
- * server doesn't want to answer the request, it should throw this exception.
- * (For example, a server might adopt new players on-the-fly.)
+ * Note that the server is not required to throw this exception when encountering an unknown player; it is only
+ * specified that <i>if</i> the server doesn't want to answer the request, it should throw this exception. (For example,
+ * a server might adopt new players on-the-fly.)
  * 
  * @author Lucas Werkmeister
  * @version 1.0
@@ -45,8 +44,7 @@ public class UnknownPlayerException extends RuntimeException {
 	}
 
 	/**
-	 * A new {@link UnknownPlayerException} with the specified unknown player
-	 * and message.
+	 * A new {@link UnknownPlayerException} with the specified unknown player and message.
 	 * 
 	 * @param unknownPlayer
 	 *            The unknown player.
@@ -59,8 +57,7 @@ public class UnknownPlayerException extends RuntimeException {
 	}
 
 	/**
-	 * A new {@link UnknownPlayerException} with the specified unknown player
-	 * and cause.
+	 * A new {@link UnknownPlayerException} with the specified unknown player and cause.
 	 * 
 	 * @param unknownPlayer
 	 *            The unknown player.
@@ -73,8 +70,7 @@ public class UnknownPlayerException extends RuntimeException {
 	}
 
 	/**
-	 * A new {@link UnknownPlayerException} with the specified unknown player,
-	 * message and cause.
+	 * A new {@link UnknownPlayerException} with the specified unknown player, message and cause.
 	 * 
 	 * @param unknownPlayer
 	 *            The unknown player.
@@ -83,15 +79,14 @@ public class UnknownPlayerException extends RuntimeException {
 	 * @param cause
 	 *            The cause.
 	 */
-	public UnknownPlayerException(Player unknownPlayer, String message,
-			Throwable cause) {
+	public UnknownPlayerException(Player unknownPlayer, String message, Throwable cause) {
 		super(message, cause);
 		this.unknownPlayer = unknownPlayer;
 	}
 
 	/**
-	 * A new {@link UnknownPlayerException} with the specified unknown player,
-	 * message, cause, enableSuppression and writableStackTrace.
+	 * A new {@link UnknownPlayerException} with the specified unknown player, message, cause, enableSuppression and
+	 * writableStackTrace.
 	 * 
 	 * @param unknownPlayer
 	 *            The unknown player.
@@ -104,8 +99,7 @@ public class UnknownPlayerException extends RuntimeException {
 	 * @param writableStackTrace
 	 *            Whether or not the stack trace should be writable.
 	 */
-	public UnknownPlayerException(Player unknownPlayer, String message,
-			Throwable cause, boolean enableSuppression,
+	public UnknownPlayerException(Player unknownPlayer, String message, Throwable cause, boolean enableSuppression,
 			boolean writableStackTrace) {
 		super(message, cause, enableSuppression, writableStackTrace);
 		this.unknownPlayer = unknownPlayer;

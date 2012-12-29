@@ -39,7 +39,10 @@ import de.lucaswerkmeister.code.fiar.framework.event.BlockField;
 import de.lucaswerkmeister.code.fiar.framework.event.BoardSizeProposal;
 import de.lucaswerkmeister.code.fiar.framework.event.FieldAction;
 import de.lucaswerkmeister.code.fiar.framework.event.GameEvent;
+import de.lucaswerkmeister.code.fiar.framework.event.JokerDistributionAccepted;
+import de.lucaswerkmeister.code.fiar.framework.event.JokerField;
 import de.lucaswerkmeister.code.fiar.framework.event.UnblockField;
+import de.lucaswerkmeister.code.fiar.framework.event.UnjokerField;
 
 /**
  * A Client that runs in the console and handles two players.
@@ -85,7 +88,9 @@ public class ConsoleClient extends Client implements Runnable {
 			eventQueue.poll(); // BoardSizeProposal
 			eventQueue.poll(); // BoardSizeProposal
 			eventQueue.poll(); // PhaseChange
-			System.out.println("You may now mark certain fields as blocked.");
+			// Set Blocks
+			System.out.println("You may now mark certain fields as blocked:");
+			System.out.println("A blocked field will not count as part of a row for any player.");
 			System.out
 					.println("Please enter the coordinates of fields you wish to block (x|y) or \"quit\" to continue.");
 			System.out.println("Enter the same coordinates again to unblock a field again.");
@@ -115,10 +120,46 @@ public class ConsoleClient extends Client implements Runnable {
 			server.action(this, new BlockDistributionAccepted(p2, server.getCurrentBoard(this)));
 			eventQueue.poll(); // BlockDistributionAccepted
 			eventQueue.poll(); // BlockDistributionAccepted
+			eventQueue.poll(); // PhaseChange
+			// Set Jokers
+			System.out.println("You may now mark certain fields as joker fields:");
+			System.out.println("A joker field will count as part of a row for every player.");
+			System.out
+					.println("Please enter the coordinates of fields you wish to set as joker (x|y) or \"quit\" to continue.");
+			System.out.println("Enter the same coordinates again to \"un-joker\" a field again.");
+			input = inputReader.readLine();
+			while (!(input.equalsIgnoreCase("quit") || input.equalsIgnoreCase("exit") || input
+					.equalsIgnoreCase("leave"))) {
+				try {
+					for (Point p : parseCoordinates(input)) {
+						if (server.getCurrentBoard(this).getPlayerAt(p) == Joker.getInstance())
+							server.action(this, new UnjokerField(p1, p.x, p.y));
+						else if (server.getCurrentBoard(this).getPlayerAt(p) != null) {
+							System.out.println("That field is already in use! Please enter another field.");
+							input = inputReader.readLine();
+							continue;
+						} else
+							server.action(this, new JokerField(p1, p.x, p.y));
+						GameEvent event = eventQueue.poll(); // (Un)JokerField
+						if (event instanceof JokerField)
+							System.out.println("Field " + p.x + "|" + p.y + " marked as joker field.");
+						else if (event instanceof UnjokerField)
+							System.out.println("Field " + p.x + "|" + p.y + " unmarked as joker field.");
+						else
+							throw new Exception("Unexpected event during \"Joker fields\" phase.");
+					}
+				} catch (IllegalArgumentException e) {
+					System.out.println("Invalid input. Please re-type the coordinates, but in a different format.");
+				}
+				input = inputReader.readLine();
+			}
+			server.action(this, new JokerDistributionAccepted(p1, server.getCurrentBoard(this)));
+			server.action(this, new JokerDistributionAccepted(p2, server.getCurrentBoard(this)));
+			eventQueue.poll(); // JokerDistributionAccepted
+			eventQueue.poll(); // JokerDistributionAccepted
+			eventQueue.poll(); // PhaseChange
 
 		} catch (Throwable t) {
-			if (t instanceof ThreadDeath)
-				System.out.println("K-k-k-kill m-m-meee");
 			System.out.println("WHOOPS! An internal error occured. I'm so sorry.");
 			t.printStackTrace();
 			if (t instanceof ThreadDeath)

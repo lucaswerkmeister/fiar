@@ -21,8 +21,7 @@ import de.lucaswerkmeister.code.fiar.framework.Board;
 import de.lucaswerkmeister.code.fiar.framework.Player;
 
 /**
- * Indicates that the player accepts the distribution of "joker" fields as it is
- * saved in this instance.
+ * Indicates that the player accepts the distribution of "joker" fields as it is saved in this instance.
  * 
  * @author Lucas Werkmeister
  * @version 1.0
@@ -30,8 +29,7 @@ import de.lucaswerkmeister.code.fiar.framework.Player;
 public class JokerDistributionAccepted extends StoneDistributionAccepted {
 
 	/**
-	 * A new {@link JokerDistributionAccepted} by the specified player with the
-	 * specified board.
+	 * A new {@link JokerDistributionAccepted} by the specified player with the specified board.
 	 * 
 	 * @param acceptingPlayer
 	 *            The player that accepts the distribution.

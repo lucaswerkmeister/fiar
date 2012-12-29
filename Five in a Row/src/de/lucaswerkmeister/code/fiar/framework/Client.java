@@ -21,8 +21,7 @@ import de.lucaswerkmeister.code.fiar.framework.event.GameEvent;
 import de.lucaswerkmeister.code.fiar.framework.event.PlayerAction;
 
 /**
- * A Client is responsible for any interaction with Players, be they actual
- * players or computer players.
+ * A Client is responsible for any interaction with Players, be they actual players or computer players.
  * 
  * @author Lucas Werkmeister
  * @version 1.1
@@ -31,11 +30,10 @@ public abstract class Client {
 	/**
 	 * Sends a {@link GameEvent} to the client.
 	 * <p>
-	 * Implementation of this method is purely optional; a client may choose to
-	 * silently ignore any or all game events passed. For some events, however,
-	 * this means that the client has to constantly poll the server (for
-	 * example, if it doesn't listen to foreign {@link PlayerAction}s), which is
-	 * undesirable and may even provoke the server to fire the client.
+	 * Implementation of this method is purely optional; a client may choose to silently ignore any or all game events
+	 * passed. For some events, however, this means that the client has to constantly poll the server (for example, if
+	 * it doesn't listen to foreign {@link PlayerAction}s), which is undesirable and may even provoke the server to fire
+	 * the client.
 	 * 
 	 * @param e
 	 *            The game event.
@@ -43,8 +41,8 @@ public abstract class Client {
 	public abstract void gameEvent(GameEvent e);
 
 	/**
-	 * Gets the client's unique ID. If two different {@link Client} instances
-	 * return the same ID, the server's behavior is unspecified.
+	 * Gets the client's unique ID. If two different {@link Client} instances return the same ID, the server's behavior
+	 * is unspecified.
 	 * 
 	 * @return The client's ID.
 	 */
@@ -55,8 +53,8 @@ public abstract class Client {
 	 * 
 	 * @param other
 	 *            The other Client instance.
-	 * @return <code>true</code> if this instance and the other instance are the
-	 *         same instance, <code>false</code> otherwise.
+	 * @return <code>true</code> if this instance and the other instance are the same instance, <code>false</code>
+	 *         otherwise.
 	 */
 	public final boolean equals(Object other) {
 		return this == other;
