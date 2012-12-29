@@ -20,49 +20,71 @@ package de.lucaswerkmeister.code.fiar.framework;
 import java.awt.Color;
 
 /**
- * This class is only used to identify players and determine their
- * representation for clients; it does not perform any game logic.
+ * This class is only used to identify players and determine their representation for clients; it does not perform any
+ * game logic.
  * 
  * @author Lucas Werkmeister
- * @version 1.1
+ * @version 1.2
  */
-public abstract class Player {
+public class Player {
+	private final String name;
+	private final Color color;
+	private final int id;
+
+	/**
+	 * Creates a new {@link Player} with the specified properties.
+	 * 
+	 * @param name
+	 *            The player's name.
+	 * @param color
+	 *            The player's color.
+	 * @param id
+	 *            The player's ID. The caller is responsible for ensuring uniqueness of this ID (see {@link #getID()}).
+	 */
+	public Player(String name, Color color, int id) {
+		this.name = name;
+		this.color = color;
+		this.id = id;
+	}
+
 	/**
 	 * Gets the player's name.
 	 * 
 	 * @return The player's name.
 	 */
-	public abstract String getName();
+	public String getName() {
+		return name;
+	}
 
 	/**
 	 * Gets the player's color.
 	 * 
 	 * @return The player's color.
 	 */
-	public abstract Color getColor();
+	public Color getColor() {
+		return color;
+	}
 
 	/**
 	 * Gets the player's unique ID.
 	 * <p>
-	 * If two different {@link Player} instances return the same ID, the server
-	 * treats them as equal; the clients' behavior if these instances differ in
-	 * name and/or color is unspecified.
+	 * If two different {@link Player} instances return the same ID, the server treats them as equal; the clients'
+	 * behavior if these instances differ in name and/or color is unspecified.
 	 * <p>
-	 * A player's ID must always be positive, as negative values and
-	 * <code>0</code> are used by the server.
+	 * A player's ID must always be positive, as negative values and <code>0</code> are used by the server.
 	 * 
 	 * @return The player's ID.
 	 */
-	public abstract int getID();
+	public int getID() {
+		return id;
+	}
 
 	/**
-	 * Two players are equal if and only if their {@link #getID() IDs} are
-	 * equal.
+	 * Two players are equal if and only if their {@link #getID() IDs} are equal.
 	 * 
 	 * @param other
 	 *            The other Player instance.
-	 * @return <code>true</code> if this player's ID is equal to the other
-	 *         player's ID, <code>false</code> otherwise.
+	 * @return <code>true</code> if this player's ID is equal to the other player's ID, <code>false</code> otherwise.
 	 */
 	public boolean equals(Object other) {
 		if (other instanceof Player)

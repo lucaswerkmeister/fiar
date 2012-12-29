@@ -23,28 +23,18 @@ import java.awt.Color;
  * This player holds all fields that are "Joker" fields.
  * 
  * @author Lucas Werkmeister
- * @version 1.0
+ * @version 1.1
  */
 public class Joker extends Player {
+	public static final int ID = -2;
 	private static final Joker instance = new Joker();
 
 	private Joker() {
-		// hide the constructor
+		super("Joker", Color.green, ID);
 	}
 
-	@Override
-	public String getName() {
-		return "Joker";
-	}
-
-	@Override
-	public Color getColor() {
-		return Color.green;
-	}
-
-	@Override
-	public int getID() {
-		return -1;
+	private Joker(String name, Color color, int id) { // hide super constructor
+		super(name, color, id);
 	}
 
 	public static Joker getInstance() {

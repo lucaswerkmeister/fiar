@@ -23,28 +23,18 @@ import java.awt.Color;
  * This player holds all fields that are blocked.
  * 
  * @author Lucas Werkmeister
- * @version 1.0
+ * @version 1.1
  */
 public class Block extends Player {
+	public static final int ID = -1;
 	private static final Block instance = new Block();
 
 	private Block() {
-		// hide the constructor
+		super("Blocked", Color.red, ID);
 	}
 
-	@Override
-	public String getName() {
-		return "Blocked";
-	}
-
-	@Override
-	public Color getColor() {
-		return Color.red;
-	}
-
-	@Override
-	public int getID() {
-		return 0;
+	private Block(String name, Color color, int id) { // hide super constructor
+		super(name, color, id);
 	}
 
 	public static Block getInstance() {

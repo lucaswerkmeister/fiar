@@ -25,8 +25,7 @@ import de.lucaswerkmeister.code.fiar.framework.Board;
 import de.lucaswerkmeister.code.fiar.framework.Player;
 
 /**
- * An implementation of the {@link Board} interface that uses an array for
- * internal representation of the board.
+ * An implementation of the {@link Board} interface that uses an array for internal representation of the board.
  * 
  * @author Lucas Werkmeister
  * @version 1.0
@@ -90,7 +89,7 @@ public class ArrayBoard extends Board {
 	public Board clone() {
 		ArrayBoard ret = new ArrayBoard(getWidth(), getHeight());
 		for (int i = 0; i < ret.board.length; i++)
-			System.arraycopy(board[0], 0, ret.board[i], 0, board[i].length);
+			System.arraycopy(board[i], 0, ret.board[i], 0, board[i].length);
 		return ret;
 	}
 
@@ -99,16 +98,14 @@ public class ArrayBoard extends Board {
 	 * 
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * de.lucaswerkmeister.code.fiar.framework.Board#equals(java.lang.Object)
+	 * @see de.lucaswerkmeister.code.fiar.framework.Board#equals(java.lang.Object)
 	 */
 	@Override
 	public boolean equals(Object other) {
 		if (!(other instanceof ArrayBoard))
 			return super.equals(other);
 		ArrayBoard otherBoard = (ArrayBoard) other;
-		if (otherBoard.getWidth() != getWidth()
-				|| otherBoard.getHeight() != getHeight())
+		if (otherBoard.getWidth() != getWidth() || otherBoard.getHeight() != getHeight())
 			return false;
 		for (int i = 0; i < board.length; i++)
 			if (!Arrays.equals(board[i], otherBoard.board[i]))

@@ -86,7 +86,7 @@ public class FixedServer extends Server {
 			if (players[i].length > 0)
 				for (int j = 0; j < players[i].length; j++)
 					pairsL.add(new ClientPlayerPair(clients[i], players[i][j]));
-		pairs = (ClientPlayerPair[]) pairsL.toArray();
+		pairs = pairsL.toArray(new ClientPlayerPair[] {});
 		allClients = new Client[clients.length];
 		System.arraycopy(clients, 0, allClients, 0, clients.length);
 		phase = new int[] {0, 0 };
@@ -170,6 +170,7 @@ public class FixedServer extends Server {
 				case 0:
 					boardSizeProposals.add((BoardSizeProposal) action);
 					currentBoardSize = ((BoardSizeProposal) action).getSize();
+					fireEvent(action);
 					if (boardSizeAgreed()) {
 						board = new ArrayBoard(currentBoardSize);
 						acceptedBlockDistributions = new HashSet<>();
@@ -184,6 +185,7 @@ public class FixedServer extends Server {
 						board.setPlayerAt(((FieldAction) action).getField(), null);
 					else
 						acceptedBlockDistributions.add((BlockDistributionAccepted) action);
+					fireEvent(action);
 					if (blockDistributionAgreed()) {
 						acceptedBlockDistributions = null; // free memory
 						acceptedJokerDistributions = new HashSet<>();
@@ -198,6 +200,7 @@ public class FixedServer extends Server {
 						board.setPlayerAt(((FieldAction) action).getField(), null);
 					else
 						acceptedJokerDistributions.add((JokerDistributionAccepted) action);
+					fireEvent(action);
 					if (jokerDistributionAgreed()) {
 						acceptedJokerDistributions = null; // free memory
 						phase = new int[] {1, 1, pairs[0].player.getID() };
@@ -218,9 +221,11 @@ public class FixedServer extends Server {
 							throw new IllegalMoveException("Field is already occupied by "
 									+ board.getPlayerAt(placeStone.getField()).getName() + "!");
 						board.setPlayerAt(placeStone.getField(), placeStone.getActingPlayer());
+						fireEvent(action);
 
 						// check to see if it was a winning move
-						int equalStonesLeft = 0, equalStonesRight = 0, equalStonesUp = 0, equalStonesDown = 0, equalStonesUpLeft = 0, equalStonesDownRight = 0, equalStonesDownLeft = 0, equalStonesUpRight = 0;
+						int equalStonesLeft = 0, equalStonesRight = 0, equalStonesUp = 0, equalStonesDown = 0, equalStonesUpLeft =
+								0, equalStonesDownRight = 0, equalStonesDownLeft = 0, equalStonesUpRight = 0;
 						Point p = placeStone.getField();
 						for (; p.x - equalStonesLeft - 1 >= 0
 								&& board.getPlayerAt(p.x - equalStonesLeft - 1, p.y).equals(board.getPlayerAt(p)); equalStonesLeft++)
