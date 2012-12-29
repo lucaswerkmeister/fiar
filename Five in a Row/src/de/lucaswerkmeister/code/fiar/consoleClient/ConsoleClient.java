@@ -82,7 +82,20 @@ public class ConsoleClient extends Client implements Runnable {
 		try (BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in))) {
 			System.out.println("Welcome to Five in a Row!");
 			System.out.println("Please enter the field size: ");
-			int boardSize = Integer.parseInt(inputReader.readLine());
+			int boardSize = 0;
+			do {
+				try {
+					boardSize = Integer.parseInt(inputReader.readLine());
+					if (boardSize < FixedServer.IN_A_ROW) {
+						System.out.println("Board size must be at least " + FixedServer.IN_A_ROW + ", please re-type.");
+						continue;
+					}
+					break;
+				} catch (NumberFormatException e) {
+					System.out.println("Invalid input - please re-type.");
+					continue;
+				}
+			} while (true);
 			server.action(this, new BoardSizeProposal(p1, new Dimension(boardSize, boardSize)));
 			server.action(this, new BoardSizeProposal(p2, new Dimension(boardSize, boardSize)));
 			eventQueue.poll(); // BoardSizeProposal

@@ -68,7 +68,7 @@ public class FixedServer extends Server {
 	private Set<BlockDistributionAccepted> acceptedBlockDistributions;
 	private Set<JokerDistributionAccepted> acceptedJokerDistributions;
 
-	private static final int IN_A_ROW = 5;
+	public static final int IN_A_ROW = 5;
 
 	/**
 	 * Creates a new {@link FixedServer} instance. The players in <code>players[i]</code> are bound to client
