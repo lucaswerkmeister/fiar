@@ -17,11 +17,12 @@
  */
 package de.lucaswerkmeister.code.fiar.framework.event;
 
+import java.awt.Point;
+
 import de.lucaswerkmeister.code.fiar.framework.Player;
 
 /**
- * Indicates that a player has marked a field as unblocked. Only allowed during
- * "Block fields" phase.
+ * Indicates that a player has marked a field as unblocked. Only allowed during "Block fields" phase.
  * 
  * @author Lucas Werkmeister
  * @version 1.0
@@ -30,8 +31,7 @@ import de.lucaswerkmeister.code.fiar.framework.Player;
 public class UnblockField extends FieldAction {
 
 	/**
-	 * A new {@link UnblockField} by the specified player on the specified
-	 * field.
+	 * A new {@link UnblockField} by the specified player on the specified field.
 	 * 
 	 * @param actingPlayer
 	 *            The acting player.
@@ -43,5 +43,17 @@ public class UnblockField extends FieldAction {
 
 	public UnblockField(Player actingPlayer, int x, int y) {
 		super(actingPlayer, x, y);
+	}
+
+	/**
+	 * A new {@link UnblockField} by the specified player on the specified field.
+	 * 
+	 * @param actingPlayer
+	 *            The acting player.
+	 * @param point
+	 *            The modified field.
+	 */
+	public UnblockField(Player actingPlayer, Point point) {
+		super(actingPlayer, point);
 	}
 }

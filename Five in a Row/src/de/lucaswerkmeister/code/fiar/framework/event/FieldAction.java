@@ -47,6 +47,18 @@ public abstract class FieldAction extends PlayerAction {
 	}
 
 	/**
+	 * A new {@link FieldAction} by the specified player on the specified field.
+	 * 
+	 * @param actingPlayer
+	 *            The acting player.
+	 * @param point
+	 *            The modified field.
+	 */
+	public FieldAction(Player actingPlayer, Point point) {
+		this(actingPlayer, point.x, point.y);
+	}
+
+	/**
 	 * Gets the field that was acted upon.
 	 * 
 	 * @return The field.

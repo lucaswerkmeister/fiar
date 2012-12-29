@@ -17,11 +17,12 @@
  */
 package de.lucaswerkmeister.code.fiar.framework.event;
 
+import java.awt.Point;
+
 import de.lucaswerkmeister.code.fiar.framework.Player;
 
 /**
- * Indicates that a player marked a field as Joker field. Only allowed during
- * "Set joker fields" phase.
+ * Indicates that a player marked a field as Joker field. Only allowed during "Set joker fields" phase.
  * 
  * @author Lucas Werkmeister
  * @version 1.0
@@ -40,5 +41,17 @@ public class JokerField extends FieldAction {
 	 */
 	public JokerField(Player actingPlayer, int x, int y) {
 		super(actingPlayer, x, y);
+	}
+
+	/**
+	 * A new {@link JokerField} by the specified player on the specified field.
+	 * 
+	 * @param actingPlayer
+	 *            The acting player.
+	 * @param point
+	 *            The modified field.
+	 */
+	public JokerField(Player actingPlayer, Point point) {
+		super(actingPlayer, point);
 	}
 }

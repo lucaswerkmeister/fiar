@@ -17,11 +17,12 @@
  */
 package de.lucaswerkmeister.code.fiar.framework.event;
 
+import java.awt.Point;
+
 import de.lucaswerkmeister.code.fiar.framework.Player;
 
 /**
- * Indicates that a player unmarked a field as Joker field. Only allowed during
- * "set joker fields" phase.
+ * Indicates that a player unmarked a field as Joker field. Only allowed during "set joker fields" phase.
  * 
  * @author Lucas Werkmeister
  * @version 1.0
@@ -29,8 +30,7 @@ import de.lucaswerkmeister.code.fiar.framework.Player;
 public class UnjokerField extends FieldAction {
 
 	/**
-	 * A new {@link UnjokerField} by the specified player on the specified
-	 * field.
+	 * A new {@link UnjokerField} by the specified player on the specified field.
 	 * 
 	 * @param actingPlayer
 	 *            The acting player.
@@ -41,5 +41,17 @@ public class UnjokerField extends FieldAction {
 	 */
 	public UnjokerField(Player actingPlayer, int x, int y) {
 		super(actingPlayer, x, y);
+	}
+
+	/**
+	 * A new {@link UnjokerField} by the specified player on the specified field.
+	 * 
+	 * @param actingPlayer
+	 *            The acting player.
+	 * @param point
+	 *            The modified field.
+	 */
+	public UnjokerField(Player actingPlayer, Point point) {
+		super(actingPlayer, point);
 	}
 }

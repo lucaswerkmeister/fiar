@@ -27,23 +27,22 @@ import java.awt.Point;
  */
 public abstract class Board {
 	/**
-	 * Gets the player that occupies the field at (x,y), or <code>null</code> if that field is still free.
+	 * Gets the player that occupies the field at (x,y).
 	 * 
 	 * @param x
 	 *            The x coordinate of the field.
 	 * @param y
 	 *            The y coordinate of the field.
-	 * @return The player at this position, or <code>null</code>.
+	 * @return The player at this position.
 	 */
 	public abstract Player getPlayerAt(int x, int y);
 
 	/**
-	 * Gets the player that occupies the field at the specified position, or <code>null</code> if that field is still
-	 * free.
+	 * Gets the player that occupies the field at the specified position.
 	 * 
 	 * @param position
 	 *            The position of the field.
-	 * @return The player at this position, or <code>null</code>.
+	 * @return The player at this position.
 	 */
 	public abstract Player getPlayerAt(Point position);
 

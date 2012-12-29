@@ -31,6 +31,7 @@ import de.lucaswerkmeister.code.fiar.framework.Board;
 import de.lucaswerkmeister.code.fiar.framework.Client;
 import de.lucaswerkmeister.code.fiar.framework.IllegalMoveException;
 import de.lucaswerkmeister.code.fiar.framework.Joker;
+import de.lucaswerkmeister.code.fiar.framework.NoPlayer;
 import de.lucaswerkmeister.code.fiar.framework.Player;
 import de.lucaswerkmeister.code.fiar.framework.Server;
 import de.lucaswerkmeister.code.fiar.framework.UnknownClientException;
@@ -162,7 +163,8 @@ public class FixedServer extends Server {
 		if (!clientPlayerMatch(requester, action.getActingPlayer()))
 			throw new IllegalArgumentException("Client and player don't match!");
 		if (!getAllowedActions(requester, action.getActingPlayer()).contains(action.getClass()))
-			throw new IllegalStateException("This action is currently not permissible for this player!");
+			throw new IllegalStateException("This action is currently not permissible for player "
+					+ action.getActingPlayer().getName() + "!");
 		try {
 			switch (phase[0]) {
 			case 0:
@@ -182,7 +184,7 @@ public class FixedServer extends Server {
 					if (action.getClass() == BlockField.class)
 						board.setPlayerAt(((FieldAction) action).getField(), Block.getInstance());
 					else if (action.getClass() == UnblockField.class)
-						board.setPlayerAt(((FieldAction) action).getField(), null);
+						board.setPlayerAt(((FieldAction) action).getField(), NoPlayer.getInstance());
 					else
 						acceptedBlockDistributions.add((BlockDistributionAccepted) action);
 					fireEvent(action);
@@ -197,7 +199,7 @@ public class FixedServer extends Server {
 					if (action.getClass() == JokerField.class)
 						board.setPlayerAt(((FieldAction) action).getField(), Joker.getInstance());
 					else if (action.getClass() == UnjokerField.class)
-						board.setPlayerAt(((FieldAction) action).getField(), null);
+						board.setPlayerAt(((FieldAction) action).getField(), NoPlayer.getInstance());
 					else
 						acceptedJokerDistributions.add((JokerDistributionAccepted) action);
 					fireEvent(action);
@@ -217,7 +219,7 @@ public class FixedServer extends Server {
 				case 1:
 					if (action.getActingPlayer().equals(pairs[currentPlayerIndex].player)) {
 						PlaceStone placeStone = (PlaceStone) action;
-						if (board.getPlayerAt(placeStone.getField()) != null)
+						if (!board.getPlayerAt(placeStone.getField()).equals(NoPlayer.getInstance()))
 							throw new IllegalMoveException("Field is already occupied by "
 									+ board.getPlayerAt(placeStone.getField()).getName() + "!");
 						board.setPlayerAt(placeStone.getField(), placeStone.getActingPlayer());
@@ -269,6 +271,8 @@ public class FixedServer extends Server {
 						}
 
 						currentPlayerIndex++;
+						currentPlayerIndex %= pairs.length;
+						phase[2] = pairs[currentPlayerIndex].player.getID();
 						return;
 					}
 					break; // Let control fall through to the

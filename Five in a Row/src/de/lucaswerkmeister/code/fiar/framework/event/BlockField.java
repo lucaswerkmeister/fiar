@@ -17,11 +17,12 @@
  */
 package de.lucaswerkmeister.code.fiar.framework.event;
 
+import java.awt.Point;
+
 import de.lucaswerkmeister.code.fiar.framework.Player;
 
 /**
- * Indicates that a player has marked a field as blocked. Only allowed during
- * "Block fields" phase.
+ * Indicates that a player has marked a field as blocked. Only allowed during "Block fields" phase.
  * 
  * @author Lucas Werkmeister
  * @version 1.0
@@ -40,5 +41,17 @@ public class BlockField extends FieldAction {
 	 */
 	public BlockField(Player actingPlayer, int x, int y) {
 		super(actingPlayer, x, y);
+	}
+
+	/**
+	 * A new {@link BlockField} by the specified player on the specified field.
+	 * 
+	 * @param actingPlayer
+	 *            The acting player.
+	 * @param point
+	 *            The modified field.
+	 */
+	public BlockField(Player actingPlayer, Point point) {
+		super(actingPlayer, point);
 	}
 }

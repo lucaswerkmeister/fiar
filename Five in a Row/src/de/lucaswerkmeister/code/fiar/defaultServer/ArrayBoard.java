@@ -22,6 +22,7 @@ import java.awt.Point;
 import java.util.Arrays;
 
 import de.lucaswerkmeister.code.fiar.framework.Board;
+import de.lucaswerkmeister.code.fiar.framework.NoPlayer;
 import de.lucaswerkmeister.code.fiar.framework.Player;
 
 /**
@@ -43,6 +44,9 @@ public class ArrayBoard extends Board {
 	 */
 	public ArrayBoard(int width, int height) {
 		board = new Player[width][height];
+		for (int x = 0; x < width; x++)
+			for (int y = 0; y < height; y++)
+				board[x][y] = NoPlayer.getInstance();
 	}
 
 	/**

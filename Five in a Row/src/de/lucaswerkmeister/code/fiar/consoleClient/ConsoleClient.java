@@ -32,6 +32,7 @@ import de.lucaswerkmeister.code.fiar.framework.Block;
 import de.lucaswerkmeister.code.fiar.framework.Board;
 import de.lucaswerkmeister.code.fiar.framework.Client;
 import de.lucaswerkmeister.code.fiar.framework.Joker;
+import de.lucaswerkmeister.code.fiar.framework.NoPlayer;
 import de.lucaswerkmeister.code.fiar.framework.Player;
 import de.lucaswerkmeister.code.fiar.framework.Server;
 import de.lucaswerkmeister.code.fiar.framework.event.BlockDistributionAccepted;
@@ -41,6 +42,7 @@ import de.lucaswerkmeister.code.fiar.framework.event.FieldAction;
 import de.lucaswerkmeister.code.fiar.framework.event.GameEvent;
 import de.lucaswerkmeister.code.fiar.framework.event.JokerDistributionAccepted;
 import de.lucaswerkmeister.code.fiar.framework.event.JokerField;
+import de.lucaswerkmeister.code.fiar.framework.event.PlaceStone;
 import de.lucaswerkmeister.code.fiar.framework.event.UnblockField;
 import de.lucaswerkmeister.code.fiar.framework.event.UnjokerField;
 
@@ -81,7 +83,7 @@ public class ConsoleClient extends Client implements Runnable {
 	public void run() {
 		try (BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in))) {
 			System.out.println("Welcome to Five in a Row!");
-			System.out.println("Please enter the field size: ");
+			System.out.println("Please enter the field size:");
 			int boardSize = 0;
 			do {
 				try {
@@ -101,6 +103,7 @@ public class ConsoleClient extends Client implements Runnable {
 			eventQueue.poll(); // BoardSizeProposal
 			eventQueue.poll(); // BoardSizeProposal
 			eventQueue.poll(); // PhaseChange
+
 			// Set Blocks
 			System.out.println("You may now mark certain fields as blocked:");
 			System.out.println("A blocked field will not count as part of a row for any player.");
@@ -113,9 +116,9 @@ public class ConsoleClient extends Client implements Runnable {
 				try {
 					for (Point p : parseCoordinates(input)) {
 						if (server.getCurrentBoard(this).getPlayerAt(p) == Block.getInstance())
-							server.action(this, new UnblockField(p1, p.x, p.y));
+							server.action(this, new UnblockField(p1, p));
 						else
-							server.action(this, new BlockField(p1, p.x, p.y));
+							server.action(this, new BlockField(p1, p));
 						GameEvent event = eventQueue.poll(); // (Un)BlockField
 						if (event instanceof BlockField)
 							System.out.println("Field " + p.x + "|" + p.y + " blocked.");
@@ -134,6 +137,7 @@ public class ConsoleClient extends Client implements Runnable {
 			eventQueue.poll(); // BlockDistributionAccepted
 			eventQueue.poll(); // BlockDistributionAccepted
 			eventQueue.poll(); // PhaseChange
+
 			// Set Jokers
 			System.out.println("You may now mark certain fields as joker fields:");
 			System.out.println("A joker field will count as part of a row for every player.");
@@ -146,13 +150,13 @@ public class ConsoleClient extends Client implements Runnable {
 				try {
 					for (Point p : parseCoordinates(input)) {
 						if (server.getCurrentBoard(this).getPlayerAt(p) == Joker.getInstance())
-							server.action(this, new UnjokerField(p1, p.x, p.y));
+							server.action(this, new UnjokerField(p1, p));
 						else if (server.getCurrentBoard(this).getPlayerAt(p) != null) {
 							System.out.println("That field is already in use! Please enter another field.");
 							input = inputReader.readLine();
 							continue;
 						} else
-							server.action(this, new JokerField(p1, p.x, p.y));
+							server.action(this, new JokerField(p1, p));
 						GameEvent event = eventQueue.poll(); // (Un)JokerField
 						if (event instanceof JokerField)
 							System.out.println("Field " + p.x + "|" + p.y + " marked as joker field.");
@@ -171,6 +175,37 @@ public class ConsoleClient extends Client implements Runnable {
 			eventQueue.poll(); // JokerDistributionAccepted
 			eventQueue.poll(); // JokerDistributionAccepted
 			eventQueue.poll(); // PhaseChange
+
+			// Game
+			System.out.println("Game started!");
+			printBoard(server.getCurrentBoard(this));
+			int player = 1;
+			while (server.getPhase(this)[0] == 1) {
+				System.out.println("Player " + player + ", where do you want to place your stone?");
+				do {
+					Set<Point> coordinate;
+					try {
+						coordinate = parseCoordinates(inputReader.readLine());
+					} catch (IllegalArgumentException e) {
+						System.out.println("Invalid input. Please re-type the coordinates, but in a different format.");
+						continue;
+					}
+					if (coordinate.size() != 1) {
+						System.out.println("Wrong coordinates count! Please re-type the coordinates.");
+						continue;
+					}
+					if (!server.getCurrentBoard(this).getPlayerAt(coordinate.iterator().next())
+							.equals(NoPlayer.getInstance())) {
+						System.out.println("That field is already in use! Please enter another field.");
+						continue;
+					}
+					server.action(this, new PlaceStone(player == 1 ? p1 : p2, coordinate.iterator().next()));
+					eventQueue.poll(); // PlaceStone or GameEnd
+					break;
+				} while (true);
+				player = (player % 2) + 1;
+			}
+			System.out.println("Player " + server.getPhase(this)[2] + " won!");
 
 		} catch (Throwable t) {
 			System.out.println("WHOOPS! An internal error occured. I'm so sorry.");

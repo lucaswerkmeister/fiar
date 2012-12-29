@@ -17,6 +17,8 @@
  */
 package de.lucaswerkmeister.code.fiar.framework.event;
 
+import java.awt.Point;
+
 import de.lucaswerkmeister.code.fiar.framework.Player;
 
 /**
@@ -39,5 +41,17 @@ public class PlaceStone extends FieldAction {
 	 */
 	public PlaceStone(Player actingPlayer, int x, int y) {
 		super(actingPlayer, x, y);
+	}
+
+	/**
+	 * A new {@link PlaceStone} by the specified player on the specified field.
+	 * 
+	 * @param actingPlayer
+	 *            The acting player.
+	 * @param point
+	 *            The modified field.
+	 */
+	public PlaceStone(Player actingPlayer, Point point) {
+		super(actingPlayer, point);
 	}
 }
