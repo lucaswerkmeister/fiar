@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lucaswerkmeister.code.fiar.consoleClient;
+package de.lucaswerkmeister.code.fiar.clients;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -27,7 +27,6 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
-import de.lucaswerkmeister.code.fiar.defaultServer.FixedServer;
 import de.lucaswerkmeister.code.fiar.framework.Block;
 import de.lucaswerkmeister.code.fiar.framework.Board;
 import de.lucaswerkmeister.code.fiar.framework.Client;
@@ -45,6 +44,7 @@ import de.lucaswerkmeister.code.fiar.framework.event.JokerField;
 import de.lucaswerkmeister.code.fiar.framework.event.PlaceStone;
 import de.lucaswerkmeister.code.fiar.framework.event.UnblockField;
 import de.lucaswerkmeister.code.fiar.framework.event.UnjokerField;
+import de.lucaswerkmeister.code.fiar.servers.FixedServer;
 
 /**
  * A Client that runs in the console and handles two players.

@@ -20,6 +20,9 @@ package de.lucaswerkmeister.code.fiar.framework;
 import java.util.Set;
 
 import de.lucaswerkmeister.code.fiar.framework.event.PlayerAction;
+import de.lucaswerkmeister.code.fiar.framework.exception.ClientFiredException;
+import de.lucaswerkmeister.code.fiar.framework.exception.IllegalMoveException;
+import de.lucaswerkmeister.code.fiar.framework.exception.UnknownClientException;
 
 /**
  * The game server.
@@ -40,6 +43,8 @@ import de.lucaswerkmeister.code.fiar.framework.event.PlayerAction;
  * @version 1.1
  */
 public abstract class Server {
+	public static final int IN_A_ROW = 5;
+
 	/**
 	 * Gets the current phase of the server.
 	 * <p>

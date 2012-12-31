@@ -15,7 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lucaswerkmeister.code.fiar.framework;
+package de.lucaswerkmeister.code.fiar.framework.exception;
+
+import de.lucaswerkmeister.code.fiar.framework.Player;
+import de.lucaswerkmeister.code.fiar.framework.Server;
 
 /**
  * A {@link UnknownPlayerException} should be thrown by a {@link Server} method to indicate that the server does not

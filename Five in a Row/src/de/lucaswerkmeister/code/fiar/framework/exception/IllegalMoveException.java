@@ -1,4 +1,4 @@
-package de.lucaswerkmeister.code.fiar.framework;
+package de.lucaswerkmeister.code.fiar.framework.exception;
 
 /**
  * This exception should be thrown by server methods to indicate that a move made by a player is illegal - e.&thinsp;g.

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lucaswerkmeister.code.fiar.defaultServer;
+package de.lucaswerkmeister.code.fiar.servers;
 
 import java.awt.Dimension;
 import java.awt.Point;
@@ -29,13 +29,10 @@ import java.util.Set;
 import de.lucaswerkmeister.code.fiar.framework.Block;
 import de.lucaswerkmeister.code.fiar.framework.Board;
 import de.lucaswerkmeister.code.fiar.framework.Client;
-import de.lucaswerkmeister.code.fiar.framework.IllegalMoveException;
 import de.lucaswerkmeister.code.fiar.framework.Joker;
 import de.lucaswerkmeister.code.fiar.framework.NoPlayer;
 import de.lucaswerkmeister.code.fiar.framework.Player;
 import de.lucaswerkmeister.code.fiar.framework.Server;
-import de.lucaswerkmeister.code.fiar.framework.UnknownClientException;
-import de.lucaswerkmeister.code.fiar.framework.UnknownPlayerException;
 import de.lucaswerkmeister.code.fiar.framework.event.BlockDistributionAccepted;
 import de.lucaswerkmeister.code.fiar.framework.event.BlockField;
 import de.lucaswerkmeister.code.fiar.framework.event.BoardSizeProposal;
@@ -49,6 +46,9 @@ import de.lucaswerkmeister.code.fiar.framework.event.PlayerAction;
 import de.lucaswerkmeister.code.fiar.framework.event.PlayerVictory;
 import de.lucaswerkmeister.code.fiar.framework.event.UnblockField;
 import de.lucaswerkmeister.code.fiar.framework.event.UnjokerField;
+import de.lucaswerkmeister.code.fiar.framework.exception.IllegalMoveException;
+import de.lucaswerkmeister.code.fiar.framework.exception.UnknownClientException;
+import de.lucaswerkmeister.code.fiar.framework.exception.UnknownPlayerException;
 
 /**
  * A server with a fixed {@link Client} and {@link Player} set, where each player is bound to one client.
@@ -68,8 +68,6 @@ public class FixedServer extends Server {
 	private Dimension currentBoardSize;
 	private Set<BlockDistributionAccepted> acceptedBlockDistributions;
 	private Set<JokerDistributionAccepted> acceptedJokerDistributions;
-
-	public static final int IN_A_ROW = 5;
 
 	/**
 	 * Creates a new {@link FixedServer} instance. The players in <code>players[i]</code> are bound to client
