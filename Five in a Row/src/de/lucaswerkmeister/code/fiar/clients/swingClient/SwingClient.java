@@ -241,13 +241,12 @@ public class SwingClient extends Client implements Runnable {
 		dialog.setAlwaysOnTop(true);
 		dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 
-		SpinnerNumberModel numberModel = new SpinnerNumberModel(15, 5, Integer.MAX_VALUE, 1);
-		JSpinner boardWidth = new JSpinner(numberModel);
-		boardWidth.getEditor().setSize(25, boardWidth.getSize().height);
+		JSpinner boardWidth = new JSpinner(new SpinnerNumberModel(15, 5, Integer.MAX_VALUE, 1));
+		boardWidth.setPreferredSize(new Dimension(50, boardWidth.getPreferredSize().height));
 		dialog.add(boardWidth);
 		dialog.add(new JLabel("×"));
-		JSpinner boardHeight = new JSpinner(numberModel);
-		boardHeight.getEditor().setSize(25, boardHeight.getSize().height);
+		JSpinner boardHeight = new JSpinner(new SpinnerNumberModel(15, 5, Integer.MAX_VALUE, 1));
+		boardHeight.setPreferredSize(new Dimension(50, boardHeight.getPreferredSize().height));
 		dialog.add(boardHeight);
 		JButton ok = new JButton("OK");
 		ok.addActionListener(new ActionListener() {
