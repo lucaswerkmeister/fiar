@@ -18,57 +18,132 @@
 package de.lucaswerkmeister.code.fiar.clients.swingClient;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 
 import de.lucaswerkmeister.code.fiar.framework.Client;
 import de.lucaswerkmeister.code.fiar.framework.Player;
 import de.lucaswerkmeister.code.fiar.framework.Server;
+import de.lucaswerkmeister.code.fiar.framework.event.BlockDistributionAccepted;
+import de.lucaswerkmeister.code.fiar.framework.event.BoardSizeProposal;
+import de.lucaswerkmeister.code.fiar.framework.event.FieldAction;
 import de.lucaswerkmeister.code.fiar.framework.event.GameEvent;
+import de.lucaswerkmeister.code.fiar.framework.event.JokerDistributionAccepted;
 import de.lucaswerkmeister.code.fiar.servers.FixedServer;
 
+/**
+ * A client that runs in a Swing GUI and handles two or more players.
+ * 
+ * @author Lucas Werkmeister
+ * @version 1.0
+ */
 public class SwingClient extends Client implements Runnable {
 	private final Server server;
 	private final List<Player> players; // note that the contents of the list are not final
 	private final JFrame gui;
+	private final BlockingQueue<GameEvent> events;
+	private final JPanel board;
+	private JComponent[][] boardComponents;
 
 	public SwingClient() {
-		gui = new JFrame("Five in a row");
+		gui = new JFrame("Five in a Row");
+		gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		players = new LinkedList<>();
 		players.add(showAddPlayerDialog(true, 1, gui));
-		int id = 2;
-		Player player = showAddPlayerDialog(true, id++, gui);
+		Player player = showAddPlayerDialog(true, 2, gui);
+		int id = 3;
 		while (player != null) {
 			players.add(player);
 			player = showAddPlayerDialog(false, id++, gui);
 		}
 		server = new FixedServer(new Client[] {this }, new Player[][] {players.toArray(new Player[] {}) });
+		events = new LinkedBlockingQueue<>();
+		board = new JPanel(true);
 	}
 
 	@Override
 	public void gameEvent(GameEvent e) {
-		// TODO Auto-generated method stub
-
+		if (e instanceof FieldAction) {
+			FieldAction fa = (FieldAction) e;
+			JComponent c = boardComponents[fa.getField().x][fa.getField().y];
+			c.setForeground(fa.getActingPlayer().getColor());
+			c.setToolTipText(fa.getActingPlayer().getName());
+			c.removeMouseListener(c.getMouseListeners()[0]);
+		}
+		events.offer(e);
 	}
 
 	@Override
 	public int getID() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
+		try {
+			// choose board size
+			Dimension boardSize = showChooseBoardSizeDialog(gui);
+			for (Player p : players) {
+				server.action(this, new BoardSizeProposal(p, boardSize));
+				events.poll(); // BoardSizeProposal
+			}
+			events.poll(); // PhaseChange
 
+			for (Player p : players) {
+				server.action(this, new BlockDistributionAccepted(p, server.getCurrentBoard(this)));
+				events.poll(); // BlockDistributionAccepted
+			}
+			events.poll(); // PhaseChange
+
+			for (Player p : players) {
+				server.action(this, new JokerDistributionAccepted(p, server.getCurrentBoard(this)));
+				events.poll(); // JokerDistributionAccepted
+			}
+			events.poll(); // PhaseChange
+
+			board.setLayout(new GridLayout(boardSize.width, boardSize.height, 0, 0));
+			boardComponents = new JComponent[boardSize.width][boardSize.height];
+			for (int x = 0; x < boardSize.width; x++) {
+				for (int y = 0; y < boardSize.height; y++) {
+					JComponent c = new JButton();
+					c.addMouseListener(new MouseAdapter() {
+						@Override
+						public void mouseClicked(MouseEvent e) {
+
+						}
+					});
+					boardComponents[x][y] = c;
+					board.add(c);
+				}
+			}
+			gui.add(board);
+			gui.pack();
+			gui.setVisible(true);
+		} catch (Throwable t) {
+			System.out.println("WHOOPS! An internal error occured. I'm so sorry.");
+			t.printStackTrace();
+			if (t instanceof ThreadDeath)
+				throw (ThreadDeath) t;
+		}
 	}
 
 	/**
@@ -82,7 +157,7 @@ public class SwingClient extends Client implements Runnable {
 	}
 
 	/**
-	 * Shows the Add Player Dialog and returns the player that was added.
+	 * Shows the Add Player dialog and returns the player that was added.
 	 * 
 	 * @param forcePlayer
 	 *            If set to <code>true</code>, the user is forced to add a player. Otherwise, he is allowed to cancel
@@ -95,12 +170,12 @@ public class SwingClient extends Client implements Runnable {
 	 *         add another player.
 	 */
 	public static Player showAddPlayerDialog(boolean forcePlayer, int id, JFrame owner) {
-		final JDialog dialog = new JDialog(owner, "Add player");
+		final JDialog dialog = new JDialog(owner, "Add player", true);
 		dialog.setLayout(new FlowLayout());
 		dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-		dialog.setModal(true);
+		dialog.setAlwaysOnTop(true);
 
-		JTextField name = new JTextField("Player name");
+		JTextField name = new JTextField("Player " + id);
 		dialog.add(name);
 		SelectableColor color = new SelectableColor(Color.black);
 		dialog.add(color);
@@ -132,5 +207,38 @@ public class SwingClient extends Client implements Runnable {
 			throw new RuntimeException("Unexpected error in Swing Client while adding player! Name was "
 					+ dialog.getName() + " (expected: \"Add Player\" or \"Cancel\"");
 		}
+	}
+
+	/**
+	 * Shows the Choose Board Size dialog and returns the chosen size.
+	 * 
+	 * @param owner
+	 *            The owner of the dialog.
+	 * @return The user-chosen size.
+	 */
+	public static Dimension showChooseBoardSizeDialog(JFrame owner) {
+		final JDialog dialog = new JDialog(owner, "Choose board size", true);
+		dialog.setLayout(new FlowLayout());
+		dialog.setAlwaysOnTop(true);
+		dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+
+		SpinnerNumberModel numberModel = new SpinnerNumberModel(15, 5, Integer.MAX_VALUE, 1);
+		JSpinner boardWidth = new JSpinner(numberModel);
+		dialog.add(boardWidth);
+		dialog.add(new JLabel("×"));
+		JSpinner boardHeight = new JSpinner(numberModel);
+		dialog.add(boardHeight);
+		JButton ok = new JButton("OK");
+		ok.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				dialog.setVisible(false);
+			}
+		});
+		dialog.add(ok);
+
+		dialog.pack();
+		dialog.setVisible(true);
+		return new Dimension((Integer) boardWidth.getValue(), (Integer) boardHeight.getValue());
 	}
 }

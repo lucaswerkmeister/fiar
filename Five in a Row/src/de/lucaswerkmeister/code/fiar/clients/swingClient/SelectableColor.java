@@ -36,7 +36,7 @@ import javax.swing.JColorChooser;
 
 public class SelectableColor extends Component implements MouseListener {
 	private static final long serialVersionUID = -464835931994412419L;
-	private static final Dimension size = new Dimension(25, 25);
+	private static final Dimension size = new Dimension(15, 15);
 	private Color color = Color.black;
 	private final List<ActionListener> listeners = new LinkedList<>();
 
