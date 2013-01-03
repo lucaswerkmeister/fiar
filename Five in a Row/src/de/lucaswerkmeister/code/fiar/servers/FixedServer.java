@@ -18,7 +18,6 @@
 package de.lucaswerkmeister.code.fiar.servers;
 
 import java.awt.Dimension;
-import java.awt.Point;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -56,7 +55,7 @@ import de.lucaswerkmeister.code.fiar.framework.exception.UnknownPlayerException;
  * This server is not thread-safe.
  * 
  * @author Lucas Werkmeister
- * @version 1.0
+ * @version 1.1
  */
 public class FixedServer extends Server {
 	private final ClientPlayerPair[] pairs;
@@ -223,50 +222,7 @@ public class FixedServer extends Server {
 						board.setPlayerAt(placeStone.getField(), placeStone.getActingPlayer());
 						fireEvent(action);
 
-						// check to see if it was a winning move
-						int equalStonesLeft = 0, equalStonesRight = 0, equalStonesUp = 0, equalStonesDown = 0, equalStonesUpLeft =
-								0, equalStonesDownRight = 0, equalStonesDownLeft = 0, equalStonesUpRight = 0;
-						Point p = placeStone.getField();
-						for (; p.x - equalStonesLeft - 1 >= 0
-								&& board.getPlayerAt(p.x - equalStonesLeft - 1, p.y).equalsWithJoker(
-										board.getPlayerAt(p)); equalStonesLeft++)
-							;
-						for (; p.x + equalStonesRight + 1 < board.getWidth()
-								&& board.getPlayerAt(p.x + equalStonesRight + 1, p.y).equalsWithJoker(
-										board.getPlayerAt(p)); equalStonesRight++)
-							;
-						for (; p.y - equalStonesUp - 1 >= 0
-								&& board.getPlayerAt(p.x, p.y - equalStonesUp - 1)
-										.equalsWithJoker(board.getPlayerAt(p)); equalStonesUp++)
-							;
-						for (; p.y + equalStonesDown + 1 < board.getHeight()
-								&& board.getPlayerAt(p.x, p.y + equalStonesDown + 1).equalsWithJoker(
-										board.getPlayerAt(p)); equalStonesDown++)
-							;
-						for (; p.x - equalStonesUpLeft - 1 >= 0
-								&& p.y - equalStonesUpLeft - 1 >= 0
-								&& board.getPlayerAt(p.x - equalStonesUpLeft - 1, p.y - equalStonesUpLeft - 1)
-										.equalsWithJoker(board.getPlayerAt(p)); equalStonesUpLeft++)
-							;
-						for (; p.x + equalStonesDownRight + 1 < board.getWidth()
-								&& p.y + equalStonesDownRight + 1 < board.getHeight()
-								&& board.getPlayerAt(p.x + equalStonesDownRight + 1, p.y + equalStonesDownRight + 1)
-										.equalsWithJoker(board.getPlayerAt(p)); equalStonesDownRight++)
-							;
-						for (; p.x - equalStonesDownLeft - 1 >= 0
-								&& p.y + equalStonesDownLeft + 1 < board.getHeight()
-								&& board.getPlayerAt(p.x - equalStonesDownLeft - 1, p.y + equalStonesDownLeft + 1)
-										.equalsWithJoker(board.getPlayerAt(p)); equalStonesDownLeft++)
-							;
-						for (; p.x + equalStonesUpRight + 1 < board.getWidth()
-								&& p.y - equalStonesUpRight - 1 >= 0
-								&& board.getPlayerAt(p.x + equalStonesUpRight + 1, p.y - equalStonesUpRight - 1)
-										.equalsWithJoker(board.getPlayerAt(p)); equalStonesUpRight++)
-							;
-						if (equalStonesLeft + 1 + equalStonesRight >= IN_A_ROW
-								|| equalStonesUp + 1 + equalStonesDown >= IN_A_ROW
-								|| equalStonesUpLeft + 1 + equalStonesDownRight >= IN_A_ROW
-								|| equalStonesDownLeft + 1 + equalStonesUpRight >= IN_A_ROW) {
+						if (board.wasWinningMove(placeStone.getField())) {
 							phase = new int[] {2, 0, action.getActingPlayer().getID() };
 							fireEvent(new PlayerVictory(action.getActingPlayer()));
 							return;

@@ -17,13 +17,15 @@
  */
 package de.lucaswerkmeister.code.fiar.framework;
 
+import static de.lucaswerkmeister.code.fiar.framework.Server.IN_A_ROW;
+
 import java.awt.Point;
 
 /**
  * Provides access to the game board.
  * 
  * @author Lucas Werkmeister
- * @version 1.2
+ * @version 1.3
  */
 public abstract class Board {
 	/**
@@ -103,5 +105,73 @@ public abstract class Board {
 					return false;
 			}
 		return true;
+	}
+
+	/**
+	 * Checks if a specific stone completes a row in any direction.
+	 * 
+	 * @param x
+	 *            The x coordinate of the stone.
+	 * @param y
+	 *            The y coordinate of the stone.
+	 * @return <code>true</code> if the stone completes a row of length {@link Server#IN_A_ROW} in any direction,
+	 *         <code>false</code> otherwise.
+	 */
+	public boolean wasWinningMove(int x, int y) {
+		int equalStonesLeft = 0, equalStonesRight = 0;
+		for (; x - equalStonesLeft - 1 >= 0
+				&& getPlayerAt(x - equalStonesLeft - 1, y).equalsWithJoker(getPlayerAt(x, y)); equalStonesLeft++)
+			;
+		for (; x + equalStonesRight + 1 < getWidth()
+				&& getPlayerAt(x + equalStonesRight + 1, y).equalsWithJoker(getPlayerAt(x, y)); equalStonesRight++)
+			;
+		if (equalStonesLeft + 1 + equalStonesRight >= IN_A_ROW)
+			return true;
+
+		int equalStonesUp = 0, equalStonesDown = 0;
+		for (; y - equalStonesUp - 1 >= 0 && getPlayerAt(x, y - equalStonesUp - 1).equalsWithJoker(getPlayerAt(x, y)); equalStonesUp++)
+			;
+		for (; y + equalStonesDown + 1 < getHeight()
+				&& getPlayerAt(x, y + equalStonesDown + 1).equalsWithJoker(getPlayerAt(x, y)); equalStonesDown++)
+			;
+		if (equalStonesUp + 1 + equalStonesDown >= IN_A_ROW)
+			return true;
+
+		int equalStonesUpLeft = 0, equalStonesDownRight = 0;
+		for (; x - equalStonesUpLeft - 1 >= 0 && y - equalStonesUpLeft - 1 >= 0
+				&& getPlayerAt(x - equalStonesUpLeft - 1, y - equalStonesUpLeft - 1).equalsWithJoker(getPlayerAt(x, y)); equalStonesUpLeft++)
+			;
+		for (; x + equalStonesDownRight + 1 < getWidth()
+				&& y + equalStonesDownRight + 1 < getHeight()
+				&& getPlayerAt(x + equalStonesDownRight + 1, y + equalStonesDownRight + 1).equalsWithJoker(
+						getPlayerAt(x, y)); equalStonesDownRight++)
+			;
+		if (equalStonesUpLeft + 1 + equalStonesDownRight >= IN_A_ROW)
+			return true;
+
+		int equalStonesDownLeft = 0, equalStonesUpRight = 0;
+		for (; x - equalStonesDownLeft - 1 >= 0
+				&& y + equalStonesDownLeft + 1 < getHeight()
+				&& getPlayerAt(x - equalStonesDownLeft - 1, y + equalStonesDownLeft + 1).equalsWithJoker(
+						getPlayerAt(x, y)); equalStonesDownLeft++)
+			;
+		for (; x + equalStonesUpRight + 1 < getWidth()
+				&& y - equalStonesUpRight - 1 >= 0
+				&& getPlayerAt(x + equalStonesUpRight + 1, y - equalStonesUpRight - 1).equalsWithJoker(
+						getPlayerAt(x, y)); equalStonesUpRight++)
+			;
+		return equalStonesDownLeft + 1 + equalStonesUpRight >= IN_A_ROW;
+	}
+
+	/**
+	 * Checks if a specific stone completes a row in any direction.
+	 * 
+	 * @param location
+	 *            The coordinates of the stone.
+	 * @return <code>true</code> if the stone completes a row of length {@link Server#IN_A_ROW} in any direction,
+	 *         <code>false</code> otherwise.
+	 */
+	public boolean wasWinningMove(Point location) {
+		return wasWinningMove(location.x, location.y);
 	}
 }
