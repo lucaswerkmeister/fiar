@@ -32,10 +32,10 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
@@ -51,6 +51,7 @@ import de.lucaswerkmeister.code.fiar.framework.event.GameEnd;
 import de.lucaswerkmeister.code.fiar.framework.event.GameEvent;
 import de.lucaswerkmeister.code.fiar.framework.event.JokerDistributionAccepted;
 import de.lucaswerkmeister.code.fiar.framework.event.PlaceStone;
+import de.lucaswerkmeister.code.fiar.framework.event.PlayerVictory;
 import de.lucaswerkmeister.code.fiar.framework.exception.IllegalMoveException;
 import de.lucaswerkmeister.code.fiar.servers.FixedServer;
 
@@ -92,11 +93,7 @@ public class SwingClient extends Client implements Runnable {
 			System.out.println("Game ended");
 		if (e instanceof FieldAction) {
 			FieldAction fa = (FieldAction) e;
-			JComponent c = fields[fa.getField().x][fa.getField().y];
-			c.setForeground(fa.getActingPlayer().getColor());
-			c.setToolTipText(fa.getActingPlayer().getName());
-			c.removeMouseListener(c.getMouseListeners()[0]);
-			c.setEnabled(false);
+			fields[fa.getField().x][fa.getField().y].setPlayer(fa.getActingPlayer());
 		}
 		events.offer(e);
 	}
@@ -110,7 +107,7 @@ public class SwingClient extends Client implements Runnable {
 	public void run() {
 		try {
 			// choose board size
-			Dimension boardSize = showChooseBoardSizeDialog(gui);
+			final Dimension boardSize = showChooseBoardSizeDialog(gui);
 			for (Player p : players) {
 				server.action(this, new BoardSizeProposal(p, boardSize));
 				events.poll(); // BoardSizeProposal
@@ -134,17 +131,33 @@ public class SwingClient extends Client implements Runnable {
 			final Dimension fieldSize = new Dimension(10, 10);
 			for (int x = 0; x < boardSize.width; x++) {
 				for (int y = 0; y < boardSize.height; y++) {
-					Field f = new Field(null, fieldSize);
+					final Field f = new Field(null, fieldSize);
 					final Point xy = new Point(x, y);
 					f.addMouseListener(new MouseAdapter() {
 						@Override
 						public void mouseClicked(MouseEvent e) {
-							try {
-								server.action(instance, new PlaceStone(players.get(playerIndex), xy));
-							} catch (IllegalStateException | IllegalMoveException e1) {
-								e1.printStackTrace();
-							}
-							playerIndex = (playerIndex + 1) % players.size();
+							if (f.isEnabled())
+								try {
+									server.action(instance, new PlaceStone(players.get(playerIndex), xy));
+									events.poll(); // PlaceStone
+									if (!events.isEmpty()) {
+										GameEvent event = events.poll();
+										if (event instanceof PlayerVictory) {
+											JOptionPane.showMessageDialog(gui, ((PlayerVictory) event)
+													.getWinningPlayer().getName() + " won!");
+										}
+										if (event instanceof GameEnd) {
+											for (int x = 0; x < boardSize.width; x++) {
+												for (int y = 0; y < boardSize.height; y++) {
+													fields[x][y].setEnabled(false);
+												}
+											}
+										}
+									}
+									playerIndex = (playerIndex + 1) % players.size();
+								} catch (IllegalStateException | IllegalMoveException e1) {
+									e1.printStackTrace();
+								}
 						}
 					});
 					fields[x][y] = f;

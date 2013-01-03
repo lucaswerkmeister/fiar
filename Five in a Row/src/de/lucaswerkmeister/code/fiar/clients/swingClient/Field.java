@@ -56,19 +56,17 @@ public class Field extends JComponent {
 
 	@Override
 	public void paint(Graphics g) {
-		System.out.println("draw " + System.currentTimeMillis());
-		g.setColor(Color.black);
-		g.fillRect(2, 2, 5, 5);
-		g.drawRect(0, 0, size.width, size.height);
 		if (player == null)
 			g.setColor(getBackground());
 		else
 			g.setColor(player.getColor());
 		g.fillRect(0, 0, size.width, size.height);
+		g.setColor(Color.black);
+		g.drawRect(0, 0, size.width, size.height);
 	}
 
 	/**
-	 * Sets the player currently occupying this field to the specified player.
+	 * Sets the player currently occupying this field to the specified player and disables this component.
 	 * 
 	 * @param player
 	 *            The player now occupying this field.
@@ -76,6 +74,7 @@ public class Field extends JComponent {
 	public void setPlayer(Player player) {
 		this.player = player;
 		setToolTipText(player.getName());
+		setEnabled(false);
 		repaint();
 	}
 }
