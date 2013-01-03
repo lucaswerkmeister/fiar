@@ -35,7 +35,7 @@ import java.util.List;
 import javax.swing.JColorChooser;
 
 public class SelectableColor extends Component implements MouseListener {
-	private static final long serialVersionUID = -464835931994412419L;
+	private static final long serialVersionUID = 8280662059844997029L;
 	private static final Dimension size = new Dimension(15, 15);
 	private Color color = Color.black;
 	private final List<ActionListener> listeners = new LinkedList<>();
@@ -44,21 +44,9 @@ public class SelectableColor extends Component implements MouseListener {
 		color = c;
 		addMouseListener(this);
 		setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-	}
-
-	@Override
-	public Dimension getPreferredSize() {
-		return size;
-	}
-
-	@Override
-	public Dimension getMinimumSize() {
-		return size;
-	}
-
-	@Override
-	public Dimension getMaximumSize() {
-		return size;
+		setPreferredSize(size);
+		setMinimumSize(size);
+		setMaximumSize(size);
 	}
 
 	@Override

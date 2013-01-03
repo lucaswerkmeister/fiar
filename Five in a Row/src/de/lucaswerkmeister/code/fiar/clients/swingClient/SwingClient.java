@@ -21,6 +21,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -46,8 +47,11 @@ import de.lucaswerkmeister.code.fiar.framework.Server;
 import de.lucaswerkmeister.code.fiar.framework.event.BlockDistributionAccepted;
 import de.lucaswerkmeister.code.fiar.framework.event.BoardSizeProposal;
 import de.lucaswerkmeister.code.fiar.framework.event.FieldAction;
+import de.lucaswerkmeister.code.fiar.framework.event.GameEnd;
 import de.lucaswerkmeister.code.fiar.framework.event.GameEvent;
 import de.lucaswerkmeister.code.fiar.framework.event.JokerDistributionAccepted;
+import de.lucaswerkmeister.code.fiar.framework.event.PlaceStone;
+import de.lucaswerkmeister.code.fiar.framework.exception.IllegalMoveException;
 import de.lucaswerkmeister.code.fiar.servers.FixedServer;
 
 /**
@@ -62,7 +66,9 @@ public class SwingClient extends Client implements Runnable {
 	private final JFrame gui;
 	private final BlockingQueue<GameEvent> events;
 	private final JPanel board;
-	private JComponent[][] boardComponents;
+	private Field[][] fields;
+	private int playerIndex = 0;
+	private static final SwingClient instance = new SwingClient();
 
 	public SwingClient() {
 		gui = new JFrame("Five in a Row");
@@ -82,12 +88,15 @@ public class SwingClient extends Client implements Runnable {
 
 	@Override
 	public void gameEvent(GameEvent e) {
+		if (e instanceof GameEnd)
+			System.out.println("Game ended");
 		if (e instanceof FieldAction) {
 			FieldAction fa = (FieldAction) e;
-			JComponent c = boardComponents[fa.getField().x][fa.getField().y];
+			JComponent c = fields[fa.getField().x][fa.getField().y];
 			c.setForeground(fa.getActingPlayer().getColor());
 			c.setToolTipText(fa.getActingPlayer().getName());
 			c.removeMouseListener(c.getMouseListeners()[0]);
+			c.setEnabled(false);
 		}
 		events.offer(e);
 	}
@@ -121,18 +130,25 @@ public class SwingClient extends Client implements Runnable {
 			events.poll(); // PhaseChange
 
 			board.setLayout(new GridLayout(boardSize.width, boardSize.height, 0, 0));
-			boardComponents = new JComponent[boardSize.width][boardSize.height];
+			fields = new Field[boardSize.width][boardSize.height];
+			final Dimension fieldSize = new Dimension(10, 10);
 			for (int x = 0; x < boardSize.width; x++) {
 				for (int y = 0; y < boardSize.height; y++) {
-					JComponent c = new JButton();
-					c.addMouseListener(new MouseAdapter() {
+					Field f = new Field(null, fieldSize);
+					final Point xy = new Point(x, y);
+					f.addMouseListener(new MouseAdapter() {
 						@Override
 						public void mouseClicked(MouseEvent e) {
-
+							try {
+								server.action(instance, new PlaceStone(players.get(playerIndex), xy));
+							} catch (IllegalStateException | IllegalMoveException e1) {
+								e1.printStackTrace();
+							}
+							playerIndex = (playerIndex + 1) % players.size();
 						}
 					});
-					boardComponents[x][y] = c;
-					board.add(c);
+					fields[x][y] = f;
+					board.add(f);
 				}
 			}
 			gui.add(board);
@@ -144,16 +160,6 @@ public class SwingClient extends Client implements Runnable {
 			if (t instanceof ThreadDeath)
 				throw (ThreadDeath) t;
 		}
-	}
-
-	/**
-	 * The main method.
-	 * 
-	 * @param args
-	 *            The arguments. Currently ignored.
-	 */
-	public static void main(String[] args) {
-		new Thread(new SwingClient()).start();
 	}
 
 	/**
@@ -224,9 +230,11 @@ public class SwingClient extends Client implements Runnable {
 
 		SpinnerNumberModel numberModel = new SpinnerNumberModel(15, 5, Integer.MAX_VALUE, 1);
 		JSpinner boardWidth = new JSpinner(numberModel);
+		boardWidth.getEditor().setSize(25, boardWidth.getSize().height);
 		dialog.add(boardWidth);
 		dialog.add(new JLabel("×"));
 		JSpinner boardHeight = new JSpinner(numberModel);
+		boardHeight.getEditor().setSize(25, boardHeight.getSize().height);
 		dialog.add(boardHeight);
 		JButton ok = new JButton("OK");
 		ok.addActionListener(new ActionListener() {
@@ -240,5 +248,15 @@ public class SwingClient extends Client implements Runnable {
 		dialog.pack();
 		dialog.setVisible(true);
 		return new Dimension((Integer) boardWidth.getValue(), (Integer) boardHeight.getValue());
+	}
+
+	/**
+	 * The main method.
+	 * 
+	 * @param args
+	 *            The arguments. Currently ignored.
+	 */
+	public static void main(String[] args) {
+		new Thread(instance).start();
 	}
 }
