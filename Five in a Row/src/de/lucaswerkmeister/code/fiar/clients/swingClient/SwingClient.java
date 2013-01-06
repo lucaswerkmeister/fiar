@@ -28,6 +28,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -62,6 +63,7 @@ import de.lucaswerkmeister.code.fiar.servers.FixedServer;
  * @version 1.0
  */
 public class SwingClient extends Client implements Runnable {
+	private static final Random random = new Random();
 	private final Server server;
 	private final List<Player> players; // note that the contents of the list are not final
 	private final JFrame gui;
@@ -136,7 +138,7 @@ public class SwingClient extends Client implements Runnable {
 					f.addMouseListener(new MouseAdapter() {
 						@Override
 						public void mouseClicked(MouseEvent e) {
-							if (f.isEnabled())
+							if (f.isEnabled()) // disabled lightweight components still receive MouseEvents
 								try {
 									server.action(instance, new PlaceStone(players.get(playerIndex), xy));
 									events.poll(); // PlaceStone
@@ -194,9 +196,12 @@ public class SwingClient extends Client implements Runnable {
 		dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		dialog.setAlwaysOnTop(true);
 
-		JTextField name = new JTextField("Player " + id);
+		JTextField name = new JTextField("Player " + id, 10);
 		dialog.add(name);
-		SelectableColor color = new SelectableColor(Color.black);
+		// This "random color" code is based on the following stackoverflow answer:
+		// http://stackoverflow.com/a/4247219/1420237
+		SelectableColor color =
+				new SelectableColor(Color.getHSBColor(random.nextFloat(), (random.nextInt(2) + 7) / 10f, 0.9f));
 		dialog.add(color);
 		JButton addPlayer = new JButton("Add Player");
 		addPlayer.addActionListener(new ActionListener() {
@@ -238,7 +243,7 @@ public class SwingClient extends Client implements Runnable {
 	public static Dimension showChooseBoardSizeDialog(JFrame owner) {
 		final JDialog dialog = new JDialog(owner, "Choose board size", true);
 		dialog.setLayout(new FlowLayout());
-		dialog.setAlwaysOnTop(true);
+		dialog.toFront();
 		dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 
 		JSpinner boardWidth = new JSpinner(new SpinnerNumberModel(15, 5, Integer.MAX_VALUE, 1));

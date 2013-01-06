@@ -23,6 +23,9 @@ import java.awt.Graphics;
 
 import javax.swing.JComponent;
 
+import de.lucaswerkmeister.code.fiar.framework.Block;
+import de.lucaswerkmeister.code.fiar.framework.Joker;
+import de.lucaswerkmeister.code.fiar.framework.NoPlayer;
 import de.lucaswerkmeister.code.fiar.framework.Player;
 
 /**
@@ -45,10 +48,8 @@ public class Field extends JComponent {
 	 *            The size of the field.
 	 */
 	public Field(Player player, Dimension size) {
-		this.player = player;
+		setPlayer(player);
 		this.size = size;
-		if (player != null)
-			setToolTipText(player.getName());
 		setPreferredSize(size);
 		setMinimumSize(size);
 		setMaximumSize(size);
@@ -56,7 +57,7 @@ public class Field extends JComponent {
 
 	@Override
 	public void paint(Graphics g) {
-		if (player == null)
+		if (player == null || player instanceof NoPlayer)
 			g.setColor(getBackground());
 		else
 			g.setColor(player.getColor());
@@ -66,15 +67,31 @@ public class Field extends JComponent {
 	}
 
 	/**
-	 * Sets the player currently occupying this field to the specified player and disables this component.
+	 * Sets the player currently occupying this field to the specified player and, if it is an actual player, disables
+	 * this component.
+	 * <p>
+	 * More specifically, the component is disabled if and only if all of the following conditions are met:
+	 * <ul>
+	 * <li>the player is not <code>null</code></li>
+	 * <li>it is not the <code>NoPlayer</code></li>
+	 * <li>it is not the <code>Block</code></li>
+	 * <li>it is not the <code>Joker</code>.</li>
+	 * </ul>
+	 * In code: The component is disabled if and only if the condition
+	 * <code>player != null && !(player instanceof NoPlayer) && !(player instanceof Block) && !(player instanceof Joker)</code>
+	 * is met.
 	 * 
 	 * @param player
 	 *            The player now occupying this field.
 	 */
 	public void setPlayer(Player player) {
 		this.player = player;
-		setToolTipText(player.getName());
-		setEnabled(false);
+		if (player != null && !(player instanceof NoPlayer)) {
+			setToolTipText(player.getName());
+			if (!(player instanceof Block) && !(player instanceof Joker))
+				setEnabled(false);
+		} else
+			setToolTipText(null);
 		repaint();
 	}
 }

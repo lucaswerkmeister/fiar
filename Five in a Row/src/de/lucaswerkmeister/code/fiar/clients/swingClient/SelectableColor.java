@@ -15,16 +15,12 @@
 package de.lucaswerkmeister.code.fiar.clients.swingClient;
 
 import java.awt.BorderLayout;
-import java.awt.Button;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
-import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Graphics;
-import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -32,9 +28,13 @@ import java.awt.event.MouseListener;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.swing.JButton;
 import javax.swing.JColorChooser;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
 
-public class SelectableColor extends Component implements MouseListener {
+public class SelectableColor extends JComponent implements MouseListener {
 	private static final long serialVersionUID = 8280662059844997029L;
 	private static final Dimension size = new Dimension(15, 15);
 	private Color color = Color.black;
@@ -76,6 +76,7 @@ public class SelectableColor extends Component implements MouseListener {
 		while (!(parent instanceof Frame))
 			parent = parent.getParent();
 		final ColorDialog d = new ColorDialog((Frame) parent, color);
+		d.setAlwaysOnTop(true);
 		d.setVisible(true);
 		color = d.getColor();
 		repaint();
@@ -107,7 +108,7 @@ public class SelectableColor extends Component implements MouseListener {
 	}
 }
 
-class ColorDialog extends Dialog implements ActionListener {
+class ColorDialog extends JDialog implements ActionListener {
 	private static final long serialVersionUID = 4347923773976010884L;
 	private boolean okClicked = false;
 	private final Color startColor;
@@ -120,11 +121,11 @@ class ColorDialog extends Dialog implements ActionListener {
 		chooser = new JColorChooser();
 		chooser.setColor(c);
 		add(chooser, BorderLayout.CENTER);
-		final Panel south = new Panel();
-		final Button ok = new Button("OK");
+		final JPanel south = new JPanel();
+		final JButton ok = new JButton("OK");
 		ok.addActionListener(this);
 		south.add(ok);
-		final Button cancel = new Button("Cancel");
+		final JButton cancel = new JButton("Cancel");
 		cancel.addActionListener(this);
 		south.add(cancel);
 		add(south, BorderLayout.SOUTH);
