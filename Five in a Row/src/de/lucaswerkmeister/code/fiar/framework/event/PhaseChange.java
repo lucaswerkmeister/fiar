@@ -21,6 +21,15 @@ import java.util.Arrays;
 
 /**
  * Represents a change in the current game Phase.
+ * <p>
+ * An instance of this class shall not be fired if the occurrence of a phase change can be implicitly derived from the
+ * firing of another {@link GameEvent}, such as (but not limited to):
+ * <ul>
+ * <li>{@link GameEnd} and any of its subclasses</li>
+ * <li>{@link PlaceStone}</li>
+ * </ul>
+ * <small>Author's note: The above list is, at the time of writing, complete; however, I wrote "not limited to" to
+ * protect against future changes when I possibly can't be bothered updating this javadoc :-)</small>
  * 
  * @author Lucas Werkmeister
  * @version 1.0

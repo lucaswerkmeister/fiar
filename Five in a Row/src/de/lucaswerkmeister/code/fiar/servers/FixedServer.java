@@ -32,6 +32,7 @@ import de.lucaswerkmeister.code.fiar.framework.Joker;
 import de.lucaswerkmeister.code.fiar.framework.NoPlayer;
 import de.lucaswerkmeister.code.fiar.framework.Player;
 import de.lucaswerkmeister.code.fiar.framework.Server;
+import de.lucaswerkmeister.code.fiar.framework.event.AllOthersForfeit;
 import de.lucaswerkmeister.code.fiar.framework.event.BlockDistributionAccepted;
 import de.lucaswerkmeister.code.fiar.framework.event.BlockField;
 import de.lucaswerkmeister.code.fiar.framework.event.BoardSizeProposal;
@@ -223,6 +224,12 @@ public class FixedServer extends Server {
 							phase[2] = pairs[currentPlayerIndex].player.getID();
 						}
 						fireEvent(action);
+						if (pairs.length < 2) {
+							phase = new int[] {2, 0, action.getActingPlayer().getID() };
+							fireEvent(new AllOthersForfeit(pairs[0].player)); // we know that they forfeit because this
+																				// server supports no other way to quit
+																				// a running game
+						}
 						return;
 					}
 					if (action.getActingPlayer().equals(pairs[currentPlayerIndex].player)) {
