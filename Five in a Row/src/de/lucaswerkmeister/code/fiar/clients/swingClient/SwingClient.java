@@ -52,6 +52,7 @@ import de.lucaswerkmeister.code.fiar.framework.event.BlockDistributionAccepted;
 import de.lucaswerkmeister.code.fiar.framework.event.BlockField;
 import de.lucaswerkmeister.code.fiar.framework.event.BoardSizeProposal;
 import de.lucaswerkmeister.code.fiar.framework.event.FieldAction;
+import de.lucaswerkmeister.code.fiar.framework.event.Forfeit;
 import de.lucaswerkmeister.code.fiar.framework.event.GameEnd;
 import de.lucaswerkmeister.code.fiar.framework.event.GameEvent;
 import de.lucaswerkmeister.code.fiar.framework.event.JokerDistributionAccepted;
@@ -107,8 +108,21 @@ public class SwingClient extends Client implements Runnable {
 
 	@Override
 	public void gameEvent(GameEvent e) {
-		if (e instanceof GameEnd)
-			System.out.println("Game ended");
+		if (e instanceof Forfeit) {
+			Player p = ((Forfeit) e).getActingPlayer();
+			int index = players.indexOf(p);
+			players.remove(p);
+			if (playerIndex == index) {
+				statusBar.setText(players.get(playerIndex).getName() + "'"
+						+ (endsWithSSound(players.get(playerIndex).getName()) ? "" : "s") + " turn!");
+			} else if (playerIndex > index)
+				playerIndex--;
+		}
+		if (e instanceof GameEnd) {
+			statusBar.setText("Game ended");
+			buttons.removeAll();
+			gui.pack();
+		}
 		if (e instanceof FieldAction) {
 			FieldAction fa = (FieldAction) e;
 			fields[fa.getField().x][fa.getField().y].setPlayer(server.getCurrentBoard(this).getPlayerAt(fa.getField()));
@@ -265,6 +279,19 @@ public class SwingClient extends Client implements Runnable {
 
 			// normal gameplay
 			buttons.removeAll();
+			JButton forfeit = new JButton("Forfeit");
+			forfeit.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					try {
+						server.action(instance, new Forfeit(players.get(playerIndex)));
+					} catch (IllegalStateException | IllegalMoveException e1) {
+						e1.printStackTrace();
+					}
+				}
+			});
+			buttons.add(forfeit);
 			gui.pack();
 			statusBar.setText(players.get(playerIndex).getName() + "'"
 					+ (endsWithSSound(players.get(playerIndex).getName()) ? "" : "s") + " turn!");

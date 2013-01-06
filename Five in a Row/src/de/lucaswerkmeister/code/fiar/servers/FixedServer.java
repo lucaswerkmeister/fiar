@@ -61,7 +61,7 @@ import de.lucaswerkmeister.code.fiar.framework.exception.UnknownPlayerException;
  * @version 1.1
  */
 public class FixedServer extends Server {
-	private final ClientPlayerPair[] pairs;
+	private ClientPlayerPair[] pairs;
 	private int currentPlayerIndex;
 	private final Client[] allClients;
 	private Board board;
@@ -230,8 +230,15 @@ public class FixedServer extends Server {
 							// IllegalStateException below
 				case 1:
 					if (action instanceof Forfeit) {
-						int index = Arrays.asList(pairs).indexOf(action.getActingPlayer());
-						System.arraycopy(pairs, index + 1, pairs, index, pairs.length - index - 1);
+						int index = 0;
+						for (int i = 0; i < pairs.length; i++)
+							if (pairs[i].player.equals(action.getActingPlayer())) {
+								index = i;
+								break;
+							}
+						ClientPlayerPair[] newPairs = new ClientPlayerPair[pairs.length - 1];
+						System.arraycopy(pairs, index + 1, newPairs, index, pairs.length - index - 1);
+						pairs = newPairs;
 						if (currentPlayerIndex > index) {
 							currentPlayerIndex--;
 							phase[2] = pairs[currentPlayerIndex].player.getID();
