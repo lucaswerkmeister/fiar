@@ -17,6 +17,7 @@
  */
 package de.lucaswerkmeister.code.fiar.clients.swingClient;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -28,9 +29,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Random;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -67,8 +67,10 @@ public class SwingClient extends Client implements Runnable {
 	private final Server server;
 	private final List<Player> players; // note that the contents of the list are not final
 	private final JFrame gui;
-	private final BlockingQueue<GameEvent> events;
+	private final Queue<GameEvent> events;
 	private final JPanel board;
+	private final JPanel buttons;
+	private final JLabel statusBar;
 	private Field[][] fields;
 	private int playerIndex = 0;
 	private static final SwingClient instance = new SwingClient();
@@ -85,8 +87,15 @@ public class SwingClient extends Client implements Runnable {
 			player = showAddPlayerDialog(false, id++, gui);
 		}
 		server = new FixedServer(new Client[] {this }, new Player[][] {players.toArray(new Player[] {}) });
-		events = new LinkedBlockingQueue<>();
-		board = new JPanel(true);
+		events = new LinkedList<>();
+		JPanel content = new JPanel(new BorderLayout());
+		board = new JPanel();
+		content.add(board, BorderLayout.CENTER);
+		buttons = new JPanel();
+		content.add(buttons, BorderLayout.EAST);
+		statusBar = new JLabel("Ready");
+		content.add(statusBar, BorderLayout.SOUTH);
+		gui.setContentPane(content);
 	}
 
 	@Override
@@ -97,7 +106,7 @@ public class SwingClient extends Client implements Runnable {
 			FieldAction fa = (FieldAction) e;
 			fields[fa.getField().x][fa.getField().y].setPlayer(fa.getActingPlayer());
 		}
-		events.offer(e);
+		events.add(e);
 	}
 
 	@Override
@@ -142,7 +151,12 @@ public class SwingClient extends Client implements Runnable {
 								try {
 									server.action(instance, new PlaceStone(players.get(playerIndex), xy));
 									events.poll(); // PlaceStone
-									if (!events.isEmpty()) {
+									playerIndex = (playerIndex + 1) % players.size();
+									if (events.isEmpty()) {
+										statusBar.setText(players.get(playerIndex).getName() + "'"
+												+ (endsWithSSound(players.get(playerIndex).getName()) ? "" : "s")
+												+ " turn!");
+									} else {
 										GameEvent event = events.poll();
 										if (event instanceof PlayerVictory) {
 											JOptionPane.showMessageDialog(gui, ((PlayerVictory) event)
@@ -156,7 +170,6 @@ public class SwingClient extends Client implements Runnable {
 											}
 										}
 									}
-									playerIndex = (playerIndex + 1) % players.size();
 								} catch (IllegalStateException | IllegalMoveException e1) {
 									e1.printStackTrace();
 								}
@@ -265,6 +278,31 @@ public class SwingClient extends Client implements Runnable {
 		dialog.pack();
 		dialog.setVisible(true);
 		return new Dimension((Integer) boardWidth.getValue(), (Integer) boardHeight.getValue());
+	}
+
+	/**
+	 * Determines if a specific string ends with an "s" sound.
+	 * <p>
+	 * This is used to determine how the genitive of that string is built.
+	 * 
+	 * @param token
+	 *            The string.
+	 * @return <code>true</code> if that string ends with an "s" sound, <code>false</code> otherwise.
+	 */
+	private static boolean endsWithSSound(String token) {
+		if (token.endsWith("ques"))
+			return false;
+		if (token.endsWith("aux"))
+			return false;
+		if (token.endsWith("s"))
+			return true;
+		if (token.endsWith("x"))
+			return true;
+		if (token.endsWith("ce"))
+			return true;
+		if (token.endsWith("se"))
+			return true;
+		return false;
 	}
 
 	/**

@@ -61,9 +61,9 @@ public class Field extends JComponent {
 			g.setColor(getBackground());
 		else
 			g.setColor(player.getColor());
-		g.fillRect(0, 0, size.width, size.height);
+		g.fillRect(1, 1, size.width - 2, size.height - 2);
 		g.setColor(Color.black);
-		g.drawRect(0, 0, size.width, size.height);
+		g.drawRect(0, 0, size.width - 1, size.height - 1);
 	}
 
 	/**
