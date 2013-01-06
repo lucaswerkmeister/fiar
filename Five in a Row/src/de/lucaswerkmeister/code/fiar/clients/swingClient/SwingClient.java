@@ -25,6 +25,8 @@ import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.LinkedList;
@@ -324,6 +326,14 @@ public class SwingClient extends Client implements Runnable {
 		dialog.setAlwaysOnTop(true);
 
 		JTextField name = new JTextField("Player " + id, 10);
+		name.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				dialog.setName("Add Player");
+				dialog.setVisible(false);
+			}
+		});
 		dialog.add(name);
 		// This "random color" code is based on the following stackoverflow answer:
 		// http://stackoverflow.com/a/4247219/1420237
@@ -375,10 +385,19 @@ public class SwingClient extends Client implements Runnable {
 
 		JSpinner boardWidth = new JSpinner(new SpinnerNumberModel(15, 5, Integer.MAX_VALUE, 1));
 		boardWidth.setPreferredSize(new Dimension(50, boardWidth.getPreferredSize().height));
+		((JSpinner.DefaultEditor) boardWidth.getEditor()).getTextField().addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER)
+					dialog.setVisible(false);
+			}
+		});
 		dialog.add(boardWidth);
 		dialog.add(new JLabel("×"));
 		JSpinner boardHeight = new JSpinner(new SpinnerNumberModel(15, 5, Integer.MAX_VALUE, 1));
 		boardHeight.setPreferredSize(new Dimension(50, boardHeight.getPreferredSize().height));
+		((JSpinner.DefaultEditor) boardHeight.getEditor()).getTextField().addKeyListener(
+				((JSpinner.DefaultEditor) boardWidth.getEditor()).getTextField().getKeyListeners()[0]);
 		dialog.add(boardHeight);
 		JButton ok = new JButton("OK");
 		ok.addActionListener(new ActionListener() {
