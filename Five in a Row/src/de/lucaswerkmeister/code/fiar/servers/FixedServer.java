@@ -36,6 +36,7 @@ import de.lucaswerkmeister.code.fiar.framework.event.BlockDistributionAccepted;
 import de.lucaswerkmeister.code.fiar.framework.event.BlockField;
 import de.lucaswerkmeister.code.fiar.framework.event.BoardSizeProposal;
 import de.lucaswerkmeister.code.fiar.framework.event.FieldAction;
+import de.lucaswerkmeister.code.fiar.framework.event.Forfeit;
 import de.lucaswerkmeister.code.fiar.framework.event.GameEvent;
 import de.lucaswerkmeister.code.fiar.framework.event.JokerDistributionAccepted;
 import de.lucaswerkmeister.code.fiar.framework.event.JokerField;
@@ -137,9 +138,9 @@ public class FixedServer extends Server {
 				case 0:
 					return Collections.emptySet();
 				case 1:
-					if (p.getID() != phase[2])
-						return Collections.emptySet();
-					ret.add(PlaceStone.class);
+					if (p.getID() == phase[2])
+						ret.add(PlaceStone.class);
+					ret.add(Forfeit.class);
 					return ret;
 				}
 			case 2:
@@ -214,6 +215,16 @@ public class FixedServer extends Server {
 					break; // Let control fall through to the
 							// IllegalStateException below
 				case 1:
+					if (action instanceof Forfeit) {
+						int index = Arrays.asList(pairs).indexOf(action.getActingPlayer());
+						System.arraycopy(pairs, index + 1, pairs, index, pairs.length - index - 1);
+						if (currentPlayerIndex > index) {
+							currentPlayerIndex--;
+							phase[2] = pairs[currentPlayerIndex].player.getID();
+						}
+						fireEvent(action);
+						return;
+					}
 					if (action.getActingPlayer().equals(pairs[currentPlayerIndex].player)) {
 						PlaceStone placeStone = (PlaceStone) action;
 						if (!board.getPlayerAt(placeStone.getField()).equals(NoPlayer.getInstance()))
