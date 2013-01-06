@@ -183,10 +183,10 @@ public class FixedServer extends Server {
 					}
 					return;
 				case 1:
-					if (action.getClass() == BlockField.class) {
+					if (action instanceof BlockField) {
 						board.setPlayerAt(((FieldAction) action).getField(), Block.getInstance());
 						occupiedFields++;
-					} else if (action.getClass() == UnblockField.class) {
+					} else if (action instanceof UnblockField) {
 						board.setPlayerAt(((FieldAction) action).getField(), NoPlayer.getInstance());
 						occupiedFields--;
 					} else
@@ -200,10 +200,16 @@ public class FixedServer extends Server {
 					}
 					return;
 				case 2:
-					if (action.getClass() == JokerField.class) {
+					if (action instanceof JokerField) {
+						if (board.getPlayerAt(((JokerField) action).getField()) != NoPlayer.getInstance())
+							throw new IllegalMoveException("Field is already occupied by "
+									+ board.getPlayerAt(((JokerField) action).getField()).getName() + "!");
 						board.setPlayerAt(((FieldAction) action).getField(), Joker.getInstance());
 						occupiedFields++;
-					} else if (action.getClass() == UnjokerField.class) {
+					} else if (action instanceof UnjokerField) {
+						if (board.getPlayerAt(((UnjokerField) action).getField()) != Joker.getInstance())
+							throw new IllegalMoveException("Field is not a Joker field but occupied by "
+									+ board.getPlayerAt(((UnjokerField) action).getField()).getName() + "!");
 						board.setPlayerAt(((FieldAction) action).getField(), NoPlayer.getInstance());
 						occupiedFields--;
 					} else

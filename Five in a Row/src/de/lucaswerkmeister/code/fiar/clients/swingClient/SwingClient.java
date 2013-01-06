@@ -42,17 +42,24 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
+import de.lucaswerkmeister.code.fiar.framework.Block;
 import de.lucaswerkmeister.code.fiar.framework.Client;
+import de.lucaswerkmeister.code.fiar.framework.Joker;
+import de.lucaswerkmeister.code.fiar.framework.NoPlayer;
 import de.lucaswerkmeister.code.fiar.framework.Player;
 import de.lucaswerkmeister.code.fiar.framework.Server;
 import de.lucaswerkmeister.code.fiar.framework.event.BlockDistributionAccepted;
+import de.lucaswerkmeister.code.fiar.framework.event.BlockField;
 import de.lucaswerkmeister.code.fiar.framework.event.BoardSizeProposal;
 import de.lucaswerkmeister.code.fiar.framework.event.FieldAction;
 import de.lucaswerkmeister.code.fiar.framework.event.GameEnd;
 import de.lucaswerkmeister.code.fiar.framework.event.GameEvent;
 import de.lucaswerkmeister.code.fiar.framework.event.JokerDistributionAccepted;
+import de.lucaswerkmeister.code.fiar.framework.event.JokerField;
 import de.lucaswerkmeister.code.fiar.framework.event.PlaceStone;
 import de.lucaswerkmeister.code.fiar.framework.event.PlayerVictory;
+import de.lucaswerkmeister.code.fiar.framework.event.UnblockField;
+import de.lucaswerkmeister.code.fiar.framework.event.UnjokerField;
 import de.lucaswerkmeister.code.fiar.framework.exception.IllegalMoveException;
 import de.lucaswerkmeister.code.fiar.servers.FixedServer;
 
@@ -104,7 +111,7 @@ public class SwingClient extends Client implements Runnable {
 			System.out.println("Game ended");
 		if (e instanceof FieldAction) {
 			FieldAction fa = (FieldAction) e;
-			fields[fa.getField().x][fa.getField().y].setPlayer(fa.getActingPlayer());
+			fields[fa.getField().x][fa.getField().y].setPlayer(server.getCurrentBoard(this).getPlayerAt(fa.getField()));
 		}
 		events.add(e);
 	}
@@ -125,18 +132,6 @@ public class SwingClient extends Client implements Runnable {
 			}
 			events.poll(); // PhaseChange
 
-			for (Player p : players) {
-				server.action(this, new BlockDistributionAccepted(p, server.getCurrentBoard(this)));
-				events.poll(); // BlockDistributionAccepted
-			}
-			events.poll(); // PhaseChange
-
-			for (Player p : players) {
-				server.action(this, new JokerDistributionAccepted(p, server.getCurrentBoard(this)));
-				events.poll(); // JokerDistributionAccepted
-			}
-			events.poll(); // PhaseChange
-
 			board.setLayout(new GridLayout(boardSize.width, boardSize.height, 0, 0));
 			fields = new Field[boardSize.width][boardSize.height];
 			final Dimension fieldSize = new Dimension(10, 10);
@@ -149,23 +144,43 @@ public class SwingClient extends Client implements Runnable {
 						public void mouseClicked(MouseEvent e) {
 							if (f.isEnabled()) // disabled lightweight components still receive MouseEvents
 								try {
-									server.action(instance, new PlaceStone(players.get(playerIndex), xy));
-									events.poll(); // PlaceStone
-									playerIndex = (playerIndex + 1) % players.size();
-									if (events.isEmpty()) {
-										statusBar.setText(players.get(playerIndex).getName() + "'"
-												+ (endsWithSSound(players.get(playerIndex).getName()) ? "" : "s")
-												+ " turn!");
-									} else {
-										GameEvent event = events.poll();
-										if (event instanceof PlayerVictory) {
-											JOptionPane.showMessageDialog(gui, ((PlayerVictory) event)
-													.getWinningPlayer().getName() + " won!");
-										}
-										if (event instanceof GameEnd) {
-											for (int x = 0; x < boardSize.width; x++) {
-												for (int y = 0; y < boardSize.height; y++) {
-													fields[x][y].setEnabled(false);
+									int[] phase = server.getPhase(instance);
+									if (phase[0] == 0 && phase[1] == 1) {
+										// blocking
+										server.action(instance,
+												server.getCurrentBoard(instance).getPlayerAt(xy) == NoPlayer
+														.getInstance() ? new BlockField(players.get(0), xy)
+														: new UnblockField(players.get(0), xy));
+										events.poll(); // BlockField / UnblockField
+									} else if (phase[0] == 0 && phase[1] == 2) {
+										// jokers
+										server.action(instance,
+												server.getCurrentBoard(instance).getPlayerAt(xy) == NoPlayer
+														.getInstance() ? new JokerField(players.get(0), xy)
+														: new UnjokerField(players.get(0), xy));
+										events.poll(); // JokerField / UnjokerField
+									} else if (phase[0] == 1 && phase[1] == 1) {
+										// move
+										server.action(instance, new PlaceStone(players.get(playerIndex), xy));
+										events.poll(); // PlaceStone
+										playerIndex = (playerIndex + 1) % players.size();
+										if (events.isEmpty()) {
+											statusBar.setText(players.get(playerIndex).getName() + "'"
+													+ (endsWithSSound(players.get(playerIndex).getName()) ? "" : "s")
+													+ " turn!");
+										} else {
+											GameEvent event = events.poll();
+											if (event instanceof PlayerVictory) {
+												String message =
+														((PlayerVictory) event).getWinningPlayer().getName() + " wins!";
+												JOptionPane.showMessageDialog(gui, message);
+												statusBar.setText(message);
+											}
+											if (event instanceof GameEnd) {
+												for (int x = 0; x < boardSize.width; x++) {
+													for (int y = 0; y < boardSize.height; y++) {
+														fields[x][y].setEnabled(false);
+													}
 												}
 											}
 										}
@@ -180,8 +195,80 @@ public class SwingClient extends Client implements Runnable {
 				}
 			}
 			gui.add(board);
+
+			// blocks
+			statusBar.setText("Select blocked fields");
+			buttons.removeAll();
+			JButton doneBlocks = new JButton("Done setting blocked fields");
+			doneBlocks.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					for (Player p : players) {
+						try {
+							server.action(instance, new BlockDistributionAccepted(p, server.getCurrentBoard(instance)));
+						} catch (IllegalStateException | IllegalMoveException e1) {
+							e1.printStackTrace();
+						}
+						events.poll(); // BlockDistributionAccepted
+					}
+					events.poll(); // PhaseChange
+					synchronized (instance) {
+						instance.notify();
+					}
+				}
+			});
+			buttons.add(doneBlocks);
 			gui.pack();
 			gui.setVisible(true);
+			synchronized (this) {
+				wait();
+			}
+			// disable blocked fields
+			for (int x = 0; x < boardSize.width; x++)
+				for (int y = 0; y < boardSize.height; y++)
+					if (server.getCurrentBoard(this).getPlayerAt(x, y) == Block.getInstance())
+						fields[x][y].setEnabled(false);
+
+			// jokers
+			statusBar.setText("Select joker fields");
+			buttons.removeAll();
+			JButton doneJokers = new JButton("Done setting joker fields");
+			doneJokers.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					for (Player p : players) {
+						try {
+							server.action(instance, new JokerDistributionAccepted(p, server.getCurrentBoard(instance)));
+						} catch (IllegalStateException | IllegalMoveException e1) {
+							e1.printStackTrace();
+						}
+						events.poll(); // JokerDistributionAccepted
+					}
+					events.poll(); // PhaseChange
+					synchronized (instance) {
+						instance.notify();
+					}
+				}
+			});
+			buttons.add(doneJokers);
+			gui.pack();
+			synchronized (this) {
+				wait();
+			}
+			// disable blocked fields
+			for (int x = 0; x < boardSize.width; x++)
+				for (int y = 0; y < boardSize.height; y++)
+					if (server.getCurrentBoard(this).getPlayerAt(x, y) == Joker.getInstance())
+						fields[x][y].setEnabled(false);
+
+			// normal gameplay
+			buttons.removeAll();
+			gui.pack();
+			statusBar.setText(players.get(playerIndex).getName() + "'"
+					+ (endsWithSSound(players.get(playerIndex).getName()) ? "" : "s") + " turn!");
+			// everything after this point is handled in ActionListeners
 		} catch (Throwable t) {
 			System.out.println("WHOOPS! An internal error occured. I'm so sorry.");
 			t.printStackTrace();
