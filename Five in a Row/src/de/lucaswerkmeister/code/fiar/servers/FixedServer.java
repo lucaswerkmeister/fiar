@@ -45,6 +45,7 @@ import de.lucaswerkmeister.code.fiar.framework.event.PhaseChange;
 import de.lucaswerkmeister.code.fiar.framework.event.PlaceStone;
 import de.lucaswerkmeister.code.fiar.framework.event.PlayerAction;
 import de.lucaswerkmeister.code.fiar.framework.event.PlayerVictory;
+import de.lucaswerkmeister.code.fiar.framework.event.Tie;
 import de.lucaswerkmeister.code.fiar.framework.event.UnblockField;
 import de.lucaswerkmeister.code.fiar.framework.event.UnjokerField;
 import de.lucaswerkmeister.code.fiar.framework.exception.IllegalMoveException;
@@ -69,6 +70,8 @@ public class FixedServer extends Server {
 	private Dimension currentBoardSize;
 	private Set<BlockDistributionAccepted> acceptedBlockDistributions;
 	private Set<JokerDistributionAccepted> acceptedJokerDistributions;
+	private int occupiedFields = 0; // number of occupied fields is cached to avoid having to iterate over the whole
+									// board after each move for counting
 
 	/**
 	 * Creates a new {@link FixedServer} instance. The players in <code>players[i]</code> are bound to client
@@ -180,11 +183,13 @@ public class FixedServer extends Server {
 					}
 					return;
 				case 1:
-					if (action.getClass() == BlockField.class)
+					if (action.getClass() == BlockField.class) {
 						board.setPlayerAt(((FieldAction) action).getField(), Block.getInstance());
-					else if (action.getClass() == UnblockField.class)
+						occupiedFields++;
+					} else if (action.getClass() == UnblockField.class) {
 						board.setPlayerAt(((FieldAction) action).getField(), NoPlayer.getInstance());
-					else
+						occupiedFields--;
+					} else
 						acceptedBlockDistributions.add((BlockDistributionAccepted) action);
 					fireEvent(action);
 					if (blockDistributionAgreed()) {
@@ -195,11 +200,13 @@ public class FixedServer extends Server {
 					}
 					return;
 				case 2:
-					if (action.getClass() == JokerField.class)
+					if (action.getClass() == JokerField.class) {
 						board.setPlayerAt(((FieldAction) action).getField(), Joker.getInstance());
-					else if (action.getClass() == UnjokerField.class)
+						occupiedFields++;
+					} else if (action.getClass() == UnjokerField.class) {
 						board.setPlayerAt(((FieldAction) action).getField(), NoPlayer.getInstance());
-					else
+						occupiedFields--;
+					} else
 						acceptedJokerDistributions.add((JokerDistributionAccepted) action);
 					fireEvent(action);
 					if (jokerDistributionAgreed()) {
@@ -238,11 +245,18 @@ public class FixedServer extends Server {
 							throw new IllegalMoveException("Field is already occupied by "
 									+ board.getPlayerAt(placeStone.getField()).getName() + "!");
 						board.setPlayerAt(placeStone.getField(), placeStone.getActingPlayer());
+						occupiedFields++;
 						fireEvent(action);
 
 						if (board.wasWinningMove(placeStone.getField())) {
 							phase = new int[] {2, 0, action.getActingPlayer().getID() };
 							fireEvent(new PlayerVictory(action.getActingPlayer()));
+							return;
+						}
+
+						if (occupiedFields >= board.getWidth() * board.getHeight()) {
+							phase = new int[] {2, 1 };
+							fireEvent(new Tie());
 							return;
 						}
 
