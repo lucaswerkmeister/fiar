@@ -36,6 +36,8 @@ public class ConsoleClientTest {
 	 * Tests basic gameplay: No blocking and jokers, no illegal input.
 	 * <p>
 	 * This plays exactly the same game as {@link FixedServerTest#testBasic()}.
+	 * <p>
+	 * Warning: This test takes a long time to finish (ca. 13s on the ATIS computers) - don't be fooled by that!
 	 */
 	@Test
 	public void testBasic() {
@@ -104,6 +106,7 @@ public class ConsoleClientTest {
 	 */
 	private void write(String clientInput) throws IOException {
 		in.write(clientInput + '\n');
+		in.flush();
 	}
 
 	/**
