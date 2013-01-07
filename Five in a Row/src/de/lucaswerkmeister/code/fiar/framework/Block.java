@@ -26,6 +26,11 @@ import java.awt.Color;
  * @version 1.1
  */
 public class Block extends Player {
+	/**
+	 * The ID of the Block instance.
+	 * 
+	 * @see #getInstance()
+	 */
 	public static final int ID = -1;
 	private static final Block instance = new Block();
 
@@ -37,6 +42,11 @@ public class Block extends Player {
 		super(name, color, id);
 	}
 
+	/**
+	 * Gets the one Block instance in this virtual machine.
+	 * 
+	 * @return The Block instance.
+	 */
 	public static Block getInstance() {
 		return instance;
 	}

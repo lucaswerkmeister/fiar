@@ -39,8 +39,134 @@ import de.lucaswerkmeister.code.fiar.servers.FixedServer;
 public class FixedServerTest extends Client {
 	private Queue<GameEvent> events;
 
+	// Eclipse formatter is stupid and inserts line breaks after every td :(
 	/**
 	 * Tests basic gameplay of the server: No blocking and jokers, only two players, no illegal action attempts.
+	 * <p>
+	 * After the game has finished, the board looks like this:<br>
+	 * <table border="1">
+	 * <colgroup width="25px" span="10"/>
+	 * <tr style="height:25px;">
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * </tr>
+	 * <tr style="height:25px;">
+	 * <td>2</td>
+	 * <td>1</td>
+	 * <td>1</td>
+	 * <td>1</td>
+	 * <td>1</td>
+	 * <td>1</td>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * </tr>
+	 * <tr style="height:25px;">
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * </tr>
+	 * <tr style="height:25px;">
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * </tr>
+	 * <tr style="height:25px;">
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * </tr>
+	 * <tr style="height:25px;">
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * </tr>
+	 * <tr style="height:25px;">
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * </tr>
+	 * <tr style="height:25px;">
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td>2</td>
+	 * <td/>
+	 * <td/>
+	 * </tr>
+	 * <tr style="height:25px;">
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td>2</td>
+	 * <td/>
+	 * </tr>
+	 * <tr style="height:25px;">
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td/>
+	 * <td>2</td>
+	 * </tr>
+	 * </table>
 	 */
 	@Test
 	public void testBasic() {
@@ -102,7 +228,8 @@ public class FixedServerTest extends Client {
 			Assert.assertTrue(PhaseChange.class.isInstance(events.poll()));
 
 			// Block (3,5) and (3,6)
-			// To confuse the server, we accept the block distribution before we set the blocks.
+			// To confuse the server, we accept the block distribution before we
+			// set the blocks.
 			// The server should be able to handle this.
 			Board targetBoard = server.getCurrentBoard(this);
 			targetBoard.setPlayerAt(3, 5, Block.getInstance());
@@ -117,7 +244,8 @@ public class FixedServerTest extends Client {
 			act(server, new UnblockField(p1, 3, 7));
 			Assert.assertTrue(PhaseChange.class.isInstance(events.poll()));
 
-			// Set (0,0) and (9,9) as joker fields. This is completely analogous to the blocking procedure.
+			// Set (0,0) and (9,9) as joker fields. This is completely analogous
+			// to the blocking procedure.
 			targetBoard.setPlayerAt(0, 0, Joker.getInstance());
 			targetBoard.setPlayerAt(9, 9, Joker.getInstance());
 			act(server, new JokerDistributionAccepted(p1, targetBoard));

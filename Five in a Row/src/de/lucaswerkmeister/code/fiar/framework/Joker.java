@@ -26,6 +26,11 @@ import java.awt.Color;
  * @version 1.1
  */
 public class Joker extends Player {
+	/**
+	 * The ID of the Joker instance.
+	 * 
+	 * @see #getInstance()
+	 */
 	public static final int ID = -2;
 	private static final Joker instance = new Joker();
 
@@ -37,6 +42,11 @@ public class Joker extends Player {
 		super(name, color, id);
 	}
 
+	/**
+	 * Gets the one Joker instance in this virtual machine.
+	 * 
+	 * @return The instance.
+	 */
 	public static Joker getInstance() {
 		return instance;
 	}
