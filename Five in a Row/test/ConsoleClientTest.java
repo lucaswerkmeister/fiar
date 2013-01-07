@@ -18,6 +18,7 @@ import de.lucaswerkmeister.code.fiar.clients.ConsoleClient;
 import de.lucaswerkmeister.code.fiar.framework.Block;
 import de.lucaswerkmeister.code.fiar.framework.Board;
 import de.lucaswerkmeister.code.fiar.framework.Joker;
+import de.lucaswerkmeister.code.fiar.framework.NoPlayer;
 import de.lucaswerkmeister.code.fiar.framework.Player;
 import de.lucaswerkmeister.code.fiar.servers.ArrayBoard;
 
@@ -28,6 +29,7 @@ import de.lucaswerkmeister.code.fiar.servers.ArrayBoard;
  * @version 1.0
  */
 public class ConsoleClientTest {
+	// Note that out is a Reader reading from the client's out and in is a Writer writing to the client's in.
 	private BufferedReader out;
 	private BufferedWriter in;
 	private Board board;
@@ -43,13 +45,7 @@ public class ConsoleClientTest {
 	public void testBasic() {
 		try {
 			// Capture System.out and System.in.
-			// Note that out is a Reader reading from the client's out and in is a Writer writing to the client's in.
-			PipedInputStream pOut = new PipedInputStream();
-			System.setOut(new PrintStream(new PipedOutputStream(pOut)));
-			PipedOutputStream pIn = new PipedOutputStream();
-			System.setIn(new PipedInputStream(pIn));
-			out = new BufferedReader(new InputStreamReader(pOut));
-			in = new BufferedWriter(new OutputStreamWriter(pIn));
+			captureIO();
 			ConsoleClient.main(new String[] {}); // runs in a new thread
 			read("Welcome to Five in a Row!");
 			read("Please enter the field size:");
@@ -82,6 +78,62 @@ public class ConsoleClientTest {
 			if (t instanceof ThreadDeath)
 				throw (ThreadDeath) t;
 		}
+	}
+
+	/**
+	 * Tests advanced gameplay with blocked fields and jokers. Additionally, some invalid inputs are sent.
+	 * <p>
+	 * This plays exactly the same game as {@link FixedServerTest#testAdvanced()}.
+	 */
+	@Test
+	public void testAdvanced() {
+		try {
+			captureIO();
+			ConsoleClient.main(new String[] {}); // runs in a new thread
+			read("Welcome to Five in a Row!");
+			read("Please enter the field size:");
+			write("10");
+			read("You may now mark certain fields as blocked:");
+			read("A blocked field will not count as part of a row for any player.");
+			read("Please enter the coordinates of fields you wish to block (x|y) or \"quit\" to continue.");
+			read("Enter the same coordinates again to unblock a field again.");
+			block(3, 5);
+			block(3, 7);
+			block(3, 6);
+			block(3, 7);
+			write("HEYYEYAAEYAAAEYAEYAA"); // weird rubbish
+			read("Invalid input. Please re-type the coordinates, but in a different format.");
+			write("quit");
+			read("You may now mark certain fields as joker fields:");
+			read("A joker field will count as part of a row for every player.");
+			read("Please enter the coordinates of fields you wish to set as joker (x|y) or \"quit\" to continue.");
+			read("Enter the same coordinates again to \"un-joker\" a field again.");
+			joker(0, 0);
+			joker(1, 7);
+			joker(9, 9);
+			joker(1, 7);
+			write("quit");
+			read("Game started!");
+		} catch (Throwable t) {
+			Assert.fail("Exception: " + t.toString());
+			if (t instanceof ThreadDeath)
+				throw (ThreadDeath) t;
+		}
+	}
+
+	/**
+	 * Captures <code>System.in</code> and <code>System.out</code>.
+	 * 
+	 * @throws IOException
+	 *             If an I/O error occurs.
+	 */
+	private void captureIO() throws IOException {
+		PipedInputStream pOut = new PipedInputStream();
+		System.setOut(new PrintStream(new PipedOutputStream(pOut)));
+		PipedOutputStream pIn = new PipedOutputStream();
+		System.setIn(new PipedInputStream(pIn));
+		out = new BufferedReader(new InputStreamReader(pOut));
+		in = new BufferedWriter(new OutputStreamWriter(pIn));
 	}
 
 	/**
@@ -162,5 +214,64 @@ public class ConsoleClientTest {
 		// This works because two players with the same ID are considered equal.
 		board.setPlayerAt(x, y, new Player("Phantom player", Color.black, player));
 		readBoard(board);
+	}
+
+	/**
+	 * Writes the "place stone" action, writes it to the board, and reads the board.
+	 * <p>
+	 * Note: This method is NOT analogous to {@link #placeStone(int, int, int)}, since this method does <i>not</i> read
+	 * the "place stone" query.
+	 * 
+	 * @param player
+	 *            The player that places the stone.
+	 * @param x
+	 *            The x-coordinate of the stone to place.
+	 * @param y
+	 *            The y-coordinate of the stone to place.
+	 * @throws IOException
+	 *             If an I/O error occurs.
+	 */
+	private void placeStone(Player player, int x, int y) throws IOException {
+		write(x + "|" + y);
+		board.setPlayerAt(x, y, player);
+		readBoard(board);
+	}
+
+	/**
+	 * Blocks or unblocks the specified field.
+	 * <p>
+	 * More specifically: {@link #placeStone(Player, int, int) Places the stone} and reads the "field blocked/unblocked"
+	 * response.
+	 * 
+	 * @param x
+	 *            The x-coordinate of the stone to place.
+	 * @param y
+	 *            The y-coordinate of the stone to place.
+	 * @throws IOException
+	 *             If an I/O error occurs.
+	 */
+	private void block(int x, int y) throws IOException {
+		boolean block = board.getPlayerAt(x, y).equals(NoPlayer.getInstance());
+		placeStone(block ? Block.getInstance() : NoPlayer.getInstance(), x, y);
+		read("Field " + x + "|" + y + (block ? " blocked." : " unblocked."));
+	}
+
+	/**
+	 * Marks or unmarks the specified field as joker field.
+	 * <p>
+	 * More specifically: {@link #placeStone(Player, int, int) Places the stone} and reads the
+	 * "field marked/unmarked as joker" response.
+	 * 
+	 * @param x
+	 *            The x-coordinate of the stone to place.
+	 * @param y
+	 *            The y-coordinate of the stone to place.
+	 * @throws IOException
+	 *             If an I/O error occurs.
+	 */
+	private void joker(int x, int y) throws IOException {
+		boolean joker = board.getPlayerAt(x, y).equals(NoPlayer.getInstance());
+		placeStone(joker ? Joker.getInstance() : NoPlayer.getInstance(), x, y);
+		read("Field " + x + "|" + y + (joker ? " marked" : " unmarked") + " as joker field");
 	}
 }

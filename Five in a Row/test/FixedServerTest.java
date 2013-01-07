@@ -228,8 +228,7 @@ public class FixedServerTest extends Client {
 			Assert.assertTrue(PhaseChange.class.isInstance(events.poll()));
 
 			// Block (3,5) and (3,6)
-			// To confuse the server, we accept the block distribution before we
-			// set the blocks.
+			// To confuse the server, we accept the block distribution before we set the blocks.
 			// The server should be able to handle this.
 			Board targetBoard = server.getCurrentBoard(this);
 			targetBoard.setPlayerAt(3, 5, Block.getInstance());
@@ -244,8 +243,7 @@ public class FixedServerTest extends Client {
 			act(server, new UnblockField(p1, 3, 7));
 			Assert.assertTrue(PhaseChange.class.isInstance(events.poll()));
 
-			// Set (0,0) and (9,9) as joker fields. This is completely analogous
-			// to the blocking procedure.
+			// Set (0,0) and (9,9) as joker fields. This is completely analogous to the blocking procedure.
 			targetBoard.setPlayerAt(0, 0, Joker.getInstance());
 			targetBoard.setPlayerAt(9, 9, Joker.getInstance());
 			act(server, new JokerDistributionAccepted(p1, targetBoard));
