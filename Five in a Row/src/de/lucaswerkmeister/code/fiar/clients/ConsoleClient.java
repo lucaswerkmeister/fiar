@@ -206,7 +206,6 @@ public class ConsoleClient extends Client implements Runnable {
 				player = (player % 2) + 1;
 			}
 			System.out.println("Player " + server.getPhase(this)[2] + " won!");
-
 		} catch (Throwable t) {
 			System.out.println("WHOOPS! An internal error occured. I'm so sorry.");
 			t.printStackTrace();
@@ -222,8 +221,8 @@ public class ConsoleClient extends Client implements Runnable {
 	 *            The board to print.
 	 */
 	private void printBoard(Board b) {
-		for (int x = 0; x < b.getWidth(); x++) {
-			for (int y = 0; y < b.getHeight(); y++)
+		for (int y = 0; y < b.getHeight(); y++) {
+			for (int x = 0; x < b.getWidth(); x++)
 				switch (b.getPlayerAt(x, y) == null ? 0 : b.getPlayerAt(x, y).getID()) {
 				case Joker.ID:
 					System.out.print('J');
