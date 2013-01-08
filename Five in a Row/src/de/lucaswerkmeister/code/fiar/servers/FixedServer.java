@@ -383,5 +383,10 @@ public class FixedServer extends Server {
 			this.client = client;
 			this.player = player;
 		}
+
+		@Override
+		public String toString() {
+			return "[" + client.toString() + "," + player.toString() + "]";
+		}
 	}
 }
