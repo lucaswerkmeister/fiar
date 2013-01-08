@@ -83,7 +83,8 @@ public class ConsoleClientTest {
 	/**
 	 * Tests advanced gameplay with blocked fields and jokers. Additionally, some invalid inputs are sent.
 	 * <p>
-	 * This plays exactly the same game as {@link FixedServerTest#testAdvanced()}.
+	 * This plays exactly the same game as {@link FixedServerTest#testAdvanced()}, with the exception that there is no
+	 * third player.
 	 */
 	@Test
 	public void testAdvanced() {
@@ -97,6 +98,7 @@ public class ConsoleClientTest {
 			read("A blocked field will not count as part of a row for any player.");
 			read("Please enter the coordinates of fields you wish to block (x|y) or \"quit\" to continue.");
 			read("Enter the same coordinates again to unblock a field again.");
+			board = new ArrayBoard(10, 10);
 			block(3, 5);
 			block(3, 7);
 			block(3, 6);
@@ -114,19 +116,18 @@ public class ConsoleClientTest {
 			joker(1, 7);
 			write("quit");
 			read("Game started!");
+			readBoard(board);
 			placeStone(1, 1, 1);
 			placeStone(2, 8, 8);
-			placeStone(3, 0, 9);
 			placeStone(1, 2, 2);
 			placeStone(2, 7, 7);
-			placeStone(3, 1, 8);
 			placeStone(1, 3, 3);
 			placeStone(2, 6, 6);
-			placeStone(3, 4, 4);
 			placeStone(1, 2, 7);
 			placeStone(2, 5, 5);
 			read("Player 2 won!");
 		} catch (Throwable t) {
+			t.printStackTrace();
 			Assert.fail("Exception: " + t.toString());
 			if (t instanceof ThreadDeath)
 				throw (ThreadDeath) t;
@@ -284,6 +285,6 @@ public class ConsoleClientTest {
 	private void joker(int x, int y) throws IOException {
 		boolean joker = board.getPlayerAt(x, y).equals(NoPlayer.getInstance());
 		placeStone(joker ? Joker.getInstance() : NoPlayer.getInstance(), x, y);
-		read("Field " + x + "|" + y + (joker ? " marked" : " unmarked") + " as joker field");
+		read("Field " + x + "|" + y + (joker ? " marked" : " unmarked") + " as joker field.");
 	}
 }
