@@ -115,6 +115,7 @@ public class SwingClient extends Client implements Runnable {
 			int index = players.indexOf(p);
 			players.remove(p);
 			if (playerIndex == index) {
+				playerIndex %= players.size();
 				statusBar.setText(players.get(playerIndex).getName() + "'"
 						+ (endsWithSSound(players.get(playerIndex).getName()) ? "" : "s") + " turn!");
 			} else if (playerIndex > index)
@@ -187,8 +188,8 @@ public class SwingClient extends Client implements Runnable {
 										} else {
 											GameEvent event = events.poll();
 											if (event instanceof PlayerVictory) {
-												String message =
-														((PlayerVictory) event).getWinningPlayer().getName() + " wins!";
+												String message = ((PlayerVictory) event).getWinningPlayer().getName()
+														+ " wins!";
 												JOptionPane.showMessageDialog(gui, message);
 												statusBar.setText(message);
 											}
@@ -337,8 +338,8 @@ public class SwingClient extends Client implements Runnable {
 		dialog.add(name);
 		// This "random color" code is based on the following stackoverflow answer:
 		// http://stackoverflow.com/a/4247219/1420237
-		SelectableColor color =
-				new SelectableColor(Color.getHSBColor(random.nextFloat(), (random.nextInt(2) + 7) / 10f, 0.9f));
+		SelectableColor color = new SelectableColor(Color.getHSBColor(random.nextFloat(),
+				(random.nextInt(2) + 7) / 10f, 0.9f));
 		dialog.add(color);
 		JButton addPlayer = new JButton("Add Player");
 		addPlayer.addActionListener(new ActionListener() {

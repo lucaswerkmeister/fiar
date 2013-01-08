@@ -165,7 +165,7 @@ public class FixedServer extends Server {
 		if (!clientPlayerMatch(requester, action.getActingPlayer()))
 			throw new IllegalArgumentException("Client and player don't match!");
 		if (!getAllowedActions(requester, action.getActingPlayer()).contains(action.getClass()))
-			throw new IllegalStateException("This action is currently not permissible for player "
+			throw new IllegalStateException("This action is currently not allowed for "
 					+ action.getActingPlayer().getName() + "!");
 		try {
 			switch (phase[0]) {
@@ -237,12 +237,13 @@ public class FixedServer extends Server {
 								break;
 							}
 						ClientPlayerPair[] newPairs = new ClientPlayerPair[pairs.length - 1];
+						System.arraycopy(pairs, 0, newPairs, 0, index);
 						System.arraycopy(pairs, index + 1, newPairs, index, pairs.length - index - 1);
 						pairs = newPairs;
-						if (currentPlayerIndex > index) {
+						if (currentPlayerIndex > index)
 							currentPlayerIndex--;
-							phase[2] = pairs[currentPlayerIndex].player.getID();
-						}
+						currentPlayerIndex %= pairs.length;
+						phase[2] = pairs[currentPlayerIndex].player.getID();
 						fireEvent(action);
 						if (pairs.length < 2) {
 							phase = new int[] {2, 0, action.getActingPlayer().getID() };

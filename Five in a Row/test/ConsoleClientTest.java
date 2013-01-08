@@ -114,6 +114,18 @@ public class ConsoleClientTest {
 			joker(1, 7);
 			write("quit");
 			read("Game started!");
+			placeStone(1, 1, 1);
+			placeStone(2, 8, 8);
+			placeStone(3, 0, 9);
+			placeStone(1, 2, 2);
+			placeStone(2, 7, 7);
+			placeStone(3, 1, 8);
+			placeStone(1, 3, 3);
+			placeStone(2, 6, 6);
+			placeStone(3, 4, 4);
+			placeStone(1, 2, 7);
+			placeStone(2, 5, 5);
+			read("Player 2 won!");
 		} catch (Throwable t) {
 			Assert.fail("Exception: " + t.toString());
 			if (t instanceof ThreadDeath)

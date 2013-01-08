@@ -113,4 +113,9 @@ public class Player {
 	public int hashCode() {
 		return getID();
 	}
+
+	@Override
+	public String toString() {
+		return "(" + getName() + "," + getColor().toString() + "," + getID() + ")";
+	}
 }
