@@ -43,6 +43,7 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.WindowConstants;
 
 import de.lucaswerkmeister.code.fiar.framework.Block;
 import de.lucaswerkmeister.code.fiar.framework.Client;
@@ -98,7 +99,7 @@ public class SwingClient extends Client implements Runnable {
 		}
 		server = new FixedServer(new Client[] {this }, new Player[][] {players.toArray(new Player[] {}) });
 		events = new LinkedList<>();
-		JPanel content = new JPanel(new BorderLayout());
+		final JPanel content = new JPanel(new BorderLayout());
 		board = new JPanel();
 		content.add(board, BorderLayout.CENTER);
 		buttons = new JPanel();
@@ -109,10 +110,10 @@ public class SwingClient extends Client implements Runnable {
 	}
 
 	@Override
-	public void gameEvent(GameEvent e) {
+	public void gameEvent(final GameEvent e) {
 		if (e instanceof Forfeit) {
-			Player p = ((Forfeit) e).getActingPlayer();
-			int index = players.indexOf(p);
+			final Player p = ((Forfeit) e).getActingPlayer();
+			final int index = players.indexOf(p);
 			players.remove(p);
 			if (playerIndex == index) {
 				playerIndex %= players.size();
@@ -127,7 +128,7 @@ public class SwingClient extends Client implements Runnable {
 			gui.pack();
 		}
 		if (e instanceof FieldAction) {
-			FieldAction fa = (FieldAction) e;
+			final FieldAction fa = (FieldAction) e;
 			fields[fa.getField().x][fa.getField().y].setPlayer(server.getCurrentBoard(this).getPlayerAt(fa.getField()));
 		}
 		events.add(e);
@@ -138,7 +139,7 @@ public class SwingClient extends Client implements Runnable {
 		try {
 			// choose board size
 			final Dimension boardSize = showChooseBoardSizeDialog(gui);
-			for (Player p : players) {
+			for (final Player p : players) {
 				server.action(this, new BoardSizeProposal(p, boardSize));
 				events.poll(); // BoardSizeProposal
 			}
@@ -147,16 +148,16 @@ public class SwingClient extends Client implements Runnable {
 			board.setLayout(new GridLayout(boardSize.width, boardSize.height, 0, 0));
 			fields = new Field[boardSize.width][boardSize.height];
 			final Dimension fieldSize = new Dimension(10, 10);
-			for (int x = 0; x < boardSize.width; x++) {
+			for (int x = 0; x < boardSize.width; x++)
 				for (int y = 0; y < boardSize.height; y++) {
 					final Field f = new Field(null, fieldSize);
 					final Point xy = new Point(x, y);
 					f.addMouseListener(new MouseAdapter() {
 						@Override
-						public void mouseClicked(MouseEvent e) {
+						public void mouseClicked(final MouseEvent e) {
 							if (f.isEnabled()) // disabled lightweight components still receive MouseEvents
 								try {
-									int[] phase = server.getPhase(instance);
+									final int[] phase = server.getPhase(instance);
 									if (phase[0] == 0 && phase[1] == 1) {
 										// blocking
 										server.action(instance,
@@ -176,25 +177,22 @@ public class SwingClient extends Client implements Runnable {
 										server.action(instance, new PlaceStone(players.get(playerIndex), xy));
 										events.poll(); // PlaceStone
 										playerIndex = (playerIndex + 1) % players.size();
-										if (events.isEmpty()) {
+										if (events.isEmpty())
 											statusBar.setText(players.get(playerIndex).getName() + "'"
 													+ (endsWithSSound(players.get(playerIndex).getName()) ? "" : "s")
 													+ " turn!");
-										} else {
-											GameEvent event = events.poll();
+										else {
+											final GameEvent event = events.poll();
 											if (event instanceof PlayerVictory) {
-												String message = ((PlayerVictory) event).getWinningPlayer().getName()
-														+ " wins!";
+												final String message = ((PlayerVictory) event).getWinningPlayer()
+														.getName() + " wins!";
 												JOptionPane.showMessageDialog(gui, message);
 												statusBar.setText(message);
 											}
-											if (event instanceof GameEnd) {
-												for (int x = 0; x < boardSize.width; x++) {
-													for (int y = 0; y < boardSize.height; y++) {
+											if (event instanceof GameEnd)
+												for (int x = 0; x < boardSize.width; x++)
+													for (int y = 0; y < boardSize.height; y++)
 														fields[x][y].setEnabled(false);
-													}
-												}
-											}
 										}
 									}
 								} catch (IllegalStateException | IllegalMoveException e1) {
@@ -205,18 +203,17 @@ public class SwingClient extends Client implements Runnable {
 					fields[x][y] = f;
 					board.add(f);
 				}
-			}
 			gui.add(board);
 
 			// blocks
 			statusBar.setText("Select blocked fields");
 			buttons.removeAll();
-			JButton doneBlocks = new JButton("Done setting blocked fields");
+			final JButton doneBlocks = new JButton("Done setting blocked fields");
 			doneBlocks.addActionListener(new ActionListener() {
 
 				@Override
-				public void actionPerformed(ActionEvent e) {
-					for (Player p : players) {
+				public void actionPerformed(final ActionEvent e) {
+					for (final Player p : players) {
 						try {
 							server.action(instance, new BlockDistributionAccepted(p, server.getCurrentBoard(instance)));
 						} catch (IllegalStateException | IllegalMoveException e1) {
@@ -245,12 +242,12 @@ public class SwingClient extends Client implements Runnable {
 			// jokers
 			statusBar.setText("Select joker fields");
 			buttons.removeAll();
-			JButton doneJokers = new JButton("Done setting joker fields");
+			final JButton doneJokers = new JButton("Done setting joker fields");
 			doneJokers.addActionListener(new ActionListener() {
 
 				@Override
-				public void actionPerformed(ActionEvent e) {
-					for (Player p : players) {
+				public void actionPerformed(final ActionEvent e) {
+					for (final Player p : players) {
 						try {
 							server.action(instance, new JokerDistributionAccepted(p, server.getCurrentBoard(instance)));
 						} catch (IllegalStateException | IllegalMoveException e1) {
@@ -277,11 +274,11 @@ public class SwingClient extends Client implements Runnable {
 
 			// normal gameplay
 			buttons.removeAll();
-			JButton forfeit = new JButton("Forfeit");
+			final JButton forfeit = new JButton("Forfeit");
 			forfeit.addActionListener(new ActionListener() {
 
 				@Override
-				public void actionPerformed(ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					try {
 						server.action(instance, new Forfeit(players.get(playerIndex)));
 					} catch (IllegalStateException | IllegalMoveException e1) {
@@ -294,7 +291,7 @@ public class SwingClient extends Client implements Runnable {
 			statusBar.setText(players.get(playerIndex).getName() + "'"
 					+ (endsWithSSound(players.get(playerIndex).getName()) ? "" : "s") + " turn!");
 			// everything after this point is handled in ActionListeners
-		} catch (Throwable t) {
+		} catch (final Throwable t) {
 			System.out.println("WHOOPS! An internal error occured. I'm so sorry.");
 			t.printStackTrace();
 			if (t instanceof ThreadDeath)
@@ -315,17 +312,17 @@ public class SwingClient extends Client implements Runnable {
 	 * @return A {@link Player} with the user-specified name and color, or <code>null</code> if the user chose not to
 	 *         add another player.
 	 */
-	public static Player showAddPlayerDialog(boolean forcePlayer, int id, JFrame owner) {
+	public static Player showAddPlayerDialog(final boolean forcePlayer, final int id, final JFrame owner) {
 		final JDialog dialog = new JDialog(owner, "Add player", true);
 		dialog.setLayout(new FlowLayout());
-		dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+		dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		dialog.setAlwaysOnTop(true);
 
-		JTextField name = new JTextField("Player " + id, 10);
+		final JTextField name = new JTextField("Player " + id, 10);
 		name.addActionListener(new ActionListener() {
 
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				dialog.setName("Add Player");
 				dialog.setVisible(false);
 			}
@@ -333,19 +330,19 @@ public class SwingClient extends Client implements Runnable {
 		dialog.add(name);
 		// This "random color" code is based on the following stackoverflow answer:
 		// http://stackoverflow.com/a/4247219/1420237
-		SelectableColor color = new SelectableColor(Color.getHSBColor(random.nextFloat(),
+		final SelectableColor color = new SelectableColor(Color.getHSBColor(random.nextFloat(),
 				(random.nextInt(2) + 7) / 10f, 0.9f));
 		dialog.add(color);
-		JButton addPlayer = new JButton("Add Player");
+		final JButton addPlayer = new JButton("Add Player");
 		addPlayer.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				dialog.setName(e.getActionCommand());
 				dialog.setVisible(false);
 			}
 		});
 		dialog.add(addPlayer);
-		JButton cancel = new JButton("Cancel");
+		final JButton cancel = new JButton("Cancel");
 		cancel.addActionListener(addPlayer.getActionListeners()[0]);
 		if (forcePlayer) {
 			cancel.setEnabled(false);
@@ -373,32 +370,32 @@ public class SwingClient extends Client implements Runnable {
 	 *            The owner of the dialog.
 	 * @return The user-chosen size.
 	 */
-	public static Dimension showChooseBoardSizeDialog(JFrame owner) {
+	public static Dimension showChooseBoardSizeDialog(final JFrame owner) {
 		final JDialog dialog = new JDialog(owner, "Choose board size", true);
 		dialog.setLayout(new FlowLayout());
 		dialog.toFront();
-		dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+		dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
-		JSpinner boardWidth = new JSpinner(new SpinnerNumberModel(15, 5, Integer.MAX_VALUE, 1));
+		final JSpinner boardWidth = new JSpinner(new SpinnerNumberModel(15, 5, Integer.MAX_VALUE, 1));
 		boardWidth.setPreferredSize(new Dimension(50, boardWidth.getPreferredSize().height));
 		((JSpinner.DefaultEditor) boardWidth.getEditor()).getTextField().addKeyListener(new KeyAdapter() {
 			@Override
-			public void keyPressed(KeyEvent e) {
+			public void keyPressed(final KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER)
 					dialog.setVisible(false);
 			}
 		});
 		dialog.add(boardWidth);
 		dialog.add(new JLabel("×"));
-		JSpinner boardHeight = new JSpinner(new SpinnerNumberModel(15, 5, Integer.MAX_VALUE, 1));
+		final JSpinner boardHeight = new JSpinner(new SpinnerNumberModel(15, 5, Integer.MAX_VALUE, 1));
 		boardHeight.setPreferredSize(new Dimension(50, boardHeight.getPreferredSize().height));
 		((JSpinner.DefaultEditor) boardHeight.getEditor()).getTextField().addKeyListener(
 				((JSpinner.DefaultEditor) boardWidth.getEditor()).getTextField().getKeyListeners()[0]);
 		dialog.add(boardHeight);
-		JButton ok = new JButton("OK");
+		final JButton ok = new JButton("OK");
 		ok.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				dialog.setVisible(false);
 			}
 		});
@@ -418,7 +415,7 @@ public class SwingClient extends Client implements Runnable {
 	 *            The string.
 	 * @return <code>true</code> if that string ends with an "s" sound, <code>false</code> otherwise.
 	 */
-	private static boolean endsWithSSound(String token) {
+	private static boolean endsWithSSound(final String token) {
 		if (token.endsWith("ques"))
 			return false;
 		if (token.endsWith("aux"))
@@ -440,7 +437,7 @@ public class SwingClient extends Client implements Runnable {
 	 * @param args
 	 *            The arguments. Currently ignored.
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		new Thread(instance).start();
 	}
 }

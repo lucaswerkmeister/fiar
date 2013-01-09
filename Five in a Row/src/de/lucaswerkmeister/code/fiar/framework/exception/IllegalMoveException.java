@@ -23,7 +23,7 @@ public class IllegalMoveException extends Exception {
 	 * @param message
 	 *            The message.
 	 */
-	public IllegalMoveException(String message) {
+	public IllegalMoveException(final String message) {
 		super(message);
 	}
 }

@@ -36,7 +36,7 @@ public class JokerDistributionAccepted extends StoneDistributionAccepted {
 	 * @param acceptedBoard
 	 *            The board that the player accepts.
 	 */
-	public JokerDistributionAccepted(Player acceptingPlayer, Board acceptedBoard) {
+	public JokerDistributionAccepted(final Player acceptingPlayer, final Board acceptedBoard) {
 		super(acceptingPlayer, acceptedBoard);
 	}
 }

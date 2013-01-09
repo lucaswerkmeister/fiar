@@ -42,7 +42,7 @@ public class ArrayBoard extends Board {
 	 * @param height
 	 *            The height of the new ArrayBoard.
 	 */
-	public ArrayBoard(int width, int height) {
+	public ArrayBoard(final int width, final int height) {
 		board = new Player[width][height];
 		for (int x = 0; x < width; x++)
 			for (int y = 0; y < height; y++)
@@ -55,27 +55,27 @@ public class ArrayBoard extends Board {
 	 * @param boardSize
 	 *            The size of the new ArrayBoard.
 	 */
-	public ArrayBoard(Dimension boardSize) {
+	public ArrayBoard(final Dimension boardSize) {
 		this(boardSize.width, boardSize.height);
 	}
 
 	@Override
-	public Player getPlayerAt(int x, int y) {
+	public Player getPlayerAt(final int x, final int y) {
 		return board[x][y];
 	}
 
 	@Override
-	public Player getPlayerAt(Point position) {
+	public Player getPlayerAt(final Point position) {
 		return board[position.x][position.y];
 	}
 
 	@Override
-	public void setPlayerAt(int x, int y, Player p) {
+	public void setPlayerAt(final int x, final int y, final Player p) {
 		board[x][y] = p;
 	}
 
 	@Override
-	public void setPlayerAt(Point position, Player p) {
+	public void setPlayerAt(final Point position, final Player p) {
 		board[position.x][position.y] = p;
 	}
 
@@ -91,7 +91,7 @@ public class ArrayBoard extends Board {
 
 	@Override
 	public Board clone() {
-		ArrayBoard ret = new ArrayBoard(getWidth(), getHeight());
+		final ArrayBoard ret = new ArrayBoard(getWidth(), getHeight());
 		for (int i = 0; i < ret.board.length; i++)
 			System.arraycopy(board[i], 0, ret.board[i], 0, board[i].length);
 		return ret;
@@ -105,10 +105,10 @@ public class ArrayBoard extends Board {
 	 * @see de.lucaswerkmeister.code.fiar.framework.Board#equals(java.lang.Object)
 	 */
 	@Override
-	public boolean equals(Object other) {
+	public boolean equals(final Object other) {
 		if (!(other instanceof ArrayBoard))
 			return super.equals(other);
-		ArrayBoard otherBoard = (ArrayBoard) other;
+		final ArrayBoard otherBoard = (ArrayBoard) other;
 		if (otherBoard.getWidth() != getWidth() || otherBoard.getHeight() != getHeight())
 			return false;
 		for (int i = 0; i < board.length; i++)

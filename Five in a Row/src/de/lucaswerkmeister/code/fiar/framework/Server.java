@@ -112,7 +112,7 @@ public abstract class Server {
 	 *            The player.
 	 * @return <code>true</code> if the player can currently perform any actions, <code>false</code> otherwise.
 	 */
-	public boolean canAct(Client requester, Player p) {
+	public boolean canAct(final Client requester, final Player p) {
 		return getAllowedActions(requester, p).size() != 0;
 	}
 

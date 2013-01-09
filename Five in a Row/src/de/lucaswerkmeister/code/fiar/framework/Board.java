@@ -91,10 +91,10 @@ public abstract class Board {
 	 * Two boards are equal if and only if they have the same size and return the same player at every field.
 	 */
 	@Override
-	public boolean equals(Object other) {
+	public boolean equals(final Object other) {
 		if (!(other instanceof Board))
 			return false;
-		Board otherBoard = (Board) other;
+		final Board otherBoard = (Board) other;
 		if (getWidth() != otherBoard.getWidth() || getHeight() != otherBoard.getHeight())
 			return false;
 		for (int x = 0; x < getWidth(); x++)
@@ -117,7 +117,7 @@ public abstract class Board {
 	 * @return <code>true</code> if the stone completes a row of length {@link Server#IN_A_ROW} in any direction,
 	 *         <code>false</code> otherwise.
 	 */
-	public boolean wasWinningMove(int x, int y) {
+	public boolean wasWinningMove(final int x, final int y) {
 		int equalStonesLeft = 0, equalStonesRight = 0;
 		for (; x - equalStonesLeft - 1 >= 0
 				&& getPlayerAt(x - equalStonesLeft - 1, y).equalsWithJoker(getPlayerAt(x, y)); equalStonesLeft++)
@@ -171,7 +171,7 @@ public abstract class Board {
 	 * @return <code>true</code> if the stone completes a row of length {@link Server#IN_A_ROW} in any direction,
 	 *         <code>false</code> otherwise.
 	 */
-	public boolean wasWinningMove(Point location) {
+	public boolean wasWinningMove(final Point location) {
 		return wasWinningMove(location.x, location.y);
 	}
 }

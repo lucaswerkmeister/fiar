@@ -35,7 +35,7 @@ public class PlayerVictory extends GameEnd {
 	 * @param winningPlayer
 	 *            The winning player.
 	 */
-	public PlayerVictory(Player winningPlayer) {
+	public PlayerVictory(final Player winningPlayer) {
 		this.winningPlayer = winningPlayer;
 	}
 

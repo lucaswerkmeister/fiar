@@ -66,7 +66,7 @@ public class FixedServer extends Server {
 	private final Client[] allClients;
 	private Board board;
 	private int[] phase;
-	private Set<BoardSizeProposal> boardSizeProposals;
+	private final Set<BoardSizeProposal> boardSizeProposals;
 	private Dimension currentBoardSize;
 	private Set<BlockDistributionAccepted> acceptedBlockDistributions;
 	private Set<JokerDistributionAccepted> acceptedJokerDistributions;
@@ -83,8 +83,8 @@ public class FixedServer extends Server {
 	 * @param players
 	 *            The players that this server recognizes.
 	 */
-	public FixedServer(Client[] clients, Player[][] players) {
-		List<ClientPlayerPair> pairsL = new LinkedList<>();
+	public FixedServer(final Client[] clients, final Player[][] players) {
+		final List<ClientPlayerPair> pairsL = new LinkedList<>();
 		for (int i = 0; i < clients.length; i++)
 			if (players[i].length > 0)
 				for (int j = 0; j < players[i].length; j++)
@@ -98,27 +98,27 @@ public class FixedServer extends Server {
 	}
 
 	@Override
-	public int[] getPhase(Client requester) {
+	public int[] getPhase(final Client requester) {
 		if (knowsClient(requester))
 			return Arrays.copyOf(phase, phase.length);
 		throw new UnknownClientException(requester);
 	}
 
 	@Override
-	public int getPhasesVersion(Client requester) {
+	public int getPhasesVersion(final Client requester) {
 		if (knowsClient(requester))
 			return 0;
 		throw new UnknownClientException(requester);
 	}
 
 	@Override
-	public boolean canAct(Client requester, Player p) {
+	public boolean canAct(final Client requester, final Player p) {
 		return phase[0] == 0 || (phase[0] == 1 && phase[1] == 1 && phase[2] == p.getID());
 	}
 
 	@Override
-	public Set<Class<? extends PlayerAction>> getAllowedActions(Client requester, Player p) {
-		HashSet<Class<? extends PlayerAction>> ret = new HashSet<>();
+	public Set<Class<? extends PlayerAction>> getAllowedActions(final Client requester, final Player p) {
+		final HashSet<Class<? extends PlayerAction>> ret = new HashSet<>();
 		try {
 			switch (phase[0]) {
 			case 0:
@@ -150,14 +150,15 @@ public class FixedServer extends Server {
 			case 2:
 				return Collections.emptySet();
 			}
-		} catch (ArrayIndexOutOfBoundsException e) {
+		} catch (final ArrayIndexOutOfBoundsException e) {
 			// Let control fall through to the IllegalStateException below
 		}
 		throw new IllegalStateException("Server is in unknown phase. This is a serious programming error!");
 	}
 
 	@Override
-	public void action(Client requester, PlayerAction action) throws IllegalStateException, IllegalMoveException {
+	public void action(final Client requester, final PlayerAction action) throws IllegalStateException,
+			IllegalMoveException {
 		if (!knowsClient(requester))
 			throw new UnknownClientException(requester);
 		if (!knowsPlayer(action.getActingPlayer()))
@@ -236,7 +237,7 @@ public class FixedServer extends Server {
 								index = i;
 								break;
 							}
-						ClientPlayerPair[] newPairs = new ClientPlayerPair[pairs.length - 1];
+						final ClientPlayerPair[] newPairs = new ClientPlayerPair[pairs.length - 1];
 						System.arraycopy(pairs, 0, newPairs, 0, index);
 						System.arraycopy(pairs, index + 1, newPairs, index, pairs.length - index - 1);
 						pairs = newPairs;
@@ -254,7 +255,7 @@ public class FixedServer extends Server {
 						return;
 					}
 					if (action.getActingPlayer().equals(pairs[currentPlayerIndex].player)) {
-						PlaceStone placeStone = (PlaceStone) action;
+						final PlaceStone placeStone = (PlaceStone) action;
 						if (!board.getPlayerAt(placeStone.getField()).equals(NoPlayer.getInstance()))
 							throw new IllegalMoveException("Field is already occupied by "
 									+ board.getPlayerAt(placeStone.getField()).getName() + "!");
@@ -286,51 +287,51 @@ public class FixedServer extends Server {
 				break; // Let control fall through to the IllegalStateException
 						// below
 			}
-		} catch (ArrayIndexOutOfBoundsException e) {
+		} catch (final ArrayIndexOutOfBoundsException e) {
 			// Let control fall through to the IllegalStateException below
 		}
 		throw new IllegalStateException("Action currently not allowed!");
 	}
 
 	@Override
-	public Board getCurrentBoard(Client requester) {
+	public Board getCurrentBoard(final Client requester) {
 		if (knowsClient(requester))
 			return board == null ? null : board.clone();
 		throw new UnknownClientException(requester);
 	}
 
-	private boolean knowsClient(Client c) {
-		for (ClientPlayerPair pair : pairs)
+	private boolean knowsClient(final Client c) {
+		for (final ClientPlayerPair pair : pairs)
 			if (pair.client.equals(c))
 				return true;
 		return false;
 	}
 
-	private boolean knowsPlayer(Player p) {
-		for (ClientPlayerPair pair : pairs)
+	private boolean knowsPlayer(final Player p) {
+		for (final ClientPlayerPair pair : pairs)
 			if (pair.player.equals(p))
 				return true;
 		return false;
 	}
 
-	private boolean clientPlayerMatch(Client c, Player p) {
-		for (ClientPlayerPair pair : pairs)
+	private boolean clientPlayerMatch(final Client c, final Player p) {
+		for (final ClientPlayerPair pair : pairs)
 			if (pair.player.equals(p))
 				return pair.client.equals(c);
 		return false;
 	}
 
-	private void fireEvent(GameEvent e) {
-		for (Client c : allClients)
+	private void fireEvent(final GameEvent e) {
+		for (final Client c : allClients)
 			c.gameEvent(e);
 	}
 
 	private boolean boardSizeAgreed() {
-		Set<Player> unagreedPlayers = new HashSet<>();
-		for (ClientPlayerPair pair : pairs)
+		final Set<Player> unagreedPlayers = new HashSet<>();
+		for (final ClientPlayerPair pair : pairs)
 			unagreedPlayers.add(pair.player);
 
-		for (BoardSizeProposal p : boardSizeProposals)
+		for (final BoardSizeProposal p : boardSizeProposals)
 			if (p.getSize().equals(currentBoardSize))
 				unagreedPlayers.remove(p.getActingPlayer());
 
@@ -338,11 +339,11 @@ public class FixedServer extends Server {
 	}
 
 	private boolean blockDistributionAgreed() {
-		Set<Player> unagreedPlayers = new HashSet<>();
-		for (ClientPlayerPair pair : pairs)
+		final Set<Player> unagreedPlayers = new HashSet<>();
+		for (final ClientPlayerPair pair : pairs)
 			unagreedPlayers.add(pair.player);
 
-		for (BlockDistributionAccepted b : acceptedBlockDistributions)
+		for (final BlockDistributionAccepted b : acceptedBlockDistributions)
 			if (b.getAcceptedBoard().equals(board))
 				unagreedPlayers.remove(b.getActingPlayer());
 
@@ -350,11 +351,11 @@ public class FixedServer extends Server {
 	}
 
 	private boolean jokerDistributionAgreed() {
-		Set<Player> unagreedPlayers = new HashSet<>();
-		for (ClientPlayerPair pair : pairs)
+		final Set<Player> unagreedPlayers = new HashSet<>();
+		for (final ClientPlayerPair pair : pairs)
 			unagreedPlayers.add(pair.player);
 
-		for (JokerDistributionAccepted j : acceptedJokerDistributions)
+		for (final JokerDistributionAccepted j : acceptedJokerDistributions)
 			if (j.getAcceptedBoard().equals(board))
 				unagreedPlayers.remove(j.getActingPlayer());
 
@@ -379,7 +380,7 @@ public class FixedServer extends Server {
 		 * @param player
 		 *            The player.
 		 */
-		ClientPlayerPair(Client client, Player player) {
+		ClientPlayerPair(final Client client, final Player player) {
 			this.client = client;
 			this.player = player;
 		}

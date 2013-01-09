@@ -39,7 +39,7 @@ public class UnjokerField extends FieldAction {
 	 * @param y
 	 *            The y coordinate of the modified field.
 	 */
-	public UnjokerField(Player actingPlayer, int x, int y) {
+	public UnjokerField(final Player actingPlayer, final int x, final int y) {
 		super(actingPlayer, x, y);
 	}
 
@@ -51,7 +51,7 @@ public class UnjokerField extends FieldAction {
 	 * @param point
 	 *            The modified field.
 	 */
-	public UnjokerField(Player actingPlayer, Point point) {
+	public UnjokerField(final Player actingPlayer, final Point point) {
 		super(actingPlayer, point);
 	}
 }

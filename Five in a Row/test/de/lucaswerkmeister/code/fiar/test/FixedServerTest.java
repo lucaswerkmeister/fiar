@@ -1,4 +1,5 @@
 package de.lucaswerkmeister.code.fiar.test;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.util.LinkedList;
@@ -175,9 +176,9 @@ public class FixedServerTest extends Client {
 	@Test
 	public void testBasic() throws IllegalStateException, IllegalMoveException {
 		events = new LinkedList<>();
-		Player p1 = new Player("Player 1", Color.blue, 1);
-		Player p2 = new Player("Player 2", Color.cyan, 2);
-		Server server = new FixedServer(new Client[] {this }, new Player[][] {new Player[] {p1, p2 } });
+		final Player p1 = new Player("Player 1", Color.blue, 1);
+		final Player p2 = new Player("Player 2", Color.cyan, 2);
+		final Server server = new FixedServer(new Client[] {this }, new Player[][] {new Player[] {p1, p2 } });
 
 		// Init: Board Size, Block Distribution, Joker Distribution
 		act(server, new BoardSizeProposal(p1, new Dimension(10, 10)));
@@ -218,10 +219,10 @@ public class FixedServerTest extends Client {
 	@Test
 	public void testAdvanced() throws IllegalStateException, IllegalMoveException {
 		events = new LinkedList<>();
-		Player p1 = new Player("Player 1", Color.blue, 1);
-		Player p2 = new Player("Player 2", Color.cyan, 2);
-		Player p3 = new Player("Player 3", Color.pink, 3);
-		Server server = new FixedServer(new Client[] {this }, new Player[][] {new Player[] {p1, p2, p3 } });
+		final Player p1 = new Player("Player 1", Color.blue, 1);
+		final Player p2 = new Player("Player 2", Color.cyan, 2);
+		final Player p3 = new Player("Player 3", Color.pink, 3);
+		final Server server = new FixedServer(new Client[] {this }, new Player[][] {new Player[] {p1, p2, p3 } });
 
 		// Board size
 		act(server, new BoardSizeProposal(p1, new Dimension(10, 10)));
@@ -232,7 +233,7 @@ public class FixedServerTest extends Client {
 		// Block (3,5) and (3,6)
 		// To confuse the server, we accept the block distribution before we set the blocks.
 		// The server should be able to handle this.
-		Board targetBoard = server.getCurrentBoard(this);
+		final Board targetBoard = server.getCurrentBoard(this);
 		targetBoard.setPlayerAt(3, 5, Block.getInstance());
 		targetBoard.setPlayerAt(3, 6, Block.getInstance());
 		act(server, new BlockDistributionAccepted(p1, targetBoard));
@@ -288,13 +289,13 @@ public class FixedServerTest extends Client {
 	 * @throws IllegalMoveException
 	 *             Thrown by the server.
 	 */
-	private void act(Server server, PlayerAction action) throws IllegalStateException, IllegalMoveException {
+	private void act(final Server server, final PlayerAction action) throws IllegalStateException, IllegalMoveException {
 		server.action(this, action);
 		Assert.assertEquals(action, events.poll());
 	}
 
 	@Override
-	public void gameEvent(GameEvent e) {
+	public void gameEvent(final GameEvent e) {
 		events.add(e);
 	}
 }

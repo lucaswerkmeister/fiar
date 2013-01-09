@@ -16,7 +16,7 @@ public class NoPlayer extends Player {
 		super("No player", Color.black, 0);
 	}
 
-	private NoPlayer(String name, Color color, int id) { // hide super constructor
+	private NoPlayer(final String name, final Color color, final int id) { // hide super constructor
 		super(name, color, id);
 	}
 

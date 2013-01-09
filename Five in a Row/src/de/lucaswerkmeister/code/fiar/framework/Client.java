@@ -52,7 +52,8 @@ public abstract class Client {
 	 * @return <code>true</code> if this instance and the other instance are the same instance, <code>false</code>
 	 *         otherwise.
 	 */
-	public final boolean equals(Object other) {
+	@Override
+	public final boolean equals(final Object other) {
 		return this == other;
 	}
 
@@ -64,6 +65,7 @@ public abstract class Client {
 	 * @return The client's hash code. It's always the same for {@link #equals(Object) equal} objects, and should not be
 	 *         the same for any other objects.
 	 */
+	@Override
 	public final int hashCode() {
 		return (this.getClass().hashCode() & (((short) -1) << 16)) + mHash & ((short) -1);
 	}

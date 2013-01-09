@@ -43,7 +43,7 @@ public class PhaseChange extends GameEvent {
 	 * @param newPhase
 	 *            The new Phase.
 	 */
-	public PhaseChange(int[] newPhase) {
+	public PhaseChange(final int[] newPhase) {
 		this.newPhase = Arrays.copyOf(newPhase, newPhase.length);
 	}
 

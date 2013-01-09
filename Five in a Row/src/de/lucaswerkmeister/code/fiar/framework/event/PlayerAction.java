@@ -35,7 +35,7 @@ public abstract class PlayerAction extends GameEvent {
 	 * @param actingPlayer
 	 *            The acting player.
 	 */
-	public PlayerAction(Player actingPlayer) {
+	public PlayerAction(final Player actingPlayer) {
 		this.actingPlayer = actingPlayer;
 	}
 

@@ -38,7 +38,7 @@ public class Block extends Player {
 		super("Blocked", Color.red, ID);
 	}
 
-	private Block(String name, Color color, int id) { // hide super constructor
+	private Block(final String name, final Color color, final int id) { // hide super constructor
 		super(name, color, id);
 	}
 

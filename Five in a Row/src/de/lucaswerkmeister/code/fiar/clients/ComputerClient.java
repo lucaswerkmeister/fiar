@@ -61,14 +61,14 @@ public class ComputerClient extends Client {
 	 * @param player
 	 *            The player that is operated by this client's AI.
 	 */
-	public ComputerClient(Server server, int id, Player player) {
+	public ComputerClient(final Server server, final int id, final Player player) {
 		this.server = server;
 		this.ID = id;
 		this.player = player;
 	}
 
 	@Override
-	public void gameEvent(GameEvent e) {
+	public void gameEvent(final GameEvent e) {
 		try {
 			if (e instanceof PlayerAction && !((PlayerAction) e).getActingPlayer().equals(player)) {
 				if (e instanceof BoardSizeProposal)
@@ -78,13 +78,12 @@ public class ComputerClient extends Client {
 				else if (e instanceof JokerField || e instanceof UnjokerField)
 					server.action(this, new JokerDistributionAccepted(player, server.getCurrentBoard(this)));
 			} else if (e instanceof PhaseChange) {
-				int[] phase = ((PhaseChange) e).getNewPhase();
-				if (phase[0] == 1 && phase[1] == 1 && phase[2] == player.getID()) {
+				final int[] phase = ((PhaseChange) e).getNewPhase();
+				if (phase[0] == 1 && phase[1] == 1 && phase[2] == player.getID())
 					// It's our player's turn
 					move();
-				}
 			}
-		} catch (Throwable t) {
+		} catch (final Throwable t) {
 			System.err.println("Computer client for player " + player.getName() + " experienced an unexpected error.");
 			t.printStackTrace();
 			if (t instanceof ThreadDeath)
@@ -120,7 +119,7 @@ public class ComputerClient extends Client {
 	 * </ol>
 	 */
 	private void move() {
-		Board board = server.getCurrentBoard(this);
+		final Board board = server.getCurrentBoard(this);
 		// TODO this is gonna be ugly.
 	}
 }

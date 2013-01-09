@@ -30,15 +30,14 @@ public abstract class StoneDistributionAccepted extends PlayerAction {
 	private final Board acceptedBoard;
 
 	/**
-	 * A new {@link StoneDistributionAccepted} by the specified player with the
-	 * specified board.
+	 * A new {@link StoneDistributionAccepted} by the specified player with the specified board.
 	 * 
 	 * @param acceptingPlayer
 	 *            The player that accepts the distribution.
 	 * @param acceptedBoard
 	 *            The board that the player accepts.
 	 */
-	public StoneDistributionAccepted(Player acceptingPlayer, Board acceptedBoard) {
+	public StoneDistributionAccepted(final Player acceptingPlayer, final Board acceptedBoard) {
 		super(acceptingPlayer);
 		this.acceptedBoard = acceptedBoard;
 	}

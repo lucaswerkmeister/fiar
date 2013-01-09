@@ -37,7 +37,7 @@ public class ClientFiredException extends UnknownClientException {
 	 * @param firedClient
 	 *            The fired client.
 	 */
-	public ClientFiredException(Client firedClient) {
+	public ClientFiredException(final Client firedClient) {
 		super(firedClient);
 	}
 
@@ -49,7 +49,7 @@ public class ClientFiredException extends UnknownClientException {
 	 * @param message
 	 *            The message.
 	 */
-	public ClientFiredException(Client firedClient, String message) {
+	public ClientFiredException(final Client firedClient, final String message) {
 		super(firedClient, message);
 	}
 
@@ -61,7 +61,7 @@ public class ClientFiredException extends UnknownClientException {
 	 * @param cause
 	 *            The cause.
 	 */
-	public ClientFiredException(Client firedClient, Throwable cause) {
+	public ClientFiredException(final Client firedClient, final Throwable cause) {
 		super(firedClient, cause);
 	}
 
@@ -75,7 +75,7 @@ public class ClientFiredException extends UnknownClientException {
 	 * @param cause
 	 *            The cause.
 	 */
-	public ClientFiredException(Client firedClient, String message, Throwable cause) {
+	public ClientFiredException(final Client firedClient, final String message, final Throwable cause) {
 		super(firedClient, message, cause);
 	}
 
@@ -94,8 +94,8 @@ public class ClientFiredException extends UnknownClientException {
 	 * @param writableStackTrace
 	 *            Whether or not the stack trace should be writable.
 	 */
-	public ClientFiredException(Client firedClient, String message, Throwable cause, boolean enableSuppression,
-			boolean writableStackTrace) {
+	public ClientFiredException(final Client firedClient, final String message, final Throwable cause,
+			final boolean enableSuppression, final boolean writableStackTrace) {
 		super(firedClient, message, cause, enableSuppression, writableStackTrace);
 	}
 

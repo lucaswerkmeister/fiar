@@ -1,5 +1,4 @@
 package de.lucaswerkmeister.code.fiar.test;
-import static junit.framework.Assert.assertEquals;
 
 import java.awt.Color;
 import java.io.BufferedReader;
@@ -10,6 +9,8 @@ import java.io.OutputStreamWriter;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintStream;
+
+import junit.framework.Assert;
 
 import org.junit.Test;
 
@@ -133,9 +134,9 @@ public class ConsoleClientTest {
 	 *             If an I/O error occurs.
 	 */
 	private void captureIO() throws IOException {
-		PipedInputStream pOut = new PipedInputStream();
+		final PipedInputStream pOut = new PipedInputStream();
 		System.setOut(new PrintStream(new PipedOutputStream(pOut)));
-		PipedOutputStream pIn = new PipedOutputStream();
+		final PipedOutputStream pIn = new PipedOutputStream();
 		System.setIn(new PipedInputStream(pIn));
 		out = new BufferedReader(new InputStreamReader(pOut));
 		in = new BufferedWriter(new OutputStreamWriter(pIn));
@@ -149,8 +150,8 @@ public class ConsoleClientTest {
 	 * @throws IOException
 	 *             If an I/O eror occurs.
 	 */
-	private void read(String expectedClientOutput) throws IOException {
-		assertEquals(expectedClientOutput, out.readLine());
+	private void read(final String expectedClientOutput) throws IOException {
+		Assert.assertEquals(expectedClientOutput, out.readLine());
 	}
 
 	/**
@@ -161,7 +162,7 @@ public class ConsoleClientTest {
 	 * @throws IOException
 	 *             If an I/O error occurs.
 	 */
-	private void write(String clientInput) throws IOException {
+	private void write(final String clientInput) throws IOException {
 		in.write(clientInput + '\n');
 		in.flush();
 	}
@@ -174,8 +175,8 @@ public class ConsoleClientTest {
 	 * @throws IOException
 	 *             If an I/O error occurs.
 	 */
-	private void readBoard(Board b) throws IOException {
-		StringBuilder line = new StringBuilder(b.getWidth());
+	private void readBoard(final Board b) throws IOException {
+		final StringBuilder line = new StringBuilder(b.getWidth());
 		for (int y = 0; y < b.getHeight(); y++) {
 			for (int x = 0; x < b.getWidth(); x++)
 				switch (b.getPlayerAt(x, y) == null ? 0 : b.getPlayerAt(x, y).getID()) {
@@ -212,7 +213,7 @@ public class ConsoleClientTest {
 	 * @throws IOException
 	 *             If an I/O error occurs.
 	 */
-	private void placeStone(int player, int x, int y) throws IOException {
+	private void placeStone(final int player, final int x, final int y) throws IOException {
 		read("Player " + player + ", where do you want to place your stone?");
 		write(x + "|" + y);
 		// We don't have access to the player instance, so we use a "Phantom player".
@@ -236,7 +237,7 @@ public class ConsoleClientTest {
 	 * @throws IOException
 	 *             If an I/O error occurs.
 	 */
-	private void placeStone(Player player, int x, int y) throws IOException {
+	private void placeStone(final Player player, final int x, final int y) throws IOException {
 		write(x + "|" + y);
 		board.setPlayerAt(x, y, player);
 		readBoard(board);
@@ -255,8 +256,8 @@ public class ConsoleClientTest {
 	 * @throws IOException
 	 *             If an I/O error occurs.
 	 */
-	private void block(int x, int y) throws IOException {
-		boolean block = board.getPlayerAt(x, y).equals(NoPlayer.getInstance());
+	private void block(final int x, final int y) throws IOException {
+		final boolean block = board.getPlayerAt(x, y).equals(NoPlayer.getInstance());
 		placeStone(block ? Block.getInstance() : NoPlayer.getInstance(), x, y);
 		read("Field " + x + "|" + y + (block ? " blocked." : " unblocked."));
 	}
@@ -274,8 +275,8 @@ public class ConsoleClientTest {
 	 * @throws IOException
 	 *             If an I/O error occurs.
 	 */
-	private void joker(int x, int y) throws IOException {
-		boolean joker = board.getPlayerAt(x, y).equals(NoPlayer.getInstance());
+	private void joker(final int x, final int y) throws IOException {
+		final boolean joker = board.getPlayerAt(x, y).equals(NoPlayer.getInstance());
 		placeStone(joker ? Joker.getInstance() : NoPlayer.getInstance(), x, y);
 		read("Field " + x + "|" + y + (joker ? " marked" : " unmarked") + " as joker field.");
 	}

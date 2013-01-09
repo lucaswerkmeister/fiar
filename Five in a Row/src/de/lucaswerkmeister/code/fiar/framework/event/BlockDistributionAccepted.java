@@ -21,8 +21,7 @@ import de.lucaswerkmeister.code.fiar.framework.Board;
 import de.lucaswerkmeister.code.fiar.framework.Player;
 
 /**
- * Indicates that the player accepts the distribution of "blocked" fields as it
- * is saved in this instance.
+ * Indicates that the player accepts the distribution of "blocked" fields as it is saved in this instance.
  * 
  * @author Lucas Werkmeister
  * @version 1.0
@@ -30,15 +29,14 @@ import de.lucaswerkmeister.code.fiar.framework.Player;
 public class BlockDistributionAccepted extends StoneDistributionAccepted {
 
 	/**
-	 * A new {@link BlockDistributionAccepted} by the specified player with the
-	 * specified board.
+	 * A new {@link BlockDistributionAccepted} by the specified player with the specified board.
 	 * 
 	 * @param acceptingPlayer
 	 *            The player that accepts the distribution.
 	 * @param acceptedBoard
 	 *            The board that the player accepts.
 	 */
-	public BlockDistributionAccepted(Player acceptingPlayer, Board acceptedBoard) {
+	public BlockDistributionAccepted(final Player acceptingPlayer, final Board acceptedBoard) {
 		super(acceptingPlayer, acceptedBoard);
 	}
 }

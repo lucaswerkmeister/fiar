@@ -41,7 +41,7 @@ public class UnblockField extends FieldAction {
 	 *            The y coordinate of the modified field.
 	 */
 
-	public UnblockField(Player actingPlayer, int x, int y) {
+	public UnblockField(final Player actingPlayer, final int x, final int y) {
 		super(actingPlayer, x, y);
 	}
 
@@ -53,7 +53,7 @@ public class UnblockField extends FieldAction {
 	 * @param point
 	 *            The modified field.
 	 */
-	public UnblockField(Player actingPlayer, Point point) {
+	public UnblockField(final Player actingPlayer, final Point point) {
 		super(actingPlayer, point);
 	}
 }
