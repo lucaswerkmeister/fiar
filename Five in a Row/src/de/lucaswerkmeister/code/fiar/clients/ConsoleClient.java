@@ -201,11 +201,11 @@ public class ConsoleClient extends Client implements Runnable {
 				player = (player % 2) + 1;
 			}
 			System.out.println("Player " + server.getPhase(this)[2] + " won!");
-		} catch (final Throwable t) {
+		} catch (final Throwable t) { // I will catch Throwable whenever I feel like it and nobody can forbid it.
 			System.out.println("WHOOPS! An internal error occured. I'm so sorry.");
 			t.printStackTrace();
 			if (t instanceof ThreadDeath)
-				throw (ThreadDeath) t;
+				throw (ThreadDeath) t; // Look, I'm even re-throwing ThreadDeath!
 		}
 	}
 

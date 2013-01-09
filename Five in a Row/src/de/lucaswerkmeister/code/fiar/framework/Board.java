@@ -17,8 +17,6 @@
  */
 package de.lucaswerkmeister.code.fiar.framework;
 
-import static de.lucaswerkmeister.code.fiar.framework.Server.IN_A_ROW;
-
 import java.awt.Point;
 
 /**
@@ -129,7 +127,7 @@ public abstract class Board {
 		for (; x + equalStonesRight + 1 < getWidth()
 				&& getPlayerAt(x + equalStonesRight + 1, y).equalsWithJoker(getPlayerAt(x, y)); equalStonesRight++)
 			;
-		if (equalStonesLeft + 1 + equalStonesRight >= IN_A_ROW)
+		if (equalStonesLeft + 1 + equalStonesRight >= Server.IN_A_ROW)
 			return true;
 
 		int equalStonesUp = 0, equalStonesDown = 0;
@@ -138,7 +136,7 @@ public abstract class Board {
 		for (; y + equalStonesDown + 1 < getHeight()
 				&& getPlayerAt(x, y + equalStonesDown + 1).equalsWithJoker(getPlayerAt(x, y)); equalStonesDown++)
 			;
-		if (equalStonesUp + 1 + equalStonesDown >= IN_A_ROW)
+		if (equalStonesUp + 1 + equalStonesDown >= Server.IN_A_ROW)
 			return true;
 
 		int equalStonesUpLeft = 0, equalStonesDownRight = 0;
@@ -150,7 +148,7 @@ public abstract class Board {
 				&& getPlayerAt(x + equalStonesDownRight + 1, y + equalStonesDownRight + 1).equalsWithJoker(
 						getPlayerAt(x, y)); equalStonesDownRight++)
 			;
-		if (equalStonesUpLeft + 1 + equalStonesDownRight >= IN_A_ROW)
+		if (equalStonesUpLeft + 1 + equalStonesDownRight >= Server.IN_A_ROW)
 			return true;
 
 		int equalStonesDownLeft = 0, equalStonesUpRight = 0;
@@ -164,7 +162,7 @@ public abstract class Board {
 				&& getPlayerAt(x + equalStonesUpRight + 1, y - equalStonesUpRight - 1).equalsWithJoker(
 						getPlayerAt(x, y)); equalStonesUpRight++)
 			;
-		return equalStonesDownLeft + 1 + equalStonesUpRight >= IN_A_ROW;
+		return equalStonesDownLeft + 1 + equalStonesUpRight >= Server.IN_A_ROW;
 	}
 
 	/**
