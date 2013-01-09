@@ -43,6 +43,9 @@ import de.lucaswerkmeister.code.fiar.framework.exception.UnknownClientException;
  * @version 1.1
  */
 public abstract class Server {
+	/**
+	 * Determines how many stones have to be in a row to win a game.
+	 */
 	public static final int IN_A_ROW = 5;
 
 	/**
@@ -80,6 +83,7 @@ public abstract class Server {
 	 * <li>Internal error: The game ended due to an internal server error.</li>
 	 * </ol>
 	 * </li>
+	 * </ol> </li>
 	 * </ul>
 	 * 
 	 * @param requester

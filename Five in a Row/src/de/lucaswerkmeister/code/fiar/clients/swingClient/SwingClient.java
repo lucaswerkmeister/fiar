@@ -86,8 +86,11 @@ public class SwingClient extends Client implements Runnable {
 	private int playerIndex = 0;
 	private static final SwingClient instance = new SwingClient();
 
+	/**
+	 * Creates a new {@link SwingClient}.
+	 */
 	public SwingClient() {
-		gui = new JFrame("Five in a Row");
+		gui = new JFrame((Server.IN_A_ROW == 5 ? "Five" : Server.IN_A_ROW) + " in a Row");
 		gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		players = new LinkedList<>();
 		players.add(showAddPlayerDialog(true, 1, gui));

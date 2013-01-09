@@ -89,6 +89,10 @@ public abstract class Board {
 
 	/**
 	 * Two boards are equal if and only if they have the same size and return the same player at every field.
+	 * 
+	 * @param other
+	 *            The other object.
+	 * @return <code>true</code> if the boards are equal, <code>false</code> otherwise.
 	 */
 	@Override
 	public boolean equals(final Object other) {

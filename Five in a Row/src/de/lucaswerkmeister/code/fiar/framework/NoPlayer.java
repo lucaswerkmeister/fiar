@@ -20,6 +20,11 @@ public class NoPlayer extends Player {
 		super(name, color, id);
 	}
 
+	/**
+	 * Gets the one NoPlayer instance in this virtual machine.
+	 * 
+	 * @return The instance.
+	 */
 	public static NoPlayer getInstance() {
 		return instance;
 	}
