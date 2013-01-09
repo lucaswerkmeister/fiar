@@ -1,3 +1,4 @@
+package de.lucaswerkmeister.code.fiar.test;
 import static junit.framework.Assert.assertEquals;
 
 import java.awt.Color;
@@ -9,8 +10,6 @@ import java.io.OutputStreamWriter;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintStream;
-
-import junit.framework.Assert;
 
 import org.junit.Test;
 
@@ -40,44 +39,41 @@ public class ConsoleClientTest {
 	 * This plays exactly the same game as {@link FixedServerTest#testBasic()}.
 	 * <p>
 	 * Warning: This test takes a long time to finish (ca. 13s on the ATIS computers) - don't be fooled by that!
+	 * 
+	 * @throws IOException
+	 *             If an I/O error occurs.
 	 */
 	@Test
-	public void testBasic() {
-		try {
-			// Capture System.out and System.in.
-			captureIO();
-			ConsoleClient.main(new String[] {}); // runs in a new thread
-			read("Welcome to Five in a Row!");
-			read("Please enter the field size:");
-			write("10");
-			read("You may now mark certain fields as blocked:");
-			read("A blocked field will not count as part of a row for any player.");
-			read("Please enter the coordinates of fields you wish to block (x|y) or \"quit\" to continue.");
-			read("Enter the same coordinates again to unblock a field again.");
-			write("quit");
-			read("You may now mark certain fields as joker fields:");
-			read("A joker field will count as part of a row for every player.");
-			read("Please enter the coordinates of fields you wish to set as joker (x|y) or \"quit\" to continue.");
-			read("Enter the same coordinates again to \"un-joker\" a field again.");
-			write("quit");
-			read("Game started!");
-			board = new ArrayBoard(10, 10);
-			readBoard(board);
-			placeStone(1, 1, 1);
-			placeStone(2, 9, 9);
-			placeStone(1, 2, 1);
-			placeStone(2, 8, 8);
-			placeStone(1, 3, 1);
-			placeStone(2, 7, 7);
-			placeStone(1, 4, 1);
-			placeStone(2, 0, 1);
-			placeStone(1, 5, 1);
-			read("Player 1 won!");
-		} catch (Throwable t) {
-			Assert.fail("Exception: " + t.toString());
-			if (t instanceof ThreadDeath)
-				throw (ThreadDeath) t;
-		}
+	public void testBasic() throws IOException {
+		// Capture System.out and System.in.
+		captureIO();
+		ConsoleClient.main(new String[] {}); // runs in a new thread
+		read("Welcome to Five in a Row!");
+		read("Please enter the field size:");
+		write("10");
+		read("You may now mark certain fields as blocked:");
+		read("A blocked field will not count as part of a row for any player.");
+		read("Please enter the coordinates of fields you wish to block (x|y) or \"quit\" to continue.");
+		read("Enter the same coordinates again to unblock a field again.");
+		write("quit");
+		read("You may now mark certain fields as joker fields:");
+		read("A joker field will count as part of a row for every player.");
+		read("Please enter the coordinates of fields you wish to set as joker (x|y) or \"quit\" to continue.");
+		read("Enter the same coordinates again to \"un-joker\" a field again.");
+		write("quit");
+		read("Game started!");
+		board = new ArrayBoard(10, 10);
+		readBoard(board);
+		placeStone(1, 1, 1);
+		placeStone(2, 9, 9);
+		placeStone(1, 2, 1);
+		placeStone(2, 8, 8);
+		placeStone(1, 3, 1);
+		placeStone(2, 7, 7);
+		placeStone(1, 4, 1);
+		placeStone(2, 0, 1);
+		placeStone(1, 5, 1);
+		read("Player 1 won!");
 	}
 
 	/**
@@ -85,53 +81,49 @@ public class ConsoleClientTest {
 	 * <p>
 	 * This plays exactly the same game as {@link FixedServerTest#testAdvanced()}, with the exception that there is no
 	 * third player.
+	 * 
+	 * @throws IOException
+	 *             If an I/O error occurs.
 	 */
 	@Test
-	public void testAdvanced() {
-		try {
-			captureIO();
-			ConsoleClient.main(new String[] {}); // runs in a new thread
-			read("Welcome to Five in a Row!");
-			read("Please enter the field size:");
-			write("10");
-			read("You may now mark certain fields as blocked:");
-			read("A blocked field will not count as part of a row for any player.");
-			read("Please enter the coordinates of fields you wish to block (x|y) or \"quit\" to continue.");
-			read("Enter the same coordinates again to unblock a field again.");
-			board = new ArrayBoard(10, 10);
-			block(3, 5);
-			block(3, 7);
-			block(3, 6);
-			block(3, 7);
-			write("HEYYEYAAEYAAAEYAEYAA"); // weird rubbish
-			read("Invalid input. Please re-type the coordinates, but in a different format.");
-			write("quit");
-			read("You may now mark certain fields as joker fields:");
-			read("A joker field will count as part of a row for every player.");
-			read("Please enter the coordinates of fields you wish to set as joker (x|y) or \"quit\" to continue.");
-			read("Enter the same coordinates again to \"un-joker\" a field again.");
-			joker(0, 0);
-			joker(1, 7);
-			joker(9, 9);
-			joker(1, 7);
-			write("quit");
-			read("Game started!");
-			readBoard(board);
-			placeStone(1, 1, 1);
-			placeStone(2, 8, 8);
-			placeStone(1, 2, 2);
-			placeStone(2, 7, 7);
-			placeStone(1, 3, 3);
-			placeStone(2, 6, 6);
-			placeStone(1, 2, 7);
-			placeStone(2, 5, 5);
-			read("Player 2 won!");
-		} catch (Throwable t) {
-			t.printStackTrace();
-			Assert.fail("Exception: " + t.toString());
-			if (t instanceof ThreadDeath)
-				throw (ThreadDeath) t;
-		}
+	public void testAdvanced() throws IOException {
+		captureIO();
+		ConsoleClient.main(new String[] {}); // runs in a new thread
+		read("Welcome to Five in a Row!");
+		read("Please enter the field size:");
+		write("10");
+		read("You may now mark certain fields as blocked:");
+		read("A blocked field will not count as part of a row for any player.");
+		read("Please enter the coordinates of fields you wish to block (x|y) or \"quit\" to continue.");
+		read("Enter the same coordinates again to unblock a field again.");
+		board = new ArrayBoard(10, 10);
+		block(3, 5);
+		block(3, 7);
+		block(3, 6);
+		block(3, 7);
+		write("HEYYEYAAEYAAAEYAEYAA"); // weird rubbish
+		read("Invalid input. Please re-type the coordinates, but in a different format.");
+		write("quit");
+		read("You may now mark certain fields as joker fields:");
+		read("A joker field will count as part of a row for every player.");
+		read("Please enter the coordinates of fields you wish to set as joker (x|y) or \"quit\" to continue.");
+		read("Enter the same coordinates again to \"un-joker\" a field again.");
+		joker(0, 0);
+		joker(1, 7);
+		joker(9, 9);
+		joker(1, 7);
+		write("quit");
+		read("Game started!");
+		readBoard(board);
+		placeStone(1, 1, 1);
+		placeStone(2, 8, 8);
+		placeStone(1, 2, 2);
+		placeStone(2, 7, 7);
+		placeStone(1, 3, 3);
+		placeStone(2, 6, 6);
+		placeStone(1, 2, 7);
+		placeStone(2, 5, 5);
+		read("Player 2 won!");
 	}
 
 	/**
