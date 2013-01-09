@@ -123,9 +123,4 @@ public class ComputerClient extends Client {
 		Board board = server.getCurrentBoard(this);
 		// TODO this is gonna be ugly.
 	}
-
-	@Override
-	public int getID() {
-		return ID;
-	}
 }

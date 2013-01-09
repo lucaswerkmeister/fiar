@@ -75,11 +75,6 @@ public class ConsoleClient extends Client implements Runnable {
 	}
 
 	@Override
-	public int getID() {
-		return 0;
-	}
-
-	@Override
 	public void run() {
 		try (BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in))) {
 			System.out.println("Welcome to Five in a Row!");

@@ -17,6 +17,8 @@
  */
 package de.lucaswerkmeister.code.fiar.framework;
 
+import java.util.Random;
+
 import de.lucaswerkmeister.code.fiar.framework.event.GameEvent;
 import de.lucaswerkmeister.code.fiar.framework.event.PlayerAction;
 
@@ -27,6 +29,8 @@ import de.lucaswerkmeister.code.fiar.framework.event.PlayerAction;
  * @version 1.1
  */
 public abstract class Client {
+	private final int mHash = new Random().nextInt();
+
 	/**
 	 * Sends a {@link GameEvent} to the client.
 	 * <p>
@@ -41,14 +45,6 @@ public abstract class Client {
 	public abstract void gameEvent(GameEvent e);
 
 	/**
-	 * Gets the client's unique ID. If two different {@link Client} instances return the same ID, the server's behavior
-	 * is unspecified.
-	 * 
-	 * @return The client's ID.
-	 */
-	public abstract int getID();
-
-	/**
 	 * Two clients are equal if and only if they are the same instance.
 	 * 
 	 * @param other
@@ -61,11 +57,14 @@ public abstract class Client {
 	}
 
 	/**
-	 * A client's hash code is its {@link #getID() ID}.
+	 * A client's hash code is a combination of the {@link Class#hashCode()} of its runtime class and a random but
+	 * constant number. (0bHHHHRRRR, where HHHH is the top two bytes of the class' hash code and RRRR is the bottom two
+	 * bytes of the random constant.)
 	 * 
-	 * @return The client's ID.
+	 * @return The client's hash code. It's always the same for {@link #equals(Object) equal} objects, and should not be
+	 *         the same for any other objects.
 	 */
 	public final int hashCode() {
-		return getID();
+		return (this.getClass().hashCode() & (((short) -1) << 16)) + mHash & ((short) -1);
 	}
 }

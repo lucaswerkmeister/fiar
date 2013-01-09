@@ -300,9 +300,4 @@ public class FixedServerTest extends Client {
 	public void gameEvent(GameEvent e) {
 		events.add(e);
 	}
-
-	@Override
-	public int getID() {
-		return 0;
-	}
 }

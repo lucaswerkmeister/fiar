@@ -134,11 +134,6 @@ public class SwingClient extends Client implements Runnable {
 	}
 
 	@Override
-	public int getID() {
-		return 0;
-	}
-
-	@Override
 	public void run() {
 		try {
 			// choose board size
