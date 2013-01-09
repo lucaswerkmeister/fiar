@@ -136,8 +136,8 @@ public class ConsoleClient extends Client implements Runnable {
 			// Set Jokers
 			System.out.println("You may now mark certain fields as joker fields:");
 			System.out.println("A joker field will count as part of a row for every player.");
-			System.out
-					.println("Please enter the coordinates of fields you wish to set as joker (x|y) or \"quit\" to continue.");
+			System.out.println("Please enter the coordinates of fields "
+					+ "you wish to set as joker (x|y) or \"quit\" to continue.");
 			System.out.println("Enter the same coordinates again to \"un-joker\" a field again.");
 			input = inputReader.readLine();
 			while (!(input.equalsIgnoreCase("quit") || input.equalsIgnoreCase("exit") || input

@@ -78,8 +78,8 @@ public class Field extends JComponent {
 	 * <li>it is not the <code>Joker</code>.</li>
 	 * </ul>
 	 * In code: The component is disabled if and only if the condition
-	 * <code>player != null && !(player instanceof NoPlayer) && !(player instanceof Block) && !(player instanceof Joker)</code>
-	 * is met.
+	 * <code>player != null && !(player instanceof NoPlayer)
+	 * && !(player instanceof Block) && !(player instanceof Joker)</code> is met.
 	 * 
 	 * @param player
 	 *            The player now occupying this field.
