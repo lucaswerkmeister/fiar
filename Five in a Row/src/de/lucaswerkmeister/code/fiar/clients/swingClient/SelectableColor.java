@@ -141,12 +141,26 @@ public class SelectableColor extends JComponent implements MouseListener {
 	}
 }
 
+/**
+ * The dialog that pops up when the user clicks on a {@link SelectableColor}.
+ * 
+ * @author Lucas Werkmeister
+ * @version 1.0
+ */
 class ColorDialog extends JDialog implements ActionListener {
 	private static final long serialVersionUID = 4347923773976010884L;
 	private boolean okClicked = false;
 	private final Color startColor;
 	private final JColorChooser chooser;
 
+	/**
+	 * Creates a new {@link ColorDialog} with the specified owner and default color.
+	 * 
+	 * @param owner
+	 *            The dialog owner.
+	 * @param c
+	 *            The default color.
+	 */
 	public ColorDialog(final Frame owner, final Color c) {
 		super(owner, "Choose color", true);
 		startColor = c;
@@ -172,6 +186,13 @@ class ColorDialog extends JDialog implements ActionListener {
 		dispose();
 	}
 
+	/**
+	 * Gets the user-selected color.
+	 * <p>
+	 * If the user canceled, then this is the startup color.
+	 * 
+	 * @return The color.
+	 */
 	public Color getColor() {
 		if (okClicked)
 			return chooser.getColor();
