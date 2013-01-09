@@ -35,7 +35,7 @@ public class PlayerQuit extends GameEnd {
 	 * @param quittingPlayer
 	 *            The quitting player.
 	 */
-	public PlayerQuit(Player quittingPlayer) {
+	public PlayerQuit(final Player quittingPlayer) {
 		this.quittingPlayer = quittingPlayer;
 	}
 

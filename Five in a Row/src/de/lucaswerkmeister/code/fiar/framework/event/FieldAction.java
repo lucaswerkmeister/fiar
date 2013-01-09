@@ -40,7 +40,7 @@ public abstract class FieldAction extends PlayerAction {
 	 * @param y
 	 *            The y coordinate of the modified field.
 	 */
-	public FieldAction(Player actingPlayer, int x, int y) {
+	public FieldAction(final Player actingPlayer, final int x, final int y) {
 		super(actingPlayer);
 		this.x = x;
 		this.y = y;
@@ -54,7 +54,7 @@ public abstract class FieldAction extends PlayerAction {
 	 * @param point
 	 *            The modified field.
 	 */
-	public FieldAction(Player actingPlayer, Point point) {
+	public FieldAction(final Player actingPlayer, final Point point) {
 		this(actingPlayer, point.x, point.y);
 	}
 

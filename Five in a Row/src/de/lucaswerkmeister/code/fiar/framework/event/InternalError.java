@@ -41,7 +41,7 @@ public class InternalError extends GameEnd {
 	 * @param cause
 	 *            The cause of the internal error.
 	 */
-	public InternalError(Throwable cause) {
+	public InternalError(final Throwable cause) {
 		this(cause, "Internal error: " + cause.getMessage());
 	}
 
@@ -51,7 +51,7 @@ public class InternalError extends GameEnd {
 	 * @param message
 	 *            The message.
 	 */
-	public InternalError(String message) {
+	public InternalError(final String message) {
 		this(null, message);
 	}
 
@@ -63,7 +63,7 @@ public class InternalError extends GameEnd {
 	 * @param message
 	 *            The message.
 	 */
-	public InternalError(Throwable cause, String message) {
+	public InternalError(final Throwable cause, final String message) {
 		this.cause = cause;
 		this.message = message;
 	}

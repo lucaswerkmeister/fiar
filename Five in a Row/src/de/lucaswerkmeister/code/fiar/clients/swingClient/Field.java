@@ -37,7 +37,7 @@ import de.lucaswerkmeister.code.fiar.framework.Player;
 public class Field extends JComponent {
 	private static final long serialVersionUID = 1004050893930330880L;
 	private Player player;
-	private Dimension size;
+	private final Dimension size;
 
 	/**
 	 * A new {@link Field} occupied by the specified player, of the specified size.
@@ -47,7 +47,7 @@ public class Field extends JComponent {
 	 * @param size
 	 *            The size of the field.
 	 */
-	public Field(Player player, Dimension size) {
+	public Field(final Player player, final Dimension size) {
 		setPlayer(player);
 		this.size = size;
 		setPreferredSize(size);
@@ -56,7 +56,7 @@ public class Field extends JComponent {
 	}
 
 	@Override
-	public void paint(Graphics g) {
+	public void paint(final Graphics g) {
 		if (player == null || player instanceof NoPlayer)
 			g.setColor(getBackground());
 		else
@@ -84,7 +84,7 @@ public class Field extends JComponent {
 	 * @param player
 	 *            The player now occupying this field.
 	 */
-	public void setPlayer(Player player) {
+	public void setPlayer(final Player player) {
 		this.player = player;
 		if (player != null && !(player instanceof NoPlayer)) {
 			setToolTipText(player.getName());

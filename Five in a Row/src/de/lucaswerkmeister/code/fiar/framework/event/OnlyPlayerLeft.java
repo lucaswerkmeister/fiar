@@ -33,7 +33,7 @@ public class OnlyPlayerLeft extends PlayerVictory {
 	 * @param winningPlayer
 	 *            The only player left.
 	 */
-	public OnlyPlayerLeft(Player winningPlayer) {
+	public OnlyPlayerLeft(final Player winningPlayer) {
 		super(winningPlayer);
 	}
 }

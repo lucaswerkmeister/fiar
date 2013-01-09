@@ -41,7 +41,7 @@ public class UnknownPlayerException extends RuntimeException {
 	 * @param unknownPlayer
 	 *            The unknown player.
 	 */
-	public UnknownPlayerException(Player unknownPlayer) {
+	public UnknownPlayerException(final Player unknownPlayer) {
 		super();
 		this.unknownPlayer = unknownPlayer;
 	}
@@ -54,7 +54,7 @@ public class UnknownPlayerException extends RuntimeException {
 	 * @param message
 	 *            The message.
 	 */
-	public UnknownPlayerException(Player unknownPlayer, String message) {
+	public UnknownPlayerException(final Player unknownPlayer, final String message) {
 		super(message);
 		this.unknownPlayer = unknownPlayer;
 	}
@@ -67,7 +67,7 @@ public class UnknownPlayerException extends RuntimeException {
 	 * @param cause
 	 *            The cause.
 	 */
-	public UnknownPlayerException(Player unknownPlayer, Throwable cause) {
+	public UnknownPlayerException(final Player unknownPlayer, final Throwable cause) {
 		super(cause);
 		this.unknownPlayer = unknownPlayer;
 	}
@@ -82,7 +82,7 @@ public class UnknownPlayerException extends RuntimeException {
 	 * @param cause
 	 *            The cause.
 	 */
-	public UnknownPlayerException(Player unknownPlayer, String message, Throwable cause) {
+	public UnknownPlayerException(final Player unknownPlayer, final String message, final Throwable cause) {
 		super(message, cause);
 		this.unknownPlayer = unknownPlayer;
 	}
@@ -102,8 +102,8 @@ public class UnknownPlayerException extends RuntimeException {
 	 * @param writableStackTrace
 	 *            Whether or not the stack trace should be writable.
 	 */
-	public UnknownPlayerException(Player unknownPlayer, String message, Throwable cause, boolean enableSuppression,
-			boolean writableStackTrace) {
+	public UnknownPlayerException(final Player unknownPlayer, final String message, final Throwable cause,
+			final boolean enableSuppression, final boolean writableStackTrace) {
 		super(message, cause, enableSuppression, writableStackTrace);
 		this.unknownPlayer = unknownPlayer;
 	}

@@ -33,7 +33,7 @@ public class AllOthersForfeit extends OnlyPlayerLeft {
 	 * @param winningPlayer
 	 *            The only player left.
 	 */
-	public AllOthersForfeit(Player winningPlayer) {
+	public AllOthersForfeit(final Player winningPlayer) {
 		super(winningPlayer);
 	}
 }

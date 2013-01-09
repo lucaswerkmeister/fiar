@@ -22,8 +22,7 @@ import java.awt.Dimension;
 import de.lucaswerkmeister.code.fiar.framework.Player;
 
 /**
- * Indicates that a player proposed a specific board size. Only allowed during
- * "Choose board size" phase.
+ * Indicates that a player proposed a specific board size. Only allowed during "Choose board size" phase.
  * 
  * @author Lucas Werkmeister
  * @version 1.0
@@ -31,7 +30,15 @@ import de.lucaswerkmeister.code.fiar.framework.Player;
 public class BoardSizeProposal extends PlayerAction {
 	private final Dimension size;
 
-	public BoardSizeProposal(Player actingPlayer, Dimension size) {
+	/**
+	 * A new {@link BoardSizeProposal} by the specified player with the specified size.
+	 * 
+	 * @param actingPlayer
+	 *            The player who proposes the board size.
+	 * @param size
+	 *            The size that the player proposes.
+	 */
+	public BoardSizeProposal(final Player actingPlayer, final Dimension size) {
 		super(actingPlayer);
 		this.size = size;
 	}

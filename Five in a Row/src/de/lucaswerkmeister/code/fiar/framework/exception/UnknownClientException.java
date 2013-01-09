@@ -42,7 +42,7 @@ public class UnknownClientException extends RuntimeException {
 	 * @param unknownClient
 	 *            The unknown client.
 	 */
-	public UnknownClientException(Client unknownClient) {
+	public UnknownClientException(final Client unknownClient) {
 		super();
 		this.unknownClient = unknownClient;
 	}
@@ -55,7 +55,7 @@ public class UnknownClientException extends RuntimeException {
 	 * @param message
 	 *            The message.
 	 */
-	public UnknownClientException(Client unknownClient, String message) {
+	public UnknownClientException(final Client unknownClient, final String message) {
 		super(message);
 		this.unknownClient = unknownClient;
 	}
@@ -68,7 +68,7 @@ public class UnknownClientException extends RuntimeException {
 	 * @param cause
 	 *            The cause.
 	 */
-	public UnknownClientException(Client unknownClient, Throwable cause) {
+	public UnknownClientException(final Client unknownClient, final Throwable cause) {
 		super(cause);
 		this.unknownClient = unknownClient;
 	}
@@ -83,7 +83,7 @@ public class UnknownClientException extends RuntimeException {
 	 * @param cause
 	 *            The cause.
 	 */
-	public UnknownClientException(Client unknownClient, String message, Throwable cause) {
+	public UnknownClientException(final Client unknownClient, final String message, final Throwable cause) {
 		super(message, cause);
 		this.unknownClient = unknownClient;
 	}
@@ -103,8 +103,8 @@ public class UnknownClientException extends RuntimeException {
 	 * @param writableStackTrace
 	 *            Whether or not the stack trace should be writable.
 	 */
-	public UnknownClientException(Client unknownClient, String message, Throwable cause, boolean enableSuppression,
-			boolean writableStackTrace) {
+	public UnknownClientException(final Client unknownClient, final String message, final Throwable cause,
+			final boolean enableSuppression, final boolean writableStackTrace) {
 		super(message, cause, enableSuppression, writableStackTrace);
 		this.unknownClient = unknownClient;
 	}

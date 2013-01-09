@@ -68,15 +68,10 @@ public class ConsoleClient extends Client implements Runnable {
 	}
 
 	@Override
-	public void gameEvent(GameEvent e) {
+	public void gameEvent(final GameEvent e) {
 		eventQueue.add(e);
 		if (e instanceof FieldAction)
 			printBoard(server.getCurrentBoard(this));
-	}
-
-	@Override
-	public int getID() {
-		return 0;
 	}
 
 	@Override
@@ -85,19 +80,19 @@ public class ConsoleClient extends Client implements Runnable {
 			System.out.println("Welcome to Five in a Row!");
 			System.out.println("Please enter the field size:");
 			int boardSize = 0;
-			do {
+			do
 				try {
 					boardSize = Integer.parseInt(inputReader.readLine());
-					if (boardSize < FixedServer.IN_A_ROW) {
-						System.out.println("Board size must be at least " + FixedServer.IN_A_ROW + ", please re-type.");
+					if (boardSize < Server.IN_A_ROW) {
+						System.out.println("Board size must be at least " + Server.IN_A_ROW + ", please re-type.");
 						continue;
 					}
 					break;
-				} catch (NumberFormatException e) {
+				} catch (final NumberFormatException e) {
 					System.out.println("Invalid input - please re-type.");
 					continue;
 				}
-			} while (true);
+			while (true);
 			server.action(this, new BoardSizeProposal(p1, new Dimension(boardSize, boardSize)));
 			server.action(this, new BoardSizeProposal(p2, new Dimension(boardSize, boardSize)));
 			eventQueue.poll(); // BoardSizeProposal
@@ -114,12 +109,12 @@ public class ConsoleClient extends Client implements Runnable {
 			while (!(input.equalsIgnoreCase("quit") || input.equalsIgnoreCase("exit") || input
 					.equalsIgnoreCase("leave"))) {
 				try {
-					for (Point p : parseCoordinates(input)) {
+					for (final Point p : parseCoordinates(input)) {
 						if (server.getCurrentBoard(this).getPlayerAt(p) == Block.getInstance())
 							server.action(this, new UnblockField(p1, p));
 						else
 							server.action(this, new BlockField(p1, p));
-						GameEvent event = eventQueue.poll(); // (Un)BlockField
+						final GameEvent event = eventQueue.poll(); // (Un)BlockField
 						if (event instanceof BlockField)
 							System.out.println("Field " + p.x + "|" + p.y + " blocked.");
 						else if (event instanceof UnblockField)
@@ -127,7 +122,7 @@ public class ConsoleClient extends Client implements Runnable {
 						else
 							throw new Exception("Unexpected event during \"Block fields\" phase.");
 					}
-				} catch (IllegalArgumentException e) {
+				} catch (final IllegalArgumentException e) {
 					System.out.println("Invalid input. Please re-type the coordinates, but in a different format.");
 				}
 				input = inputReader.readLine();
@@ -148,7 +143,7 @@ public class ConsoleClient extends Client implements Runnable {
 			while (!(input.equalsIgnoreCase("quit") || input.equalsIgnoreCase("exit") || input
 					.equalsIgnoreCase("leave"))) {
 				try {
-					for (Point p : parseCoordinates(input)) {
+					for (final Point p : parseCoordinates(input)) {
 						if (server.getCurrentBoard(this).getPlayerAt(p) == Joker.getInstance())
 							server.action(this, new UnjokerField(p1, p));
 						else if (!server.getCurrentBoard(this).getPlayerAt(p).equals(NoPlayer.getInstance())) {
@@ -157,7 +152,7 @@ public class ConsoleClient extends Client implements Runnable {
 							continue;
 						} else
 							server.action(this, new JokerField(p1, p));
-						GameEvent event = eventQueue.poll(); // (Un)JokerField
+						final GameEvent event = eventQueue.poll(); // (Un)JokerField
 						if (event instanceof JokerField)
 							System.out.println("Field " + p.x + "|" + p.y + " marked as joker field.");
 						else if (event instanceof UnjokerField)
@@ -165,7 +160,7 @@ public class ConsoleClient extends Client implements Runnable {
 						else
 							throw new Exception("Unexpected event during \"Joker fields\" phase.");
 					}
-				} catch (IllegalArgumentException e) {
+				} catch (final IllegalArgumentException e) {
 					System.out.println("Invalid input. Please re-type the coordinates, but in a different format.");
 				}
 				input = inputReader.readLine();
@@ -186,7 +181,7 @@ public class ConsoleClient extends Client implements Runnable {
 					Set<Point> coordinate;
 					try {
 						coordinate = parseCoordinates(inputReader.readLine());
-					} catch (IllegalArgumentException e) {
+					} catch (final IllegalArgumentException e) {
 						System.out.println("Invalid input. Please re-type the coordinates, but in a different format.");
 						continue;
 					}
@@ -206,7 +201,7 @@ public class ConsoleClient extends Client implements Runnable {
 				player = (player % 2) + 1;
 			}
 			System.out.println("Player " + server.getPhase(this)[2] + " won!");
-		} catch (Throwable t) {
+		} catch (final Throwable t) {
 			System.out.println("WHOOPS! An internal error occured. I'm so sorry.");
 			t.printStackTrace();
 			if (t instanceof ThreadDeath)
@@ -220,7 +215,7 @@ public class ConsoleClient extends Client implements Runnable {
 	 * @param b
 	 *            The board to print.
 	 */
-	private void printBoard(Board b) {
+	private void printBoard(final Board b) {
 		for (int y = 0; y < b.getHeight(); y++) {
 			for (int x = 0; x < b.getWidth(); x++)
 				switch (b.getPlayerAt(x, y) == null ? 0 : b.getPlayerAt(x, y).getID()) {
@@ -261,24 +256,24 @@ public class ConsoleClient extends Client implements Runnable {
 	 * @throws IllegalArgumentException
 	 *             If the input can't be parsed.
 	 */
-	private Set<Point> parseCoordinates(String input) throws IllegalArgumentException {
-		HashSet<Point> ret = new HashSet<>();
+	private Set<Point> parseCoordinates(final String input) throws IllegalArgumentException {
+		final HashSet<Point> ret = new HashSet<>();
 		if (input.contains("|")) {
 			// coordinates separated by '|'
-			String[] pairs = input.split("[ ,]");
-			for (String pair : pairs) {
+			final String[] pairs = input.split("[ ,]");
+			for (final String pair : pairs) {
 				if (pair.isEmpty())
 					continue;
-				String[] subpair = pair.split("\\|");
+				final String[] subpair = pair.split("\\|");
 				ret.add(new Point(Integer.parseInt(subpair[0]), Integer.parseInt(subpair[1])));
 			}
 		} else {
 			// coordinates separated by ','
-			String[] pairs = input.split(" ");
-			for (String pair : pairs) {
+			final String[] pairs = input.split(" ");
+			for (final String pair : pairs) {
 				if (pair.isEmpty())
 					continue;
-				String[] subpair = pair.split(",");
+				final String[] subpair = pair.split(",");
 				ret.add(new Point(Integer.parseInt(subpair[0]), Integer.parseInt(subpair[1])));
 			}
 		}
@@ -291,7 +286,7 @@ public class ConsoleClient extends Client implements Runnable {
 	 * @param args
 	 *            The arguments. Currently ignored.
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		new Thread(new ConsoleClient()).start();
 	}
 }

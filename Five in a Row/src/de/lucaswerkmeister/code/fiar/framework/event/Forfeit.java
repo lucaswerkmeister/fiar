@@ -33,7 +33,7 @@ public class Forfeit extends PlayerAction {
 	 * @param capitulatingPlayer
 	 *            The capitulating player.
 	 */
-	public Forfeit(Player capitulatingPlayer) {
+	public Forfeit(final Player capitulatingPlayer) {
 		super(capitulatingPlayer);
 	}
 }

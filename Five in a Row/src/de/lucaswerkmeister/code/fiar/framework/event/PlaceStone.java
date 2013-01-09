@@ -39,7 +39,7 @@ public class PlaceStone extends FieldAction {
 	 * @param y
 	 *            The y coordinate of the modified field.
 	 */
-	public PlaceStone(Player actingPlayer, int x, int y) {
+	public PlaceStone(final Player actingPlayer, final int x, final int y) {
 		super(actingPlayer, x, y);
 	}
 
@@ -51,7 +51,7 @@ public class PlaceStone extends FieldAction {
 	 * @param point
 	 *            The modified field.
 	 */
-	public PlaceStone(Player actingPlayer, Point point) {
+	public PlaceStone(final Player actingPlayer, final Point point) {
 		super(actingPlayer, point);
 	}
 }

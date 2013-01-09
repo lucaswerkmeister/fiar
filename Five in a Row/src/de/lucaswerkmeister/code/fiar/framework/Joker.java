@@ -38,7 +38,7 @@ public class Joker extends Player {
 		super("Joker", Color.green, ID);
 	}
 
-	private Joker(String name, Color color, int id) { // hide super constructor
+	private Joker(final String name, final Color color, final int id) { // hide super constructor
 		super(name, color, id);
 	}
 

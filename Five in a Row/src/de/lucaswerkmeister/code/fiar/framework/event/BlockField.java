@@ -39,7 +39,7 @@ public class BlockField extends FieldAction {
 	 * @param y
 	 *            The y coordinate of the modified field.
 	 */
-	public BlockField(Player actingPlayer, int x, int y) {
+	public BlockField(final Player actingPlayer, final int x, final int y) {
 		super(actingPlayer, x, y);
 	}
 
@@ -51,7 +51,7 @@ public class BlockField extends FieldAction {
 	 * @param point
 	 *            The modified field.
 	 */
-	public BlockField(Player actingPlayer, Point point) {
+	public BlockField(final Player actingPlayer, final Point point) {
 		super(actingPlayer, point);
 	}
 }

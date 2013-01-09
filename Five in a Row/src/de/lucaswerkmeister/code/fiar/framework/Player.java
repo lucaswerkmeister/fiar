@@ -41,7 +41,7 @@ public class Player {
 	 * @param id
 	 *            The player's ID. The caller is responsible for ensuring uniqueness of this ID (see {@link #getID()}).
 	 */
-	public Player(String name, Color color, int id) {
+	public Player(final String name, final Color color, final int id) {
 		this.name = name;
 		this.color = color;
 		this.id = id;
@@ -86,7 +86,8 @@ public class Player {
 	 *            The other Player instance.
 	 * @return <code>true</code> if this player's ID is equal to the other player's ID, <code>false</code> otherwise.
 	 */
-	public boolean equals(Object other) {
+	@Override
+	public boolean equals(final Object other) {
 		if (other instanceof Player)
 			return getID() == ((Player) other).getID();
 		return false;
@@ -101,7 +102,7 @@ public class Player {
 	 * @return <code>true</code> if the players are to be deemed equals when checking for winning moves,
 	 *         <code>false</code> otherwise.
 	 */
-	public boolean equalsWithJoker(Player other) {
+	public boolean equalsWithJoker(final Player other) {
 		return this instanceof Joker || other instanceof Joker || equals(other);
 	}
 
@@ -110,6 +111,7 @@ public class Player {
 	 * 
 	 * @return The player's ID.
 	 */
+	@Override
 	public int hashCode() {
 		return getID();
 	}
