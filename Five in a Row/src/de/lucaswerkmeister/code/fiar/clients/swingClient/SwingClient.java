@@ -75,6 +75,7 @@ import de.lucaswerkmeister.code.fiar.servers.FixedServer;
  */
 public class SwingClient extends Client implements Runnable {
 	private static final Random random = new Random();
+	private static final SwingClient instance = new SwingClient();
 	private final Server server;
 	private final List<Player> players; // note that the contents of the list are not final
 	private final JFrame gui;
@@ -84,7 +85,6 @@ public class SwingClient extends Client implements Runnable {
 	private final JLabel statusBar;
 	private Field[][] fields;
 	private int playerIndex = 0;
-	private static final SwingClient instance = new SwingClient();
 
 	/**
 	 * Creates a new {@link SwingClient}.
@@ -187,8 +187,8 @@ public class SwingClient extends Client implements Runnable {
 										else {
 											final GameEvent event = events.poll();
 											if (event instanceof PlayerVictory) {
-												final String message = ((PlayerVictory) event).getWinningPlayer()
-														.getName() + " wins!";
+												final String message =
+														((PlayerVictory) event).getWinningPlayer().getName() + " wins!";
 												JOptionPane.showMessageDialog(gui, message);
 												statusBar.setText(message);
 											}
@@ -294,11 +294,13 @@ public class SwingClient extends Client implements Runnable {
 			statusBar.setText(players.get(playerIndex).getName() + "'"
 					+ (endsWithSSound(players.get(playerIndex).getName()) ? "" : "s") + " turn!");
 			// everything after this point is handled in ActionListeners
-		} catch (final Throwable t) {
+		} catch (final Throwable t) { // I will catch Throwable whenever I feel like it and nobody can forbid it.
 			System.out.println("WHOOPS! An internal error occured. I'm so sorry.");
-			t.printStackTrace();
-			if (t instanceof ThreadDeath)
-				throw (ThreadDeath) t;
+			System.out.println("If you want to report this to the developer, please include the information below: ");
+			t.printStackTrace(System.out);
+			// unneccessary because the thread exits anyways
+			// if (t instanceof ThreadDeath || t instanceof VirtualMachineError)
+			// throw (Error) t; // OutOfMemoryExceptions etc.
 		}
 	}
 
@@ -333,8 +335,8 @@ public class SwingClient extends Client implements Runnable {
 		dialog.add(name);
 		// This "random color" code is based on the following stackoverflow answer:
 		// http://stackoverflow.com/a/4247219/1420237
-		final SelectableColor color = new SelectableColor(Color.getHSBColor(random.nextFloat(),
-				(random.nextInt(2) + 7) / 10f, 0.9f));
+		final SelectableColor color =
+				new SelectableColor(Color.getHSBColor(random.nextFloat(), (random.nextInt(2) + 7) / 10f, 0.9f));
 		dialog.add(color);
 		final JButton addPlayer = new JButton("Add Player");
 		addPlayer.addActionListener(new ActionListener() {

@@ -39,6 +39,15 @@ import de.lucaswerkmeister.code.fiar.servers.FixedServer;
 public class FixedServerTest extends Client {
 	private Queue<GameEvent> events;
 
+	/**
+	 * Creates a new {@link FixedServerTest}.
+	 * <p>
+	 * Does nothing, but pleases the Praktomat.
+	 */
+	public FixedServerTest() {
+		// do nothing
+	}
+
 	// Eclipse formatter is stupid and inserts line breaks after every td :(
 	/**
 	 * Tests basic gameplay of the server: No blocking and jokers, only two players, no illegal action attempts.

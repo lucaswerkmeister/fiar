@@ -25,4 +25,12 @@ package de.lucaswerkmeister.code.fiar.framework.event;
  */
 public class Tie extends GameEnd {
 
+	/**
+	 * Creates a new {@link Tie}.
+	 * <p>
+	 * This constructor does nothing and is only declared explicitly so the Praktomat will shut up.
+	 */
+	public Tie() {
+
+	}
 }

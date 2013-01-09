@@ -54,7 +54,8 @@ import de.lucaswerkmeister.code.fiar.servers.FixedServer;
  */
 public class ConsoleClient extends Client implements Runnable {
 	private final Server server;
-	private final Player p1, p2;
+	private final Player p1;
+	private final Player p2;
 	private final Queue<GameEvent> eventQueue;
 
 	/**
@@ -203,9 +204,11 @@ public class ConsoleClient extends Client implements Runnable {
 			System.out.println("Player " + server.getPhase(this)[2] + " won!");
 		} catch (final Throwable t) { // I will catch Throwable whenever I feel like it and nobody can forbid it.
 			System.out.println("WHOOPS! An internal error occured. I'm so sorry.");
-			t.printStackTrace();
-			if (t instanceof ThreadDeath)
-				throw (ThreadDeath) t; // Look, I'm even re-throwing ThreadDeath!
+			System.out.println("If you want to report this to the developer, please include the information below: ");
+			t.printStackTrace(System.out);
+			// unneccessary because the thread exits anyways
+			// if (t instanceof ThreadDeath || t instanceof VirtualMachineError)
+			// throw (Error) t; // OutOfMemoryExceptions etc.
 		}
 	}
 
