@@ -34,12 +34,25 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 
+/**
+ * A swing component that displays a color. When clicked, it opens a dialog with a {@link JColorChooser} where the user
+ * can select a color.
+ * 
+ * @author Lucas Werkmeister
+ * @version 1.0
+ */
 public class SelectableColor extends JComponent implements MouseListener {
 	private static final long serialVersionUID = 8280662059844997029L;
 	private static final Dimension size = new Dimension(15, 15);
 	private Color color = Color.black;
 	private final List<ActionListener> listeners = new LinkedList<>();
 
+	/**
+	 * Creates a new {@link SelectableColor} with the specified color as initial color.
+	 * 
+	 * @param c
+	 *            The initial color.
+	 */
 	public SelectableColor(final Color c) {
 		color = c;
 		addMouseListener(this);
@@ -57,15 +70,35 @@ public class SelectableColor extends JComponent implements MouseListener {
 		g.fillRect(1, 1, size.width - 1, size.height - 1);
 	}
 
+	/**
+	 * Sets the color.
+	 * 
+	 * @param c
+	 *            The color to set.
+	 */
 	public void setColor(final Color c) {
 		color = c;
 		repaint();
 	}
 
+	/**
+	 * Gets the color.
+	 * 
+	 * @return The color.
+	 */
 	public Color getColor() {
 		return color;
 	}
 
+	/**
+	 * Adds an action listener to this component.
+	 * <p>
+	 * The action listener is notified whenever the user closes the "select color" dialog, regardless of the result (OK
+	 * or Cancel).
+	 * 
+	 * @param listener
+	 *            The action listener for this component.
+	 */
 	public void addActionListener(final ActionListener listener) {
 		listeners.add(listener);
 	}
