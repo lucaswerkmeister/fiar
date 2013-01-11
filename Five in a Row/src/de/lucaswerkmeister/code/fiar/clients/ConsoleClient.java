@@ -203,12 +203,20 @@ public class ConsoleClient extends Client implements Runnable {
 			}
 			System.out.println("Player " + server.getPhase(this)[2] + " won!");
 		} catch (final Throwable t) { // I will catch Throwable whenever I feel like it and nobody can forbid it.
+			// I always want the user to see this message before the confusing log starts
 			System.out.println("WHOOPS! An internal error occured. I'm so sorry.");
-			System.out.println("If you want to report this to the developer, please include the information below: ");
-			t.printStackTrace(System.out);
-			// unneccessary because the thread exits anyways
-			// if (t instanceof ThreadDeath || t instanceof VirtualMachineError)
-			// throw (Error) t; // OutOfMemoryExceptions etc.
+			System.out.println("If you want to report this to the developer, please include the information below:");
+			// VMErrors and ThreadDeaths should always be re-thrown;
+			// for ThreadDeaths, the stack trace normally isn't printed,
+			// so I do that manually here.
+			// For all other exceptions, I print the stack trace and don't re-throw them.
+			if (t instanceof VirtualMachineError)
+				throw (VirtualMachineError) t;
+			else if (t instanceof ThreadDeath) {
+				t.printStackTrace();
+				throw (ThreadDeath) t;
+			}
+			t.printStackTrace();
 		}
 	}
 
