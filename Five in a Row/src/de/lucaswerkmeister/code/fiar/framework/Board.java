@@ -133,7 +133,9 @@ public abstract class Board {
 
 		int equalStonesUp = 0;
 		int equalStonesDown = 0;
-		for (; y - equalStonesUp - 1 >= 0 && getPlayerAt(x, y - equalStonesUp - 1).equalsWithJoker(getPlayerAt(x, y)); equalStonesUp++)
+		// @formatter:off
+		for (; y - equalStonesUp - 1 >= 0
+				&& getPlayerAt(x, y - equalStonesUp - 1).equalsWithJoker(getPlayerAt(x, y)); equalStonesUp++)
 			;
 		for (; y + equalStonesDown + 1 < getHeight()
 				&& getPlayerAt(x, y + equalStonesDown + 1).equalsWithJoker(getPlayerAt(x, y)); equalStonesDown++)
@@ -144,8 +146,10 @@ public abstract class Board {
 		int equalStonesUpLeft = 0;
 		int equalStonesDownRight = 0;
 		for (; x - equalStonesUpLeft - 1 >= 0 && y - equalStonesUpLeft - 1 >= 0
-				&& getPlayerAt(x - equalStonesUpLeft - 1, y - equalStonesUpLeft - 1).equalsWithJoker(getPlayerAt(x, y)); equalStonesUpLeft++)
+				&& getPlayerAt(x - equalStonesUpLeft - 1, y - equalStonesUpLeft - 1)
+					.equalsWithJoker(getPlayerAt(x, y)); equalStonesUpLeft++)
 			;
+		// @formatter:on
 		for (; x + equalStonesDownRight + 1 < getWidth()
 				&& y + equalStonesDownRight + 1 < getHeight()
 				&& getPlayerAt(x + equalStonesDownRight + 1, y + equalStonesDownRight + 1).equalsWithJoker(

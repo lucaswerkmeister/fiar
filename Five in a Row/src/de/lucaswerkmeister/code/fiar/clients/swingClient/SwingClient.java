@@ -156,6 +156,9 @@ public class SwingClient extends Client implements Runnable {
 					final Field f = new Field(null, fieldSize);
 					final Point xy = new Point(x, y);
 					f.addMouseListener(new MouseAdapter() {
+
+
+
 						@Override
 						public void mouseClicked(final MouseEvent e) {
 							if (f.isEnabled()) // disabled lightweight components still receive MouseEvents
@@ -187,8 +190,10 @@ public class SwingClient extends Client implements Runnable {
 										else {
 											final GameEvent event = events.poll();
 											if (event instanceof PlayerVictory) {
-												final String message =
-														((PlayerVictory) event).getWinningPlayer().getName() + " wins!";
+												//@formatter:off
+												final String message
+													= ((PlayerVictory) event).getWinningPlayer().getName() + " wins!";
+												//@formatter:on
 												JOptionPane.showMessageDialog(gui, message);
 												statusBar.setText(message);
 											}
@@ -335,8 +340,10 @@ public class SwingClient extends Client implements Runnable {
 		dialog.add(name);
 		// This "random color" code is based on the following stackoverflow answer:
 		// http://stackoverflow.com/a/4247219/1420237
-		final SelectableColor color =
-				new SelectableColor(Color.getHSBColor(random.nextFloat(), (random.nextInt(2) + 7) / 10f, 0.9f));
+		// @formatter:off
+		final SelectableColor color 
+			= new SelectableColor(Color.getHSBColor(random.nextFloat(), (random.nextInt(2) + 7) / 10f, 0.9f));
+		// @formatter:on
 		dialog.add(color);
 		final JButton addPlayer = new JButton("Add Player");
 		addPlayer.addActionListener(new ActionListener() {

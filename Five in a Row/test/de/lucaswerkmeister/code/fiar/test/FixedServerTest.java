@@ -298,7 +298,10 @@ public class FixedServerTest extends Client {
 	 * @throws IllegalMoveException
 	 *             Thrown by the server.
 	 */
-	private void act(final Server server, final PlayerAction action) throws IllegalStateException, IllegalMoveException {
+	// @formatter:off
+	private void act(final Server server, final PlayerAction action)
+			throws IllegalStateException, IllegalMoveException {
+		// @formatter:on
 		server.action(this, action);
 		Assert.assertEquals(action, events.poll());
 	}
