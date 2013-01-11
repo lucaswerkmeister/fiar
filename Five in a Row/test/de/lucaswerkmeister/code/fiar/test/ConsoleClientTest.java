@@ -35,6 +35,15 @@ public class ConsoleClientTest {
 	private Board board;
 
 	/**
+	 * Creates a new {@link ConsoleClientTest}.
+	 * <p>
+	 * Does nothing other than shutting up the Praktomat. I'm beginning to hate that system.
+	 */
+	public ConsoleClientTest() {
+		// do nothing
+	}
+
+	/**
 	 * Tests basic gameplay: No blocking and jokers, no illegal input.
 	 * <p>
 	 * This plays exactly the same game as {@link FixedServerTest#testBasic()}.

@@ -54,7 +54,8 @@ import de.lucaswerkmeister.code.fiar.servers.FixedServer;
  */
 public class ConsoleClient extends Client implements Runnable {
 	private final Server server;
-	private final Player p1, p2;
+	private final Player p1;
+	private final Player p2;
 	private final Queue<GameEvent> eventQueue;
 
 	/**
@@ -136,8 +137,8 @@ public class ConsoleClient extends Client implements Runnable {
 			// Set Jokers
 			System.out.println("You may now mark certain fields as joker fields:");
 			System.out.println("A joker field will count as part of a row for every player.");
-			System.out
-					.println("Please enter the coordinates of fields you wish to set as joker (x|y) or \"quit\" to continue.");
+			System.out.println("Please enter the coordinates of fields "
+					+ "you wish to set as joker (x|y) or \"quit\" to continue.");
 			System.out.println("Enter the same coordinates again to \"un-joker\" a field again.");
 			input = inputReader.readLine();
 			while (!(input.equalsIgnoreCase("quit") || input.equalsIgnoreCase("exit") || input
@@ -201,11 +202,21 @@ public class ConsoleClient extends Client implements Runnable {
 				player = (player % 2) + 1;
 			}
 			System.out.println("Player " + server.getPhase(this)[2] + " won!");
-		} catch (final Throwable t) {
+		} catch (final Throwable t) { // I will catch Throwable whenever I feel like it and nobody can forbid it.
+			// I always want the user to see this message before the confusing log starts
 			System.out.println("WHOOPS! An internal error occured. I'm so sorry.");
-			t.printStackTrace();
-			if (t instanceof ThreadDeath)
+			System.out.println("If you want to report this to the developer, please include the information below:");
+			// VMErrors and ThreadDeaths should always be re-thrown;
+			// for ThreadDeaths, the stack trace normally isn't printed,
+			// so I do that manually here.
+			// For all other exceptions, I print the stack trace and don't re-throw them.
+			if (t instanceof VirtualMachineError)
+				throw (VirtualMachineError) t;
+			else if (t instanceof ThreadDeath) {
+				t.printStackTrace();
 				throw (ThreadDeath) t;
+			}
+			t.printStackTrace();
 		}
 	}
 

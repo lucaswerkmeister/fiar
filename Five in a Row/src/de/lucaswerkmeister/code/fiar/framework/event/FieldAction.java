@@ -28,7 +28,8 @@ import de.lucaswerkmeister.code.fiar.framework.Player;
  * @version 1.0
  */
 public abstract class FieldAction extends PlayerAction {
-	private final int x, y;
+	private final int x;
+	private final int y;
 
 	/**
 	 * A new {@link FieldAction} by the specified player on the specified field.
