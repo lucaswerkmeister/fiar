@@ -12,6 +12,7 @@ make will automatically
 * create the zip files
 * increase the version numer
 * commit the increased version number.
+
 This makes it very easy to reobtain the zip files that were uploaded to the Praktomat:
 Just switch/checkout to the according tag (creating a new branch in the process) and run make again.
 Since you are in a new branch, make's commits won't break anything.
