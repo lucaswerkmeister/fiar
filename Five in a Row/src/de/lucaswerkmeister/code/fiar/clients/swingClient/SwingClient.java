@@ -157,14 +157,6 @@ public final class SwingClient extends Client implements Runnable {
 					final Point xy = new Point(x, y);
 					f.addMouseListener(new MouseAdapter() {
 
-
-
-
-
-
-
-
-
 						@Override
 						public void mouseClicked(final MouseEvent e) {
 							if (f.isEnabled()) // disabled lightweight components still receive MouseEvents

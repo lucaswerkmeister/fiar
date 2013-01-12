@@ -2,6 +2,8 @@ SRC = $(shell find src -name *.java)
 TEST = $(shell find test -name *.java)
 VERSION = $(shell cat version)
 all: src.zip test.zip
+	git config user.name "Lucas Werkmeister"
+	git config user.email "mail@lucaswerkmeister.de"
 	git tag -a Solution_$(VERSION) -m "Praktomat Solution $(VERSION)."
 	echo $$(($(VERSION)+1))>version
 
