@@ -12,7 +12,8 @@ ifneq ($(strip $(CHANGES)),)
 endif
 	git tag -a Solution_$(VERSION) -m "$(MESSAGE)"
 	echo $$(($(VERSION)+1))>version
-	git commit -a -m "Increased version number."
+	git add version
+	git commit -m "Increased version number."
 
 test.zip: $(TEST)
 	cd test && zip -r ../Solution$(VERSION)_test.zip $(TEST:test/%=%)
