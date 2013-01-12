@@ -21,6 +21,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -57,6 +58,7 @@ public final class ConsoleClient extends Client implements Runnable {
 	private final Player p1;
 	private final Player p2;
 	private final Queue<GameEvent> eventQueue;
+	private boolean bbInstalled = false;
 
 	/**
 	 * Creates a new {@link ConsoleClient} instance.
@@ -110,7 +112,7 @@ public final class ConsoleClient extends Client implements Runnable {
 			while (!(input.equalsIgnoreCase("quit") || input.equalsIgnoreCase("exit") || input
 					.equalsIgnoreCase("leave"))) {
 				try {
-					for (final Point p : parseCoordinates(input)) {
+					for (final Point p : parseCoordinates(input, inputReader)) {
 						if (server.getCurrentBoard(this).getPlayerAt(p) == Block.getInstance())
 							server.action(this, new UnblockField(p1, p));
 						else
@@ -144,7 +146,7 @@ public final class ConsoleClient extends Client implements Runnable {
 			while (!(input.equalsIgnoreCase("quit") || input.equalsIgnoreCase("exit") || input
 					.equalsIgnoreCase("leave"))) {
 				try {
-					for (final Point p : parseCoordinates(input)) {
+					for (final Point p : parseCoordinates(input, inputReader)) {
 						if (server.getCurrentBoard(this).getPlayerAt(p) == Joker.getInstance())
 							server.action(this, new UnjokerField(p1, p));
 						else if (!server.getCurrentBoard(this).getPlayerAt(p).equals(NoPlayer.getInstance())) {
@@ -181,7 +183,7 @@ public final class ConsoleClient extends Client implements Runnable {
 				do {
 					Set<Point> coordinate;
 					try {
-						coordinate = parseCoordinates(inputReader.readLine());
+						coordinate = parseCoordinates(inputReader.readLine(), inputReader);
 					} catch (final IllegalArgumentException e) {
 						System.out.println("Invalid input. Please re-type the coordinates, but in a different format.");
 						continue;
@@ -267,26 +269,58 @@ public final class ConsoleClient extends Client implements Runnable {
 	 * @throws IllegalArgumentException
 	 *             If the input can't be parsed.
 	 */
-	private Set<Point> parseCoordinates(final String input) throws IllegalArgumentException {
-		final HashSet<Point> ret = new HashSet<>();
+	private Set<Point> parseCoordinates(final String input, final BufferedReader inputReader)
+			throws IllegalArgumentException {
+		final Set<Point> ret = new HashSet<>();
 		if (input.contains("|")) {
 			// coordinates separated by '|'
 			final String[] pairs = input.split("[ ,]");
-			for (final String pair : pairs) {
+			for (String pair : pairs) {
 				if (pair.isEmpty())
 					continue;
+				if (pair.startsWith("("))
+					pair = pair.substring(1, pair.length() - 1);
 				final String[] subpair = pair.split("\\|");
 				ret.add(new Point(Integer.parseInt(subpair[0]), Integer.parseInt(subpair[1])));
 			}
-		} else {
+		} else if (input.contains(",")) {
 			// coordinates separated by ','
 			final String[] pairs = input.split(" ");
-			for (final String pair : pairs) {
+			for (String pair : pairs) {
 				if (pair.isEmpty())
 					continue;
+				if (pair.startsWith("("))
+					pair = pair.substring(1, pair.length() - 1);
 				final String[] subpair = pair.split(",");
 				ret.add(new Point(Integer.parseInt(subpair[0]), Integer.parseInt(subpair[1])));
 			}
+		}
+		// Easter egg... I just had to do it.
+		else {
+			if (input.equals("bb")) {
+				if (bbInstalled)
+					System.out.println("If you were expecting ASCII Art, I'm sorry, but I have to disappoint you.");
+				else
+					System.out.println("bb is not installed - try sudo apt-get install bb.");
+			} else if (input.endsWith("apt-get install bb")) {
+				if (input.equals("sudo apt-get install bb"))
+					if (bbInstalled)
+						System.out.println("bb is already installed!");
+					else {
+						bbInstalled = true;
+						System.out.println("bb successfully installed.");
+					}
+				else
+					System.out.println("Error: can't install bb");
+			}
+			do {
+				try {
+					ret.addAll(parseCoordinates(inputReader.readLine(), inputReader));
+					break;
+				} catch (IOException e) {
+					continue;
+				}
+			} while (true);
 		}
 		return ret;
 	}

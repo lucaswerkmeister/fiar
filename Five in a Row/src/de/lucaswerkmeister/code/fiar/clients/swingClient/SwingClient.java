@@ -160,6 +160,11 @@ public final class SwingClient extends Client implements Runnable {
 
 
 
+
+
+
+
+
 						@Override
 						public void mouseClicked(final MouseEvent e) {
 							if (f.isEnabled()) // disabled lightweight components still receive MouseEvents
@@ -367,7 +372,9 @@ public final class SwingClient extends Client implements Runnable {
 		dialog.setVisible(true);
 		switch (dialog.getName()) {
 		case "Add Player":
-			return new Player(name.getText(), color.getColor(), id);
+			// This Easter Egg is clearly of the "WTF" type.
+			return new Player(name.getText().equals("All your base are belong to us") ? "CATS" : name.getText(),
+					color.getColor(), id);
 		case "Cancel":
 			return null;
 		default:
