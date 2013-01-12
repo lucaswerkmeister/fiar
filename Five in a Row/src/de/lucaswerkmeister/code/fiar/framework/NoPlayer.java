@@ -9,7 +9,7 @@ import java.awt.Color;
  * @version 1.0
  * 
  */
-public class NoPlayer extends Player {
+public final class NoPlayer extends Player {
 	private static final NoPlayer instance = new NoPlayer();
 
 	private NoPlayer() {

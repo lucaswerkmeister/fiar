@@ -25,7 +25,7 @@ import java.awt.Color;
  * @author Lucas Werkmeister
  * @version 1.1
  */
-public class Joker extends Player {
+public final class Joker extends Player {
 	/**
 	 * The ID of the Joker instance.
 	 * 

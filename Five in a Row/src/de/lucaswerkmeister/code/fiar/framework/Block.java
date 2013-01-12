@@ -25,7 +25,7 @@ import java.awt.Color;
  * @author Lucas Werkmeister
  * @version 1.1
  */
-public class Block extends Player {
+public final class Block extends Player {
 	/**
 	 * The ID of the Block instance.
 	 * 
