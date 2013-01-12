@@ -369,8 +369,8 @@ public class FixedServer extends Server {
 	 * @version 1.0
 	 */
 	private class ClientPlayerPair {
-		Client client;
-		Player player;
+		final Client client;
+		final Player player;
 
 		/**
 		 * Creates a new Client-Player pair with the specified client and player.
