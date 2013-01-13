@@ -53,7 +53,7 @@ import de.lucaswerkmeister.code.fiar.servers.FixedServer;
  * @author Lucas Werkmeister
  * @version 1.0
  */
-public final class ConsoleClient extends Client implements Runnable {
+public final class ConsoleClient implements Client, Runnable {
 	private final Server server;
 	private final Player p1;
 	private final Player p2;

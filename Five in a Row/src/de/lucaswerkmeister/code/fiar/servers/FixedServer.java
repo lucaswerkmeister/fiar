@@ -60,7 +60,7 @@ import de.lucaswerkmeister.code.fiar.framework.exception.UnknownPlayerException;
  * @author Lucas Werkmeister
  * @version 1.1
  */
-public class FixedServer extends Server {
+public class FixedServer implements Server {
 	private ClientPlayerPair[] pairs;
 	private int currentPlayerIndex;
 	private final Client[] allClients;

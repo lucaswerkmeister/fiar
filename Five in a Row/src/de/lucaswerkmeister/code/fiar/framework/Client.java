@@ -28,8 +28,8 @@ import de.lucaswerkmeister.code.fiar.framework.event.PlayerAction;
  * @author Lucas Werkmeister
  * @version 1.1
  */
-public abstract class Client {
-	private final int mHash = new Random().nextInt();
+public interface Client {
+	final int mHash = new Random().nextInt();
 
 	/**
 	 * Sends a {@link GameEvent} to the client.
@@ -42,7 +42,7 @@ public abstract class Client {
 	 * @param e
 	 *            The game event.
 	 */
-	public abstract void gameEvent(GameEvent e);
+	public void gameEvent(GameEvent e);
 
 	/**
 	 * Two clients are equal if and only if they are the same instance.
@@ -53,9 +53,7 @@ public abstract class Client {
 	 *         otherwise.
 	 */
 	@Override
-	public final boolean equals(final Object other) {
-		return this == other;
-	}
+	public boolean equals(final Object other);
 
 	/**
 	 * A client's hash code is a combination of the {@link Class#hashCode()} of its runtime class and a random but
@@ -66,7 +64,8 @@ public abstract class Client {
 	 *         the same for any other objects.
 	 */
 	@Override
-	public final int hashCode() {
-		return (this.getClass().hashCode() & (((short) -1) << 16)) + mHash & ((short) -1);
-	}
+	public int hashCode();
+	/*
+	 * { return (this.getClass().hashCode() & (((short) -1) << 16)) + mHash & ((short) -1); }
+	 */
 }

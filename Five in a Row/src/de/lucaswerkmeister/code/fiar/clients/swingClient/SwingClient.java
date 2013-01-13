@@ -73,7 +73,7 @@ import de.lucaswerkmeister.code.fiar.servers.FixedServer;
  * @author Lucas Werkmeister
  * @version 1.0
  */
-public final class SwingClient extends Client implements Runnable {
+public final class SwingClient implements Client, Runnable {
 	private static final Random random = new Random();
 	private static final SwingClient instance = new SwingClient();
 	private final Server server;
@@ -156,6 +156,7 @@ public final class SwingClient extends Client implements Runnable {
 					final Field f = new Field(null, fieldSize);
 					final Point xy = new Point(x, y);
 					f.addMouseListener(new MouseAdapter() {
+
 
 						@Override
 						public void mouseClicked(final MouseEvent e) {

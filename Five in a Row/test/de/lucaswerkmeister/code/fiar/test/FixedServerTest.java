@@ -36,7 +36,7 @@ import de.lucaswerkmeister.code.fiar.servers.FixedServer;
  * @author Lucas Werkmeister
  * @version 1.0
  */
-public class FixedServerTest extends Client {
+public class FixedServerTest implements Client {
 	private Queue<GameEvent> events;
 
 	/**

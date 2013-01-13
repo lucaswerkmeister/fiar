@@ -17,6 +17,8 @@
  */
 package de.lucaswerkmeister.code.fiar.framework;
 
+import java.io.Serializable;
+import java.rmi.Remote;
 import java.util.Set;
 
 import de.lucaswerkmeister.code.fiar.framework.event.PlayerAction;
@@ -42,7 +44,7 @@ import de.lucaswerkmeister.code.fiar.framework.exception.UnknownClientException;
  * @author Lucas Werkmeister
  * @version 1.1
  */
-public abstract class Server {
+public interface Server extends Remote, Serializable {
 	/**
 	 * Determines how many stones have to be in a row to win a game.
 	 */
@@ -90,7 +92,7 @@ public abstract class Server {
 	 *            The requesting client.
 	 * @return The current phase.
 	 */
-	public abstract int[] getPhase(Client requester);
+	public int[] getPhase(Client requester);
 
 	/**
 	 * Gets the version of the Phases list that the server is using. This method is provided for compatibility between
@@ -102,7 +104,7 @@ public abstract class Server {
 	 *            The requesting client.
 	 * @return The Phases list version.
 	 */
-	public abstract int getPhasesVersion(Client requester);
+	public int getPhasesVersion(Client requester);
 
 	/**
 	 * Determines if the specified player can currently perform any actions.
@@ -116,9 +118,7 @@ public abstract class Server {
 	 *            The player.
 	 * @return <code>true</code> if the player can currently perform any actions, <code>false</code> otherwise.
 	 */
-	public boolean canAct(final Client requester, final Player p) {
-		return getAllowedActions(requester, p).size() != 0;
-	}
+	public boolean canAct(final Client requester, final Player p);
 
 	/**
 	 * Determines which actions the specified player can currently perform.
@@ -130,7 +130,7 @@ public abstract class Server {
 	 * @return A {@link Set} containing all classes of actions that the player, at the time of the method invocation, is
 	 *         allowed to perform.
 	 */
-	public abstract Set<Class<? extends PlayerAction>> getAllowedActions(Client requester, Player p);
+	public Set<Class<? extends PlayerAction>> getAllowedActions(Client requester, Player p);
 
 	/**
 	 * Performs an action to the game.
@@ -144,8 +144,7 @@ public abstract class Server {
 	 * @throws IllegalMoveException
 	 *             If an illegal move was made.
 	 */
-	public abstract void action(Client requester, PlayerAction action) throws IllegalStateException,
-			IllegalMoveException;
+	public void action(Client requester, PlayerAction action) throws IllegalStateException, IllegalMoveException;
 
 	/**
 	 * Gets the current board.
@@ -160,5 +159,5 @@ public abstract class Server {
 	 *            The requesting client.
 	 * @return The current board, or <code>null</code>.
 	 */
-	public abstract Board getCurrentBoard(Client requester);
+	public Board getCurrentBoard(Client requester);
 }
