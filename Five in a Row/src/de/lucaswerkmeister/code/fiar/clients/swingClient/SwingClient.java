@@ -29,6 +29,10 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.rmi.AccessException;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -47,9 +51,11 @@ import javax.swing.WindowConstants;
 
 import de.lucaswerkmeister.code.fiar.framework.Block;
 import de.lucaswerkmeister.code.fiar.framework.Client;
+import de.lucaswerkmeister.code.fiar.framework.Hoster;
 import de.lucaswerkmeister.code.fiar.framework.Joker;
 import de.lucaswerkmeister.code.fiar.framework.NoPlayer;
 import de.lucaswerkmeister.code.fiar.framework.Player;
+import de.lucaswerkmeister.code.fiar.framework.RemoteClient;
 import de.lucaswerkmeister.code.fiar.framework.Server;
 import de.lucaswerkmeister.code.fiar.framework.event.BlockDistributionAccepted;
 import de.lucaswerkmeister.code.fiar.framework.event.BlockField;
@@ -73,10 +79,12 @@ import de.lucaswerkmeister.code.fiar.servers.FixedServer;
  * @author Lucas Werkmeister
  * @version 1.0
  */
-public final class SwingClient implements Client, Runnable {
+public final class SwingClient implements RemoteClient, Runnable {
+	private static final long serialVersionUID = -742632519403100569L;
 	private static final Random random = new Random();
-	private static final SwingClient instance = new SwingClient();
-	private final Server server;
+	private static SwingClient instance;
+	private Server server;
+	private final Hoster hoster;
 	private final List<Player> players; // note that the contents of the list are not final
 	private final JFrame gui;
 	private final Queue<GameEvent> events;
@@ -87,9 +95,11 @@ public final class SwingClient implements Client, Runnable {
 	private int playerIndex = 0;
 
 	/**
-	 * Creates a new {@link SwingClient}.
+	 * Creates a new {@link SwingClient} that starts an own local server.
 	 */
 	public SwingClient() {
+		instance = this;
+		hoster = null;
 		gui = new JFrame((Server.IN_A_ROW == 5 ? "Five" : Server.IN_A_ROW) + " in a Row");
 		gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		players = new LinkedList<>();
@@ -110,6 +120,53 @@ public final class SwingClient implements Client, Runnable {
 		statusBar = new JLabel("Ready");
 		content.add(statusBar, BorderLayout.SOUTH);
 		gui.setContentPane(content);
+	}
+
+	/**
+	 * Creates a new {@link SwingClient} running on the specified remote server.
+	 * 
+	 * @param host
+	 *            The host address of the remote server.
+	 * @param port
+	 *            The port of the remote server.
+	 * @throws NotBoundException
+	 *             If the remote server can't be found.
+	 * @throws RemoteException
+	 *             If some remote error occurs.
+	 * @throws AccessException
+	 *             If the remote server can't be accessed.
+	 */
+	public SwingClient(String host, int port) throws AccessException, RemoteException, NotBoundException {
+		super(); // avoid call to this()
+		instance = this;
+		hoster = (Hoster) LocateRegistry.getRegistry(host, port).lookup("hoster");
+		players = new LinkedList<>();
+		gui = new JFrame((Server.IN_A_ROW == 5 ? "Five" : Server.IN_A_ROW) + " in a Row");
+		gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		events = new LinkedList<>();
+		final JPanel content = new JPanel(new BorderLayout());
+		board = new JPanel();
+		content.add(board, BorderLayout.CENTER);
+		buttons = new JPanel();
+		content.add(buttons, BorderLayout.EAST);
+		statusBar = new JLabel("Ready");
+		content.add(statusBar, BorderLayout.SOUTH);
+		gui.setContentPane(content);
+	}
+
+	@Override
+	public void playerJoined(Player player) {
+		players.add(player);
+	}
+
+	@Override
+	public void playerLeft(Player player) {
+		players.remove(player);
+	}
+
+	@Override
+	public void gameStarts(Server server) {
+		this.server = server;
 	}
 
 	@Override
@@ -140,6 +197,11 @@ public final class SwingClient implements Client, Runnable {
 	@Override
 	public void run() {
 		try {
+			if (server == null) {
+				if (hoster == null)
+					throw new Exception("No server and no hoster! Aborting.");
+
+			}
 			// choose board size
 			final Dimension boardSize = showChooseBoardSizeDialog(gui);
 			for (final Player p : players) {
@@ -155,11 +217,12 @@ public final class SwingClient implements Client, Runnable {
 				for (int y = 0; y < boardSize.height; y++) {
 					final Field f = new Field(null, fieldSize);
 					final Point xy = new Point(x, y);
+					// @formatter:off The formatter keeps inserting more and more blank lines before the @Override
 					f.addMouseListener(new MouseAdapter() {
-
-
 						@Override
-						public void mouseClicked(final MouseEvent e) {
+						// @formatter:on
+								public
+								void mouseClicked(final MouseEvent e) {
 							if (f.isEnabled()) // disabled lightweight components still receive MouseEvents
 								try {
 									final int[] phase = server.getPhase(instance);
@@ -353,7 +416,7 @@ public final class SwingClient implements Client, Runnable {
 			}
 		});
 		dialog.add(addPlayer);
-		final JButton cancel = new JButton("Cancel");
+		final JButton cancel = new JButton("Stop adding players");
 		cancel.addActionListener(addPlayer.getActionListeners()[0]);
 		if (forcePlayer) {
 			cancel.setEnabled(false);
@@ -368,11 +431,11 @@ public final class SwingClient implements Client, Runnable {
 			// This Easter Egg is clearly of the "WTF" type.
 			return new Player(name.getText().equals("All your base are belong to us") ? "CATS" : name.getText(),
 					color.getColor(), id);
-		case "Cancel":
+		case "Stop adding players":
 			return null;
 		default:
 			throw new RuntimeException("Unexpected error in Swing Client while adding player! Name was "
-					+ dialog.getName() + " (expected: \"Add Player\" or \"Cancel\"");
+					+ dialog.getName() + " (expected: \"Add Player\" or \"Stop adding players\"");
 		}
 	}
 
@@ -448,9 +511,33 @@ public final class SwingClient implements Client, Runnable {
 	 * The main method.
 	 * 
 	 * @param args
-	 *            The arguments. Currently ignored.
+	 *            The arguments.
+	 *            <ul>
+	 *            <li>If <code>args.length == 0</code>, the SwingClient runs on a local server.</li>
+	 *            <li>If <code>args.length == 2</code>, the SwingClient runs on the specified remote server (arguments:
+	 *            host + port).</li>
+	 *            </ul>
 	 */
 	public static void main(final String[] args) {
+		if (instance == null) {
+			switch (args.length) {
+			case 0:
+				instance = new SwingClient();
+				break;
+			case 2:
+				try {
+					instance = new SwingClient(args[0], Integer.parseInt(args[1]));
+				} catch (NumberFormatException | RemoteException | NotBoundException e) {
+					e.printStackTrace();
+					System.exit(1);
+				}
+				break;
+			default:
+				System.out
+						.println("Incorrect command line! Please specify either zero or two (host + port) arguments!");
+				System.exit(1);
+			}
+		}
 		new Thread(instance).start();
 	}
 }

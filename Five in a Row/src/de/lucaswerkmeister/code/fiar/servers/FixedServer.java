@@ -98,6 +98,27 @@ public class FixedServer implements Server {
 		currentBoardSize = new Dimension(0, 0);
 	}
 
+	/**
+	 * Creates a new {@link FixedServer} instance. The players are bound to clients as specified by the pairs parameter;
+	 * clients that don't control any players ("watching clients") can be specified with the additionalClients
+	 * parameter.
+	 * 
+	 * @param pairs
+	 *            The client-player bindings.
+	 * @param additionalClients
+	 *            Additional clients that aren't bound to any players.
+	 */
+	public FixedServer(Set<ClientPlayerPair> pairs, Set<? extends Client> additionalClients) {
+		this.pairs = pairs.toArray(new ClientPlayerPair[] {});
+		Set<Client> allClients = new HashSet<>(additionalClients);
+		for (ClientPlayerPair pair : pairs)
+			allClients.add(pair.getClient());
+		this.allClients = allClients.toArray(new Client[] {});
+		phase = new int[] {0, 0 };
+		boardSizeProposals = new HashSet<>(pairs.size());
+		currentBoardSize = new Dimension(0, 0);
+	}
+
 	@Override
 	public int[] getPhase(final Client requester) {
 		if (knowsClient(requester))

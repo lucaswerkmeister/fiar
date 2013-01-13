@@ -21,7 +21,7 @@ public class ClientPlayerPair {
 	 * @param player
 	 *            The player.
 	 */
-	ClientPlayerPair(final Client client, final Player player) {
+	public ClientPlayerPair(final Client client, final Player player) {
 		this.client = client;
 		this.player = player;
 	}
