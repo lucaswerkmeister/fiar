@@ -50,9 +50,9 @@ import de.lucaswerkmeister.code.fiar.servers.FixedServer;
  */
 public class FixedHoster extends JFrame implements Hoster {
 	private static final long serialVersionUID = -195985835430112510L;
-	private Set<RemoteClient> knownClients;
-	private Map<Player, ClientPlayerPair> pairs;
-	private DefaultListModel<String> players;
+	private final Set<RemoteClient> knownClients;
+	private final Map<Player, ClientPlayerPair> pairs;
+	private final DefaultListModel<String> players;
 
 	private FixedHoster(final String globalAddress, final String localAddress) {
 		super("Hosting");
@@ -70,9 +70,9 @@ public class FixedHoster extends JFrame implements Hoster {
 		startLocalClient.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String[] addressParts = localAddress.split(":");
 				try {
-					new Thread(new SwingClient(addressParts[0], Integer.parseInt(addressParts[1]))).run();
+					String[] addressParts = localAddress.split(":");
+					new Thread(new SwingClient(addressParts[0], Integer.parseInt(addressParts[1]))).start();
 				} catch (NumberFormatException | RemoteException | NotBoundException exception) {
 					StringWriter sw = new StringWriter();
 					sw.write("Failed to start local client. Exception:\n");
@@ -86,6 +86,7 @@ public class FixedHoster extends JFrame implements Hoster {
 		startServer.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				System.out.println(gui.hashCode());
 				Set<RemoteClient> watchingClients = new HashSet<>(knownClients);
 				for (ClientPlayerPair pair : pairs.values())
 					watchingClients.remove(pair.getClient());
@@ -93,6 +94,7 @@ public class FixedHoster extends JFrame implements Hoster {
 				Server server = new FixedServer(pairSet, watchingClients);
 				for (RemoteClient client : knownClients)
 					client.gameStarts(server);
+				gui.setVisible(false);
 			}
 		});
 		add(startServer);
@@ -114,6 +116,9 @@ public class FixedHoster extends JFrame implements Hoster {
 	@Override
 	public void addPlayer(RemoteClient controller, Player player) throws UnknownClientException,
 			IllegalArgumentException {
+		System.out.println(getClass());
+		System.out.println(toString());
+		System.out.println(hashCode());
 		if (!knownClients.contains(controller))
 			throw new UnknownClientException(controller);
 		if (pairs.containsKey(player) && !pairs.get(player).getClient().equals(controller))
@@ -134,7 +139,7 @@ public class FixedHoster extends JFrame implements Hoster {
 
 	public static void main(String[] args) {
 		try {
-			File policy = new File("FixedHoster.policy");
+			File policy = new File("bin/FixedHoster.policy");
 			try (BufferedWriter policyWriter = new BufferedWriter(new FileWriter(policy))) {
 				policyWriter.write("grant { permission java.security.AllPermission;};");
 			} catch (IOException e) {
@@ -142,7 +147,7 @@ public class FixedHoster extends JFrame implements Hoster {
 				e.printStackTrace();
 				System.exit(1);
 			}
-			System.setProperty("java.security.policy", "FixedHoster.policy");
+			System.setProperty("java.security.policy", policy.getPath());
 			System.setSecurityManager(new SecurityManager());
 		} catch (SecurityException e) {
 			System.err.println("FixedHoster must be allowed to set its security manager! Exception:");
@@ -157,6 +162,7 @@ public class FixedHoster extends JFrame implements Hoster {
 					new FixedHoster(new BufferedReader(new InputStreamReader(
 							new URL("http://checkip.amazonaws.com").openStream())).readLine()
 							+ ":" + port, InetAddress.getLocalHost().getHostAddress() + ":" + port);
+			System.out.println(hoster.hashCode());
 			registry.bind("hoster", hoster);
 		} catch (AlreadyBoundException | IOException e) {
 			e.printStackTrace();

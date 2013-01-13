@@ -93,6 +93,7 @@ public final class SwingClient implements RemoteClient, Runnable {
 	private final JLabel statusBar;
 	private Field[][] fields;
 	private int playerIndex = 0;
+	private static JDialog addPlayerDialog;
 
 	/**
 	 * Creates a new {@link SwingClient} that starts an own local server.
@@ -140,6 +141,8 @@ public final class SwingClient implements RemoteClient, Runnable {
 		super(); // avoid call to this()
 		instance = this;
 		hoster = (Hoster) LocateRegistry.getRegistry(host, port).lookup("hoster");
+		System.out.println(hoster.getClass());
+		hoster.addClient(this);
 		players = new LinkedList<>();
 		gui = new JFrame((Server.IN_A_ROW == 5 ? "Five" : Server.IN_A_ROW) + " in a Row");
 		gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -166,7 +169,13 @@ public final class SwingClient implements RemoteClient, Runnable {
 
 	@Override
 	public void gameStarts(Server server) {
+		if (addPlayerDialog != null) {
+			addPlayerDialog.setName("Stop adding players");
+			addPlayerDialog.setVisible(false);
+		}
 		this.server = server;
+		System.out.println("STARTED");
+		this.notify();
 	}
 
 	@Override
@@ -200,7 +209,18 @@ public final class SwingClient implements RemoteClient, Runnable {
 			if (server == null) {
 				if (hoster == null)
 					throw new Exception("No server and no hoster! Aborting.");
-
+				Player player = showAddPlayerDialog(false, findID(), gui);
+				while (player != null) {
+					players.add(player);
+					hoster.addPlayer(this, player);
+					player = showAddPlayerDialog(false, findID(), gui);
+				}
+				JOptionPane.showMessageDialog(gui, "Waiting for the game to start...", "Info",
+						JOptionPane.INFORMATION_MESSAGE);
+				synchronized (this) {
+					wait();
+				}
+				System.out.println("Continuing");
 			}
 			// choose board size
 			final Dimension boardSize = showChooseBoardSizeDialog(gui);
@@ -372,6 +392,26 @@ public final class SwingClient implements RemoteClient, Runnable {
 	}
 
 	/**
+	 * Finds an unused ID.
+	 * 
+	 * @return An ID that is not yet used by any player known to the client.
+	 */
+	private int findID() {
+		int id = 0;
+		boolean isUsed;
+		do {
+			id++;
+			isUsed = false;
+			for (Player p : players)
+				if (p.getID() == id) {
+					isUsed = true;
+					break;
+				}
+		} while (isUsed);
+		return id;
+	}
+
+	/**
 	 * Shows the Add Player dialog and returns the player that was added.
 	 * 
 	 * @param forcePlayer
@@ -385,48 +425,48 @@ public final class SwingClient implements RemoteClient, Runnable {
 	 *         add another player.
 	 */
 	public static Player showAddPlayerDialog(final boolean forcePlayer, final int id, final JFrame owner) {
-		final JDialog dialog = new JDialog(owner, "Add player", true);
-		dialog.setLayout(new FlowLayout());
-		dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		dialog.setAlwaysOnTop(true);
+		addPlayerDialog = new JDialog(owner, "Add player", true);
+		addPlayerDialog.setLayout(new FlowLayout());
+		addPlayerDialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		addPlayerDialog.setAlwaysOnTop(true);
 
 		final JTextField name = new JTextField("Player " + id, 10);
 		name.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				dialog.setName("Add Player");
-				dialog.setVisible(false);
+				addPlayerDialog.setName("Add Player");
+				addPlayerDialog.setVisible(false);
 			}
 		});
-		dialog.add(name);
+		addPlayerDialog.add(name);
 		// This "random color" code is based on the following stackoverflow answer:
 		// http://stackoverflow.com/a/4247219/1420237
 		// @formatter:off
 		final SelectableColor color 
 			= new SelectableColor(Color.getHSBColor(random.nextFloat(), (random.nextInt(2) + 7) / 10f, 0.9f));
 		// @formatter:on
-		dialog.add(color);
+		addPlayerDialog.add(color);
 		final JButton addPlayer = new JButton("Add Player");
 		addPlayer.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				dialog.setName(e.getActionCommand());
-				dialog.setVisible(false);
+				addPlayerDialog.setName(e.getActionCommand());
+				addPlayerDialog.setVisible(false);
 			}
 		});
-		dialog.add(addPlayer);
+		addPlayerDialog.add(addPlayer);
 		final JButton cancel = new JButton("Stop adding players");
 		cancel.addActionListener(addPlayer.getActionListeners()[0]);
 		if (forcePlayer) {
 			cancel.setEnabled(false);
 			cancel.setToolTipText("You need at least two players to play");
 		}
-		dialog.add(cancel);
+		addPlayerDialog.add(cancel);
 
-		dialog.pack();
-		dialog.setVisible(true);
-		switch (dialog.getName()) {
+		addPlayerDialog.pack();
+		addPlayerDialog.setVisible(true);
+		switch (addPlayerDialog.getName()) {
 		case "Add Player":
 			// This Easter Egg is clearly of the "WTF" type.
 			return new Player(name.getText().equals("All your base are belong to us") ? "CATS" : name.getText(),
@@ -435,7 +475,7 @@ public final class SwingClient implements RemoteClient, Runnable {
 			return null;
 		default:
 			throw new RuntimeException("Unexpected error in Swing Client while adding player! Name was "
-					+ dialog.getName() + " (expected: \"Add Player\" or \"Stop adding players\"");
+					+ addPlayerDialog.getName() + " (expected: \"Add Player\" or \"Stop adding players\"");
 		}
 	}
 
