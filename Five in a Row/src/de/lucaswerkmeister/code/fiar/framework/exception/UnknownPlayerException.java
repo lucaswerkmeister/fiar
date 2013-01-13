@@ -42,7 +42,7 @@ public class UnknownPlayerException extends RuntimeException {
 	 *            The unknown player.
 	 */
 	public UnknownPlayerException(final Player unknownPlayer) {
-		super();
+		super("Unknown player!");
 		this.unknownPlayer = unknownPlayer;
 	}
 
@@ -68,7 +68,7 @@ public class UnknownPlayerException extends RuntimeException {
 	 *            The cause.
 	 */
 	public UnknownPlayerException(final Player unknownPlayer, final Throwable cause) {
-		super(cause);
+		super("Unknown player!", cause);
 		this.unknownPlayer = unknownPlayer;
 	}
 

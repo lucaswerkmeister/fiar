@@ -43,7 +43,7 @@ public class UnknownClientException extends RuntimeException {
 	 *            The unknown client.
 	 */
 	public UnknownClientException(final Client unknownClient) {
-		super();
+		super("Unknown client!");
 		this.unknownClient = unknownClient;
 	}
 
@@ -69,7 +69,7 @@ public class UnknownClientException extends RuntimeException {
 	 *            The cause.
 	 */
 	public UnknownClientException(final Client unknownClient, final Throwable cause) {
-		super(cause);
+		super("Unknown client!", cause);
 		this.unknownClient = unknownClient;
 	}
 
