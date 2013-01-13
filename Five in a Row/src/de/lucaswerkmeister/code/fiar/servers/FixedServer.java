@@ -61,6 +61,7 @@ import de.lucaswerkmeister.code.fiar.framework.exception.UnknownPlayerException;
  * @version 1.1
  */
 public class FixedServer implements Server {
+	private static final long serialVersionUID = 5803548088856474570L;
 	private ClientPlayerPair[] pairs;
 	private int currentPlayerIndex;
 	private final Client[] allClients;
@@ -218,7 +219,7 @@ public class FixedServer implements Server {
 					fireEvent(action);
 					if (jokerDistributionAgreed()) {
 						acceptedJokerDistributions = null; // free memory
-						phase = new int[] {1, 1, pairs[0].player.getID() };
+						phase = new int[] {1, 1, pairs[0].getPlayer().getID() };
 						currentPlayerIndex = 0;
 						fireEvent(new PhaseChange(phase));
 					}
@@ -233,7 +234,7 @@ public class FixedServer implements Server {
 					if (action instanceof Forfeit) {
 						int index = 0;
 						for (int i = 0; i < pairs.length; i++)
-							if (pairs[i].player.equals(action.getActingPlayer())) {
+							if (pairs[i].getPlayer().equals(action.getActingPlayer())) {
 								index = i;
 								break;
 							}
@@ -244,17 +245,19 @@ public class FixedServer implements Server {
 						if (currentPlayerIndex > index)
 							currentPlayerIndex--;
 						currentPlayerIndex %= pairs.length;
-						phase[2] = pairs[currentPlayerIndex].player.getID();
+						phase[2] = pairs[currentPlayerIndex].getPlayer().getID();
 						fireEvent(action);
 						if (pairs.length < 2) {
 							phase = new int[] {2, 0, action.getActingPlayer().getID() };
-							fireEvent(new AllOthersForfeit(pairs[0].player)); // we know that they forfeit because this
-																				// server supports no other way to quit
-																				// a running game
+							fireEvent(new AllOthersForfeit(pairs[0].getPlayer())); // we know that they forfeit because
+																					// this
+																					// server supports no other way to
+																					// quit
+																					// a running game
 						}
 						return;
 					}
-					if (action.getActingPlayer().equals(pairs[currentPlayerIndex].player)) {
+					if (action.getActingPlayer().equals(pairs[currentPlayerIndex].getPlayer())) {
 						final PlaceStone placeStone = (PlaceStone) action;
 						if (!board.getPlayerAt(placeStone.getField()).equals(NoPlayer.getInstance()))
 							throw new IllegalMoveException("Field is already occupied by "
@@ -277,7 +280,7 @@ public class FixedServer implements Server {
 
 						currentPlayerIndex++;
 						currentPlayerIndex %= pairs.length;
-						phase[2] = pairs[currentPlayerIndex].player.getID();
+						phase[2] = pairs[currentPlayerIndex].getPlayer().getID();
 						return;
 					}
 					break; // Let control fall through to the
@@ -302,22 +305,22 @@ public class FixedServer implements Server {
 
 	private boolean knowsClient(final Client c) {
 		for (final ClientPlayerPair pair : pairs)
-			if (pair.client.equals(c))
+			if (pair.getClient().equals(c))
 				return true;
 		return false;
 	}
 
 	private boolean knowsPlayer(final Player p) {
 		for (final ClientPlayerPair pair : pairs)
-			if (pair.player.equals(p))
+			if (pair.getPlayer().equals(p))
 				return true;
 		return false;
 	}
 
 	private boolean clientPlayerMatch(final Client c, final Player p) {
 		for (final ClientPlayerPair pair : pairs)
-			if (pair.player.equals(p))
-				return pair.client.equals(c);
+			if (pair.getPlayer().equals(p))
+				return pair.getClient().equals(c);
 		return false;
 	}
 
@@ -329,7 +332,7 @@ public class FixedServer implements Server {
 	private boolean boardSizeAgreed() {
 		final Set<Player> unagreedPlayers = new HashSet<>();
 		for (final ClientPlayerPair pair : pairs)
-			unagreedPlayers.add(pair.player);
+			unagreedPlayers.add(pair.getPlayer());
 
 		for (final BoardSizeProposal p : boardSizeProposals)
 			if (p.getSize().equals(currentBoardSize))
@@ -341,7 +344,7 @@ public class FixedServer implements Server {
 	private boolean blockDistributionAgreed() {
 		final Set<Player> unagreedPlayers = new HashSet<>();
 		for (final ClientPlayerPair pair : pairs)
-			unagreedPlayers.add(pair.player);
+			unagreedPlayers.add(pair.getPlayer());
 
 		for (final BlockDistributionAccepted b : acceptedBlockDistributions)
 			if (b.getAcceptedBoard().equals(board))
@@ -353,41 +356,12 @@ public class FixedServer implements Server {
 	private boolean jokerDistributionAgreed() {
 		final Set<Player> unagreedPlayers = new HashSet<>();
 		for (final ClientPlayerPair pair : pairs)
-			unagreedPlayers.add(pair.player);
+			unagreedPlayers.add(pair.getPlayer());
 
 		for (final JokerDistributionAccepted j : acceptedJokerDistributions)
 			if (j.getAcceptedBoard().equals(board))
 				unagreedPlayers.remove(j.getActingPlayer());
 
 		return unagreedPlayers.isEmpty();
-	}
-
-	/**
-	 * A Client-Player pair.
-	 * 
-	 * @author Lucas Werkmeister
-	 * @version 1.0
-	 */
-	private class ClientPlayerPair {
-		final Client client;
-		final Player player;
-
-		/**
-		 * Creates a new Client-Player pair with the specified client and player.
-		 * 
-		 * @param client
-		 *            The client.
-		 * @param player
-		 *            The player.
-		 */
-		ClientPlayerPair(final Client client, final Player player) {
-			this.client = client;
-			this.player = player;
-		}
-
-		@Override
-		public String toString() {
-			return "[" + client.toString() + "," + player.toString() + "]";
-		}
 	}
 }
