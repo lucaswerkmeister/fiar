@@ -1,5 +1,7 @@
 package de.lucaswerkmeister.code.fiar.servers;
 
+import java.io.Serializable;
+
 import de.lucaswerkmeister.code.fiar.framework.Client;
 import de.lucaswerkmeister.code.fiar.framework.Player;
 
@@ -9,7 +11,8 @@ import de.lucaswerkmeister.code.fiar.framework.Player;
  * @author Lucas Werkmeister
  * @version 1.0
  */
-public class ClientPlayerPair {
+public class ClientPlayerPair implements Serializable {
+	private static final long serialVersionUID = -2702108193397181741L;
 	private final Client client;
 	private final Player player;
 

@@ -10,6 +10,7 @@ import java.awt.Color;
  * 
  */
 public final class NoPlayer extends Player {
+	private static final long serialVersionUID = -3101883841114616879L;
 	private static final NoPlayer instance = new NoPlayer();
 
 	private NoPlayer() {

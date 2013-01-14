@@ -26,6 +26,7 @@ import java.awt.Color;
  * @version 1.1
  */
 public final class Block extends Player {
+	private static final long serialVersionUID = 9169815489612959619L;
 	/**
 	 * The ID of the Block instance.
 	 * 

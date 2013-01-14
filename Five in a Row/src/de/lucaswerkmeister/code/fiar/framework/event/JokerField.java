@@ -28,6 +28,7 @@ import de.lucaswerkmeister.code.fiar.framework.Player;
  * @version 1.0
  */
 public class JokerField extends FieldAction {
+	private static final long serialVersionUID = 3832525610688669797L;
 
 	/**
 	 * A new {@link JokerField} by the specified player on the specified field.

@@ -27,6 +27,7 @@ import de.lucaswerkmeister.code.fiar.framework.Player;
  * @version 1.0
  */
 public class BlockDistributionAccepted extends StoneDistributionAccepted {
+	private static final long serialVersionUID = 1267037003423662744L;
 
 	/**
 	 * A new {@link BlockDistributionAccepted} by the specified player with the specified board.

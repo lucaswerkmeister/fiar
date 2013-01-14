@@ -26,7 +26,7 @@ import de.lucaswerkmeister.code.fiar.framework.Player;
  * @version 1.0
  */
 public abstract class PlayerAction extends GameEvent {
-
+	private static final long serialVersionUID = 6259563891916770883L;
 	private final Player actingPlayer;
 
 	/**

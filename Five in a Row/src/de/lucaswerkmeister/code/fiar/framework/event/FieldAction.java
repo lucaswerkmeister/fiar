@@ -28,6 +28,7 @@ import de.lucaswerkmeister.code.fiar.framework.Player;
  * @version 1.0
  */
 public abstract class FieldAction extends PlayerAction {
+	private static final long serialVersionUID = 4156717078863597905L;
 	private final int x;
 	private final int y;
 

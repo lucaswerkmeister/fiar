@@ -4,4 +4,6 @@
 *.jar
 *.war
 *.ear
+
+# bin folder #
 /Five in a Row/bin

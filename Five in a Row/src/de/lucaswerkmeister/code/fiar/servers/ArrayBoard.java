@@ -32,6 +32,7 @@ import de.lucaswerkmeister.code.fiar.framework.Player;
  * @version 1.0
  */
 public class ArrayBoard extends Board {
+	private static final long serialVersionUID = 8910447580797731071L;
 	private final Player[][] board;
 
 	/**

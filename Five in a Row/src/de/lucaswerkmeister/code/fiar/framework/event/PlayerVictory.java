@@ -26,7 +26,7 @@ import de.lucaswerkmeister.code.fiar.framework.Player;
  * @version 1.0
  */
 public class PlayerVictory extends GameEnd {
-
+	private static final long serialVersionUID = 1798120782082859925L;
 	private final Player winningPlayer;
 
 	/**

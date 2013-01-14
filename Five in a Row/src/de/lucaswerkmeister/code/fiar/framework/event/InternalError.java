@@ -24,7 +24,7 @@ package de.lucaswerkmeister.code.fiar.framework.event;
  * @version 1.0
  */
 public class InternalError extends GameEnd {
-
+	private static final long serialVersionUID = 5645330367270412369L;
 	private final Throwable cause;
 	private final String message;
 

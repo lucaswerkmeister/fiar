@@ -17,12 +17,14 @@
  */
 package de.lucaswerkmeister.code.fiar.framework.event;
 
+import java.io.Serializable;
+
 /**
  * Represents some event in the game.
  * 
  * @author Lucas Werkmeister
  * @version 1.0
  */
-public abstract class GameEvent {
-
+public abstract class GameEvent implements Serializable {
+	private static final long serialVersionUID = -870049906550814459L;
 }

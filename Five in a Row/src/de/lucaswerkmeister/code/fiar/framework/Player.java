@@ -18,6 +18,7 @@
 package de.lucaswerkmeister.code.fiar.framework;
 
 import java.awt.Color;
+import java.io.Serializable;
 
 /**
  * This class is only used to identify players and determine their representation for clients; it does not perform any
@@ -26,7 +27,8 @@ import java.awt.Color;
  * @author Lucas Werkmeister
  * @version 1.2
  */
-public class Player {
+public class Player implements Serializable {
+	private static final long serialVersionUID = 5147745438297096992L;
 	private final String name;
 	private final Color color;
 	private final int id;

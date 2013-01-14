@@ -26,6 +26,7 @@ import de.lucaswerkmeister.code.fiar.framework.Player;
  * @version 1.0
  */
 public class Forfeit extends PlayerAction {
+	private static final long serialVersionUID = 35599765809926089L;
 
 	/**
 	 * A new {@link Forfeit} by the specified player.

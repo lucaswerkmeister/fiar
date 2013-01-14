@@ -28,6 +28,7 @@ import de.lucaswerkmeister.code.fiar.framework.Player;
  * @version 1.0
  */
 public class PlaceStone extends FieldAction {
+	private static final long serialVersionUID = -6366562301577889658L;
 
 	/**
 	 * A new {@link PlaceStone} by the specified player on the specified field.

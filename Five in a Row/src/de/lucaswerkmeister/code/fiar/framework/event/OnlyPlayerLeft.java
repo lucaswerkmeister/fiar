@@ -26,6 +26,7 @@ import de.lucaswerkmeister.code.fiar.framework.Player;
  * @version 1.0
  */
 public class OnlyPlayerLeft extends PlayerVictory {
+	private static final long serialVersionUID = -5693476679386924028L;
 
 	/**
 	 * A new {@link OnlyPlayerLeft} where only the specified player is left.

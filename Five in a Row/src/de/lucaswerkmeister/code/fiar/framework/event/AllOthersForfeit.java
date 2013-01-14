@@ -26,6 +26,7 @@ import de.lucaswerkmeister.code.fiar.framework.Player;
  * @version 1.0
  */
 public class AllOthersForfeit extends OnlyPlayerLeft {
+	private static final long serialVersionUID = -3807357356141844692L;
 
 	/**
 	 * A new {@link AllOthersForfeit} where only the specified player is left.

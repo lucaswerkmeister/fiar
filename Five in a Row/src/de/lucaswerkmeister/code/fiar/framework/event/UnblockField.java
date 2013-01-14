@@ -29,6 +29,7 @@ import de.lucaswerkmeister.code.fiar.framework.Player;
  * 
  */
 public class UnblockField extends FieldAction {
+	private static final long serialVersionUID = 2867548602925526571L;
 
 	/**
 	 * A new {@link UnblockField} by the specified player on the specified field.

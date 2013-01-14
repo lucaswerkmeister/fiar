@@ -28,6 +28,7 @@ import de.lucaswerkmeister.code.fiar.framework.Player;
  * @version 1.0
  */
 public class BlockField extends FieldAction {
+	private static final long serialVersionUID = -4341291965176463496L;
 
 	/**
 	 * A new {@link BlockField} by the specified player on the specified field.

@@ -24,6 +24,7 @@ package de.lucaswerkmeister.code.fiar.framework.event;
  * @version 1.0
  */
 public class Tie extends GameEnd {
+	private static final long serialVersionUID = -815663871526133073L;
 
 	/**
 	 * Creates a new {@link Tie}.

@@ -20,7 +20,6 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import javax.swing.DefaultListModel;
@@ -50,12 +49,13 @@ import de.lucaswerkmeister.code.fiar.servers.FixedServer;
  */
 public class FixedHoster extends JFrame implements Hoster {
 	private static final long serialVersionUID = -195985835430112510L;
-	private final Set<RemoteClient> knownClients;
-	private final Map<Player, ClientPlayerPair> pairs;
-	private final DefaultListModel<String> players;
+	private HashSet<RemoteClient> knownClients;
+	private HashMap<Player, ClientPlayerPair> pairs;
+	private DefaultListModel<String> players;
 
 	private FixedHoster(final String globalAddress, final String localAddress) {
 		super("Hosting");
+		System.out.println(hashCode());
 		knownClients = new HashSet<>();
 		pairs = new HashMap<>();
 		setLayout(new GridLayout(5, 1));

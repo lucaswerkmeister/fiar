@@ -35,6 +35,7 @@ import java.util.Arrays;
  * @version 1.0
  */
 public class PhaseChange extends GameEvent {
+	private static final long serialVersionUID = 8538900938762208485L;
 	private final int[] newPhase;
 
 	/**

@@ -26,6 +26,7 @@ import java.awt.Color;
  * @version 1.1
  */
 public final class Joker extends Player {
+	private static final long serialVersionUID = -4819645883271455371L;
 	/**
 	 * The ID of the Joker instance.
 	 * 

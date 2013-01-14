@@ -27,6 +27,7 @@ import de.lucaswerkmeister.code.fiar.framework.Player;
  * @version 1.0
  */
 public class JokerDistributionAccepted extends StoneDistributionAccepted {
+	private static final long serialVersionUID = -8196308727321069709L;
 
 	/**
 	 * A new {@link JokerDistributionAccepted} by the specified player with the specified board.

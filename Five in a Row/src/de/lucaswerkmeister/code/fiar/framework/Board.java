@@ -18,6 +18,7 @@
 package de.lucaswerkmeister.code.fiar.framework;
 
 import java.awt.Point;
+import java.io.Serializable;
 
 /**
  * Provides access to the game board.
@@ -25,7 +26,9 @@ import java.awt.Point;
  * @author Lucas Werkmeister
  * @version 1.3
  */
-public abstract class Board {
+public abstract class Board implements Serializable {
+	private static final long serialVersionUID = -1655149922458049620L;
+
 	/**
 	 * Gets the player that occupies the field at (x,y).
 	 * 

@@ -26,7 +26,7 @@ import de.lucaswerkmeister.code.fiar.framework.Player;
  * @version 1.0
  */
 public class PlayerQuit extends GameEnd {
-
+	private static final long serialVersionUID = -2536174002275043650L;
 	private final Player quittingPlayer;
 
 	/**

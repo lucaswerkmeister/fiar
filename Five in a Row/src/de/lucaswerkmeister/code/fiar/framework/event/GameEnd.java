@@ -24,5 +24,5 @@ package de.lucaswerkmeister.code.fiar.framework.event;
  * @version 1.0
  */
 public abstract class GameEnd extends GameEvent {
-
+	private static final long serialVersionUID = 3749408481359065555L;
 }

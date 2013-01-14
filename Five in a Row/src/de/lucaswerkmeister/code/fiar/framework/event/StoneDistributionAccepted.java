@@ -27,6 +27,7 @@ import de.lucaswerkmeister.code.fiar.framework.Player;
  * @version 1.0
  */
 public abstract class StoneDistributionAccepted extends PlayerAction {
+	private static final long serialVersionUID = -2383498821580521814L;
 	private final Board acceptedBoard;
 
 	/**

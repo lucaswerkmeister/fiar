@@ -28,6 +28,7 @@ import de.lucaswerkmeister.code.fiar.framework.Player;
  * @version 1.0
  */
 public class BoardSizeProposal extends PlayerAction {
+	private static final long serialVersionUID = 6868425142825023278L;
 	private final Dimension size;
 
 	/**
