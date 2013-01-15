@@ -1,6 +1,9 @@
 package de.lucaswerkmeister.code.fiar.hosters;
 
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -29,6 +32,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 
 import de.lucaswerkmeister.code.fiar.clients.swingClient.SwingClient;
@@ -56,16 +61,30 @@ public class FixedHoster extends JFrame implements Hoster {
 
 	private FixedHoster(final String globalAddress, final String localAddress) {
 		super("Hosting");
-		System.out.println(hashCode());
 		knownClients = new HashSet<>();
 		pairs = new HashMap<>();
-		setLayout(new GridLayout(5, 1));
-		add(new JLabel("Global: " + globalAddress, JLabel.TRAILING));
-		add(new JLabel("Local: " + localAddress, JLabel.TRAILING));
+
+		setLayout(new BorderLayout());
+		JPanel addresses = new JPanel(new GridLayout(2, 2));
+		addresses.add(new JLabel("Global address:", JLabel.TRAILING));
+		JTextField globalTF = new JTextField(globalAddress);
+		globalTF.setEditable(false);
+		addresses.add(globalTF);
+		addresses.add(new JLabel("Local address:", JLabel.TRAILING));
+		JTextField localTF = new JTextField(localAddress);
+		localTF.setEditable(false);
+		addresses.add(localTF);
+		add(addresses, BorderLayout.NORTH);
+
+		ScrollPane playersPanel = new ScrollPane(ScrollPane.SCROLLBARS_AS_NEEDED);
 		players = new DefaultListModel<>();
 		JList<String> playerList = new JList<>(players);
 		playerList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		add(playerList);
+		playersPanel.add(playerList);
+		add(playersPanel, BorderLayout.CENTER);
+
+		JPanel buttons = new JPanel(new GridLayout(2, 1));
+		JPanel startLocalClientPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		JButton startLocalClient = new JButton("Start local client");
 		final FixedHoster gui = this;
 		startLocalClient.addActionListener(new ActionListener() {
@@ -82,7 +101,9 @@ public class FixedHoster extends JFrame implements Hoster {
 				}
 			}
 		});
-		add(startLocalClient);
+		startLocalClientPanel.add(startLocalClient);
+		buttons.add(startLocalClientPanel);
+		JPanel startServerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		JButton startServer = new JButton("Start server");
 		startServer.addActionListener(new ActionListener() {
 			@Override
@@ -101,7 +122,10 @@ public class FixedHoster extends JFrame implements Hoster {
 				gui.setVisible(false);
 			}
 		});
-		add(startServer);
+		startServerPanel.add(startServer);
+		buttons.add(startServerPanel);
+		add(buttons, BorderLayout.SOUTH);
+
 		pack();
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setVisible(true);
