@@ -431,7 +431,7 @@ public final class SwingClient implements RemoteClient, Runnable {
 	 * @return A {@link Player} with the user-specified name and color, or <code>null</code> if the user chose not to
 	 *         add another player.
 	 */
-	public static Player showAddPlayerDialog(final boolean forcePlayer, final int id, final JFrame owner) {
+	public static Player showAddPlayerDialog(final boolean forcePlayer, int id, final JFrame owner) {
 		addPlayerDialog = new JDialog(owner, "Add player", true);
 		addPlayerDialog.setLayout(new FlowLayout());
 		addPlayerDialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -473,20 +473,26 @@ public final class SwingClient implements RemoteClient, Runnable {
 
 		addPlayerDialog.pack();
 		addPlayerDialog.setVisible(true);
-		switch (addPlayerDialog.getName()) {
-		case "Add Player":
-			// This Easter Egg is clearly of the "WTF" type.
-			return new Player(name.getText().equals("All your base are belong to us") ? "CATS" : name.getText(),
-					color.getColor(), id);
-		case "Stop adding players":
-			return null;
-		default:
-			if (addPlayerDialog.getName().startsWith("Reload dialog:")) {
-				return showAddPlayerDialog(forcePlayer,
-						Integer.parseInt(addPlayerDialog.getName().substring("Reload dialog:".length())), owner);
+		while (true) {
+			switch (addPlayerDialog.getName()) {
+			case "Add Player":
+				// This Easter Egg is clearly of the "WTF" type.
+				return new Player(name.getText().equals("All your base are belong to us") ? "CATS" : name.getText(),
+						color.getColor(), id);
+			case "Stop adding players":
+				return null;
+			default:
+				if (addPlayerDialog.getName().startsWith("Reload dialog:")) {
+					boolean needToReplaceName = name.getText().equals("Player " + id);
+					id = Integer.parseInt(addPlayerDialog.getName().substring("Reload dialog:".length()));
+					if (needToReplaceName)
+						name.setText("Player " + id);
+					addPlayerDialog.setVisible(true);
+					continue;
+				}
+				throw new RuntimeException("Unexpected error in Swing Client while adding player! Name was "
+						+ addPlayerDialog.getName() + " (expected: \"Add Player\" or \"Stop adding players\"");
 			}
-			throw new RuntimeException("Unexpected error in Swing Client while adding player! Name was "
-					+ addPlayerDialog.getName() + " (expected: \"Add Player\" or \"Stop adding players\"");
 		}
 	}
 
