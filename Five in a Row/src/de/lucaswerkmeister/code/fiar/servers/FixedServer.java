@@ -18,6 +18,7 @@
 package de.lucaswerkmeister.code.fiar.servers;
 
 import java.awt.Dimension;
+import java.rmi.RemoteException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -180,7 +181,7 @@ public class FixedServer implements Server {
 
 	@Override
 	public void action(final Client requester, final PlayerAction action) throws IllegalStateException,
-			IllegalMoveException {
+			IllegalMoveException, RemoteException {
 		if (!knowsClient(requester))
 			throw new UnknownClientException(requester);
 		if (!knowsPlayer(action.getActingPlayer()))
@@ -345,7 +346,7 @@ public class FixedServer implements Server {
 		return false;
 	}
 
-	private void fireEvent(final GameEvent e) {
+	private void fireEvent(final GameEvent e) throws RemoteException {
 		for (final Client c : allClients)
 			c.gameEvent(e);
 	}

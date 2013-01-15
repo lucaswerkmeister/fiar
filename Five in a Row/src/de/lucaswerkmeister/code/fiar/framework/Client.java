@@ -17,6 +17,7 @@
  */
 package de.lucaswerkmeister.code.fiar.framework;
 
+import java.rmi.RemoteException;
 import java.util.Random;
 
 import de.lucaswerkmeister.code.fiar.framework.event.GameEvent;
@@ -41,31 +42,8 @@ public interface Client {
 	 * 
 	 * @param e
 	 *            The game event.
+	 * @throws RemoteException
+	 *             Only {@link RemoteClient}s: If a remote exception occurs.
 	 */
-	public void gameEvent(GameEvent e);
-
-	/**
-	 * Two clients are equal if and only if they are the same instance.
-	 * 
-	 * @param other
-	 *            The other Client instance.
-	 * @return <code>true</code> if this instance and the other instance are the same instance, <code>false</code>
-	 *         otherwise.
-	 */
-	@Override
-	public boolean equals(final Object other);
-
-	/**
-	 * A client's hash code is a combination of the {@link Class#hashCode()} of its runtime class and a random but
-	 * constant number. (0bHHHHRRRR, where HHHH is the top two bytes of the class' hash code and RRRR is the bottom two
-	 * bytes of the random constant.)
-	 * 
-	 * @return The client's hash code. It's always the same for {@link #equals(Object) equal} objects, and should not be
-	 *         the same for any other objects.
-	 */
-	@Override
-	public int hashCode();
-	/*
-	 * { return (this.getClass().hashCode() & (((short) -1) << 16)) + mHash & ((short) -1); }
-	 */
+	public void gameEvent(GameEvent e) throws RemoteException;
 }

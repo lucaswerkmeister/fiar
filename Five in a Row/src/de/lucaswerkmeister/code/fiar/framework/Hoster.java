@@ -2,6 +2,7 @@ package de.lucaswerkmeister.code.fiar.framework;
 
 import java.io.Serializable;
 import java.rmi.Remote;
+import java.rmi.RemoteException;
 
 import de.lucaswerkmeister.code.fiar.framework.exception.UnknownClientException;
 import de.lucaswerkmeister.code.fiar.framework.exception.UnknownPlayerException;
@@ -22,7 +23,7 @@ public interface Hoster extends Remote, Serializable {
 	 * @param client
 	 *            The client.
 	 */
-	public void addClient(RemoteClient client);
+	public void addClient(RemoteClient client) throws RemoteException;
 
 	/**
 	 * Removes a client from this hoster.
@@ -34,7 +35,7 @@ public interface Hoster extends Remote, Serializable {
 	 * @param client
 	 *            The client.
 	 */
-	public void removeClient(RemoteClient client);
+	public void removeClient(RemoteClient client) throws RemoteException;
 
 	/**
 	 * Adds a player, controlled by the specified client, to the hoster.
@@ -52,7 +53,7 @@ public interface Hoster extends Remote, Serializable {
 	 *             If the player is already controlled by another client.
 	 */
 	public void addPlayer(RemoteClient controller, Player player) throws UnknownClientException,
-			IllegalArgumentException;
+			IllegalArgumentException, RemoteException;
 
 	/**
 	 * Removes a player from the hoster.
@@ -64,5 +65,5 @@ public interface Hoster extends Remote, Serializable {
 	 * @throws UnknownPlayerException
 	 *             If the player has not been previously {@link #addPlayer(RemoteClient, Player) added} to this hoster.
 	 */
-	public void removePlayer(Player player) throws UnknownPlayerException;
+	public void removePlayer(Player player) throws UnknownPlayerException, RemoteException;
 }

@@ -18,6 +18,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -86,14 +87,17 @@ public class FixedHoster extends JFrame implements Hoster {
 		startServer.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println(gui.hashCode());
 				Set<RemoteClient> watchingClients = new HashSet<>(knownClients);
 				for (ClientPlayerPair pair : pairs.values())
 					watchingClients.remove(pair.getClient());
 				Set<ClientPlayerPair> pairSet = new HashSet<>(pairs.values());
 				Server server = new FixedServer(pairSet, watchingClients);
 				for (RemoteClient client : knownClients)
-					client.gameStarts(server);
+					try {
+						client.gameStarts(server);
+					} catch (RemoteException e1) {
+						e1.printStackTrace();
+					}
 				gui.setVisible(false);
 			}
 		});
@@ -116,9 +120,6 @@ public class FixedHoster extends JFrame implements Hoster {
 	@Override
 	public void addPlayer(RemoteClient controller, Player player) throws UnknownClientException,
 			IllegalArgumentException {
-		System.out.println(getClass());
-		System.out.println(toString());
-		System.out.println(hashCode());
 		if (!knownClients.contains(controller))
 			throw new UnknownClientException(controller);
 		if (pairs.containsKey(player) && !pairs.get(player).getClient().equals(controller))
@@ -162,8 +163,7 @@ public class FixedHoster extends JFrame implements Hoster {
 					new FixedHoster(new BufferedReader(new InputStreamReader(
 							new URL("http://checkip.amazonaws.com").openStream())).readLine()
 							+ ":" + port, InetAddress.getLocalHost().getHostAddress() + ":" + port);
-			System.out.println(hoster.hashCode());
-			registry.bind("hoster", hoster);
+			registry.bind("hoster", UnicastRemoteObject.exportObject(hoster, 0));
 		} catch (AlreadyBoundException | IOException e) {
 			e.printStackTrace();
 			System.exit(1);

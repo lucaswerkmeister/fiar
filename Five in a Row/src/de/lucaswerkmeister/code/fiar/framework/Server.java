@@ -19,6 +19,7 @@ package de.lucaswerkmeister.code.fiar.framework;
 
 import java.io.Serializable;
 import java.rmi.Remote;
+import java.rmi.RemoteException;
 import java.util.Set;
 
 import de.lucaswerkmeister.code.fiar.framework.event.PlayerAction;
@@ -92,7 +93,7 @@ public interface Server extends Remote, Serializable {
 	 *            The requesting client.
 	 * @return The current phase.
 	 */
-	public int[] getPhase(Client requester);
+	public int[] getPhase(Client requester) throws RemoteException;
 
 	/**
 	 * Gets the version of the Phases list that the server is using. This method is provided for compatibility between
@@ -104,7 +105,7 @@ public interface Server extends Remote, Serializable {
 	 *            The requesting client.
 	 * @return The Phases list version.
 	 */
-	public int getPhasesVersion(Client requester);
+	public int getPhasesVersion(Client requester) throws RemoteException;
 
 	/**
 	 * Determines if the specified player can currently perform any actions.
@@ -118,7 +119,7 @@ public interface Server extends Remote, Serializable {
 	 *            The player.
 	 * @return <code>true</code> if the player can currently perform any actions, <code>false</code> otherwise.
 	 */
-	public boolean canAct(final Client requester, final Player p);
+	public boolean canAct(final Client requester, final Player p) throws RemoteException;
 
 	/**
 	 * Determines which actions the specified player can currently perform.
@@ -130,7 +131,7 @@ public interface Server extends Remote, Serializable {
 	 * @return A {@link Set} containing all classes of actions that the player, at the time of the method invocation, is
 	 *         allowed to perform.
 	 */
-	public Set<Class<? extends PlayerAction>> getAllowedActions(Client requester, Player p);
+	public Set<Class<? extends PlayerAction>> getAllowedActions(Client requester, Player p) throws RemoteException;
 
 	/**
 	 * Performs an action to the game.
@@ -144,7 +145,8 @@ public interface Server extends Remote, Serializable {
 	 * @throws IllegalMoveException
 	 *             If an illegal move was made.
 	 */
-	public void action(Client requester, PlayerAction action) throws IllegalStateException, IllegalMoveException;
+	public void action(Client requester, PlayerAction action) throws IllegalStateException, IllegalMoveException,
+			RemoteException;
 
 	/**
 	 * Gets the current board.
@@ -159,5 +161,5 @@ public interface Server extends Remote, Serializable {
 	 *            The requesting client.
 	 * @return The current board, or <code>null</code>.
 	 */
-	public Board getCurrentBoard(Client requester);
+	public Board getCurrentBoard(Client requester) throws RemoteException;
 }

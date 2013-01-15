@@ -2,6 +2,7 @@ package de.lucaswerkmeister.code.fiar.test;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.rmi.RemoteException;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -181,9 +182,11 @@ public class FixedServerTest implements Client {
 	 *             If an illegal move is attempted. Should never happen.
 	 * @throws IllegalStateException
 	 *             If the server is in an illegal state. Should never happen.
+	 * @throws RemoteException
+	 *             If a remote error occurs.
 	 */
 	@Test
-	public void testBasic() throws IllegalStateException, IllegalMoveException {
+	public void testBasic() throws IllegalStateException, IllegalMoveException, RemoteException {
 		events = new LinkedList<>();
 		final Player p1 = new Player("Player 1", Color.blue, 1);
 		final Player p2 = new Player("Player 2", Color.cyan, 2);
@@ -224,9 +227,11 @@ public class FixedServerTest implements Client {
 	 *             If an illegal move is attempted. Should never happen.
 	 * @throws IllegalStateException
 	 *             If the server is in an illegal state. Should never happen.
+	 * @throws RemoteException
+	 *             If a remote error occurs.
 	 */
 	@Test
-	public void testAdvanced() throws IllegalStateException, IllegalMoveException {
+	public void testAdvanced() throws IllegalStateException, IllegalMoveException, RemoteException {
 		events = new LinkedList<>();
 		final Player p1 = new Player("Player 1", Color.blue, 1);
 		final Player p2 = new Player("Player 2", Color.cyan, 2);
@@ -297,10 +302,12 @@ public class FixedServerTest implements Client {
 	 *             Thrown by the server.
 	 * @throws IllegalMoveException
 	 *             Thrown by the server.
+	 * @throws RemoteException
+	 *             If a remote error occurs.
 	 */
 	// @formatter:off
 	private void act(final Server server, final PlayerAction action)
-			throws IllegalStateException, IllegalMoveException {
+			throws IllegalStateException, IllegalMoveException, RemoteException {
 		// @formatter:on
 		server.action(this, action);
 		Assert.assertEquals(action, events.poll());

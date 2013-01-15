@@ -23,6 +23,7 @@ import java.awt.Point;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.rmi.RemoteException;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -71,7 +72,7 @@ public final class ConsoleClient implements Client, Runnable {
 	}
 
 	@Override
-	public void gameEvent(final GameEvent e) {
+	public void gameEvent(final GameEvent e) throws RemoteException {
 		eventQueue.add(e);
 		if (e instanceof FieldAction)
 			printBoard(server.getCurrentBoard(this));

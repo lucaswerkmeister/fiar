@@ -19,6 +19,7 @@ package de.lucaswerkmeister.code.fiar.framework;
 
 import java.io.Serializable;
 import java.rmi.Remote;
+import java.rmi.RemoteException;
 
 import de.lucaswerkmeister.code.fiar.framework.event.GameEvent;
 import de.lucaswerkmeister.code.fiar.framework.event.PlayerQuit;
@@ -39,7 +40,7 @@ public interface RemoteClient extends Client, Remote, Serializable {
 	 * @param player
 	 *            The joining player.
 	 */
-	public void playerJoined(Player player);
+	public void playerJoined(Player player) throws RemoteException;
 
 	/**
 	 * Informs the client that a player left the game.
@@ -51,7 +52,7 @@ public interface RemoteClient extends Client, Remote, Serializable {
 	 * @param player
 	 *            The leaving player.
 	 */
-	public void playerLeft(Player player);
+	public void playerLeft(Player player) throws RemoteException;
 
 	/**
 	 * Informs the client that the game started, and gives it the server that was created to run the game.
@@ -59,5 +60,8 @@ public interface RemoteClient extends Client, Remote, Serializable {
 	 * @param server
 	 *            The server.
 	 */
-	public void gameStarts(Server server);
+	public void gameStarts(Server server) throws RemoteException;
+
+	@Override
+	public void gameEvent(GameEvent e) throws RemoteException;
 }

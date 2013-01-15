@@ -33,6 +33,7 @@ import java.rmi.AccessException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -141,7 +142,7 @@ public final class SwingClient implements RemoteClient, Runnable {
 		super(); // avoid call to this()
 		instance = this;
 		hoster = (Hoster) LocateRegistry.getRegistry(host, port).lookup("hoster");
-		System.out.println(hoster.getClass());
+		UnicastRemoteObject.exportObject(this, 0);
 		hoster.addClient(this);
 		players = new LinkedList<>();
 		gui = new JFrame((Server.IN_A_ROW == 5 ? "Five" : Server.IN_A_ROW) + " in a Row");
@@ -175,11 +176,13 @@ public final class SwingClient implements RemoteClient, Runnable {
 		}
 		this.server = server;
 		System.out.println("STARTED");
-		this.notify();
+		synchronized (this) {
+			this.notify();
+		}
 	}
 
 	@Override
-	public void gameEvent(final GameEvent e) {
+	public void gameEvent(final GameEvent e) throws RemoteException {
 		if (e instanceof Forfeit) {
 			final Player p = ((Forfeit) e).getActingPlayer();
 			final int index = players.indexOf(p);
@@ -285,7 +288,7 @@ public final class SwingClient implements RemoteClient, Runnable {
 														fields[x][y].setEnabled(false);
 										}
 									}
-								} catch (IllegalStateException | IllegalMoveException e1) {
+								} catch (IllegalStateException | IllegalMoveException | RemoteException e1) {
 									e1.printStackTrace();
 								}
 						}
@@ -306,7 +309,7 @@ public final class SwingClient implements RemoteClient, Runnable {
 					for (final Player p : players) {
 						try {
 							server.action(instance, new BlockDistributionAccepted(p, server.getCurrentBoard(instance)));
-						} catch (IllegalStateException | IllegalMoveException e1) {
+						} catch (IllegalStateException | IllegalMoveException | RemoteException e1) {
 							e1.printStackTrace();
 						}
 						events.poll(); // BlockDistributionAccepted
@@ -340,7 +343,7 @@ public final class SwingClient implements RemoteClient, Runnable {
 					for (final Player p : players) {
 						try {
 							server.action(instance, new JokerDistributionAccepted(p, server.getCurrentBoard(instance)));
-						} catch (IllegalStateException | IllegalMoveException e1) {
+						} catch (IllegalStateException | IllegalMoveException | RemoteException e1) {
 							e1.printStackTrace();
 						}
 						events.poll(); // JokerDistributionAccepted
@@ -371,7 +374,7 @@ public final class SwingClient implements RemoteClient, Runnable {
 				public void actionPerformed(final ActionEvent e) {
 					try {
 						server.action(instance, new Forfeit(players.get(playerIndex)));
-					} catch (IllegalStateException | IllegalMoveException e1) {
+					} catch (IllegalStateException | IllegalMoveException | RemoteException e1) {
 						e1.printStackTrace();
 					}
 				}
