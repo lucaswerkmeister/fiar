@@ -132,8 +132,10 @@ public class FixedHoster extends JFrame implements Hoster {
 	}
 
 	@Override
-	public void addClient(RemoteClient client) {
+	public void addClient(RemoteClient client) throws RemoteException {
 		knownClients.add(client);
+		for (Player p : pairs.keySet())
+			client.playerJoined(p);
 	}
 
 	@Override
@@ -143,22 +145,26 @@ public class FixedHoster extends JFrame implements Hoster {
 
 	@Override
 	public void addPlayer(RemoteClient controller, Player player) throws UnknownClientException,
-			IllegalArgumentException {
+			IllegalArgumentException, RemoteException {
 		if (!knownClients.contains(controller))
 			throw new UnknownClientException(controller);
 		if (pairs.containsKey(player) && !pairs.get(player).getClient().equals(controller))
 			throw new IllegalArgumentException("Wrong client for player " + player.toString() + "!");
 		pairs.put(player, new ClientPlayerPair(controller, player));
 		players.addElement(player.getName() + " (" + player.getID() + ")");
+		for (RemoteClient c : knownClients)
+			c.playerJoined(player);
 		pack();
 	}
 
 	@Override
-	public void removePlayer(Player player) throws UnknownPlayerException {
+	public void removePlayer(Player player) throws UnknownPlayerException, RemoteException {
 		if (!pairs.containsKey(player))
 			throw new UnknownPlayerException(player);
 		pairs.remove(player);
 		players.removeElement(player.getName() + " (" + player.getID() + ")");
+		for (RemoteClient c : knownClients)
+			c.playerLeft(player);
 		pack();
 	}
 

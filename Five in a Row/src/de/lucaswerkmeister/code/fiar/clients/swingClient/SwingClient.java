@@ -143,8 +143,8 @@ public final class SwingClient implements RemoteClient, Runnable {
 		instance = this;
 		hoster = (Hoster) LocateRegistry.getRegistry(host, port).lookup("hoster");
 		UnicastRemoteObject.exportObject(this, 0);
-		hoster.addClient(this);
 		players = new LinkedList<>();
+		hoster.addClient(this);
 		gui = new JFrame((Server.IN_A_ROW == 5 ? "Five" : Server.IN_A_ROW) + " in a Row");
 		gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		events = new LinkedList<>();
@@ -161,6 +161,10 @@ public final class SwingClient implements RemoteClient, Runnable {
 	@Override
 	public void playerJoined(Player player) {
 		players.add(player);
+		if (addPlayerDialog != null && addPlayerDialog.isVisible()) {
+			addPlayerDialog.setName("Reload dialog:" + findID());
+			addPlayerDialog.setVisible(false);
+		}
 	}
 
 	@Override
@@ -477,6 +481,10 @@ public final class SwingClient implements RemoteClient, Runnable {
 		case "Stop adding players":
 			return null;
 		default:
+			if (addPlayerDialog.getName().startsWith("Reload dialog:")) {
+				return showAddPlayerDialog(forcePlayer,
+						Integer.parseInt(addPlayerDialog.getName().substring("Reload dialog:".length())), owner);
+			}
 			throw new RuntimeException("Unexpected error in Swing Client while adding player! Name was "
 					+ addPlayerDialog.getName() + " (expected: \"Add Player\" or \"Stop adding players\"");
 		}
