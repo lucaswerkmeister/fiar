@@ -187,9 +187,10 @@ public class FixedServer implements Server {
 		if (!knowsPlayer(action.getActingPlayer()))
 			throw new UnknownPlayerException(action.getActingPlayer());
 		if (!clientPlayerMatch(requester, action.getActingPlayer()))
-			throw new IllegalArgumentException("Client and player don't match!");
+			throw new IllegalArgumentException("Client " + requester.toString() + " and player "
+					+ action.getActingPlayer().getName() + " don't match!");
 		if (!getAllowedActions(requester, action.getActingPlayer()).contains(action.getClass()))
-			throw new IllegalStateException("This action is currently not allowed for "
+			throw new IllegalStateException("This action (" + action.toString() + ") is currently not allowed for "
 					+ action.getActingPlayer().getName() + "!");
 		try {
 			switch (phase[0]) {

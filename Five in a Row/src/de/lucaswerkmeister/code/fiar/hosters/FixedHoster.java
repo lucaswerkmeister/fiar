@@ -113,6 +113,17 @@ public class FixedHoster extends JFrame implements Hoster {
 					watchingClients.remove(pair.getClient());
 				Set<ClientPlayerPair> pairSet = new HashSet<>(pairs.values());
 				Server server = new FixedServer(pairSet, watchingClients);
+				do {
+					try {
+						UnicastRemoteObject.exportObject(server, 0);
+						break;
+					} catch (RemoteException e2) {
+						if (JOptionPane.showOptionDialog(gui, "Failed to host server. Retry?", "Error",
+								JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null) == JOptionPane.OK_OPTION)
+							continue;
+						System.exit(1);
+					}
+				} while (true);
 				for (RemoteClient client : knownClients)
 					try {
 						client.gameStarts(server);
