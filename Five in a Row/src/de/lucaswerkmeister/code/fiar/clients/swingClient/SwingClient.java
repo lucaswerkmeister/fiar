@@ -86,7 +86,8 @@ public final class SwingClient implements RemoteClient, Runnable {
 	private static SwingClient instance;
 	private Server server;
 	private final Hoster hoster;
-	private final List<Player> players; // note that the contents of the list are not final
+	private final List<Player> ownPlayers; // note that the contents of the list are not final
+	private final List<Player> allPlayers;
 	private final JFrame gui;
 	private final Queue<GameEvent> events;
 	private final JPanel board;
@@ -104,15 +105,16 @@ public final class SwingClient implements RemoteClient, Runnable {
 		hoster = null;
 		gui = new JFrame((Server.IN_A_ROW == 5 ? "Five" : Server.IN_A_ROW) + " in a Row");
 		gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		players = new LinkedList<>();
-		players.add(showAddPlayerDialog(true, 1, gui));
+		ownPlayers = new LinkedList<>();
+		ownPlayers.add(showAddPlayerDialog(true, 1, gui));
 		Player player = showAddPlayerDialog(true, 2, gui);
 		int id = 3;
 		while (player != null) {
-			players.add(player);
+			ownPlayers.add(player);
 			player = showAddPlayerDialog(false, id++, gui);
 		}
-		server = new FixedServer(new Client[] {this }, new Player[][] {players.toArray(new Player[] {}) });
+		allPlayers = new LinkedList<>(ownPlayers);
+		server = new FixedServer(new Client[] {this }, new Player[][] {ownPlayers.toArray(new Player[] {}) });
 		events = new LinkedList<>();
 		final JPanel content = new JPanel(new BorderLayout());
 		board = new JPanel();
@@ -143,7 +145,8 @@ public final class SwingClient implements RemoteClient, Runnable {
 		instance = this;
 		hoster = (Hoster) LocateRegistry.getRegistry(host, port).lookup("hoster");
 		UnicastRemoteObject.exportObject(this, 0);
-		players = new LinkedList<>();
+		ownPlayers = new LinkedList<>();
+		allPlayers = new LinkedList<>();
 		hoster.addClient(this);
 		gui = new JFrame((Server.IN_A_ROW == 5 ? "Five" : Server.IN_A_ROW) + " in a Row");
 		gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -160,7 +163,7 @@ public final class SwingClient implements RemoteClient, Runnable {
 
 	@Override
 	public void playerJoined(Player player) {
-		players.add(player);
+		allPlayers.add(player);
 		if (addPlayerDialog != null && addPlayerDialog.isVisible()) {
 			addPlayerDialog.setName("Reload dialog:" + findID());
 			addPlayerDialog.setVisible(false);
@@ -169,12 +172,12 @@ public final class SwingClient implements RemoteClient, Runnable {
 
 	@Override
 	public void playerLeft(Player player) {
-		players.remove(player);
+		allPlayers.remove(player);
 	}
 
 	@Override
 	public void gameStarts(Server server) {
-		if (addPlayerDialog != null) {
+		if (addPlayerDialog != null && addPlayerDialog.isVisible()) {
 			addPlayerDialog.setName("Stop adding players");
 			addPlayerDialog.setVisible(false);
 		}
@@ -189,12 +192,12 @@ public final class SwingClient implements RemoteClient, Runnable {
 	public void gameEvent(final GameEvent e) throws RemoteException {
 		if (e instanceof Forfeit) {
 			final Player p = ((Forfeit) e).getActingPlayer();
-			final int index = players.indexOf(p);
-			players.remove(p);
+			final int index = allPlayers.indexOf(p);
+			allPlayers.remove(p);
 			if (playerIndex == index) {
-				playerIndex %= players.size();
-				statusBar.setText(players.get(playerIndex).getName() + "'"
-						+ (endsWithSSound(players.get(playerIndex).getName()) ? "" : "s") + " turn!");
+				playerIndex %= allPlayers.size();
+				statusBar.setText(allPlayers.get(playerIndex).getName() + "'"
+						+ (endsWithSSound(allPlayers.get(playerIndex).getName()) ? "" : "s") + " turn!");
 			} else if (playerIndex > index)
 				playerIndex--;
 		}
@@ -218,7 +221,8 @@ public final class SwingClient implements RemoteClient, Runnable {
 					throw new Exception("No server and no hoster! Aborting.");
 				Player player = showAddPlayerDialog(false, findID(), gui);
 				while (player != null) {
-					players.add(player);
+					ownPlayers.add(player);
+					// allPlayers.add(player); don't add here as it will be added in playerJoined() above
 					hoster.addPlayer(this, player);
 					player = showAddPlayerDialog(false, findID(), gui);
 				}
@@ -231,7 +235,7 @@ public final class SwingClient implements RemoteClient, Runnable {
 			}
 			// choose board size
 			final Dimension boardSize = showChooseBoardSizeDialog(gui);
-			for (final Player p : players) {
+			for (final Player p : ownPlayers) {
 				server.action(this, new BoardSizeProposal(p, boardSize));
 				events.poll(); // BoardSizeProposal
 			}
@@ -257,25 +261,27 @@ public final class SwingClient implements RemoteClient, Runnable {
 										// blocking
 										server.action(instance,
 												server.getCurrentBoard(instance).getPlayerAt(xy) == NoPlayer
-														.getInstance() ? new BlockField(players.get(0), xy)
-														: new UnblockField(players.get(0), xy));
+														.getInstance() ? new BlockField(ownPlayers.get(0), xy)
+														: new UnblockField(ownPlayers.get(0), xy));
 										events.poll(); // BlockField / UnblockField
 									} else if (phase[0] == 0 && phase[1] == 2) {
 										// jokers
 										server.action(instance,
 												server.getCurrentBoard(instance).getPlayerAt(xy) == NoPlayer
-														.getInstance() ? new JokerField(players.get(0), xy)
-														: new UnjokerField(players.get(0), xy));
+														.getInstance() ? new JokerField(ownPlayers.get(0), xy)
+														: new UnjokerField(ownPlayers.get(0), xy));
 										events.poll(); // JokerField / UnjokerField
 									} else if (phase[0] == 1 && phase[1] == 1) {
 										// move
-										server.action(instance, new PlaceStone(players.get(playerIndex), xy));
+										server.action(instance, new PlaceStone(ownPlayers.get(playerIndex), xy));
 										events.poll(); // PlaceStone
-										playerIndex = (playerIndex + 1) % players.size();
+										playerIndex = (playerIndex + 1) % ownPlayers.size();
 										if (events.isEmpty())
-											statusBar.setText(players.get(playerIndex).getName() + "'"
-													+ (endsWithSSound(players.get(playerIndex).getName()) ? "" : "s")
-													+ " turn!");
+											statusBar
+													.setText(ownPlayers.get(playerIndex).getName()
+															+ "'"
+															+ (endsWithSSound(ownPlayers.get(playerIndex).getName())
+																	? "" : "s") + " turn!");
 										else {
 											final GameEvent event = events.poll();
 											if (event instanceof PlayerVictory) {
@@ -310,7 +316,7 @@ public final class SwingClient implements RemoteClient, Runnable {
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					for (final Player p : players) {
+					for (final Player p : ownPlayers) {
 						try {
 							server.action(instance, new BlockDistributionAccepted(p, server.getCurrentBoard(instance)));
 						} catch (IllegalStateException | IllegalMoveException | RemoteException e1) {
@@ -344,7 +350,7 @@ public final class SwingClient implements RemoteClient, Runnable {
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					for (final Player p : players) {
+					for (final Player p : ownPlayers) {
 						try {
 							server.action(instance, new JokerDistributionAccepted(p, server.getCurrentBoard(instance)));
 						} catch (IllegalStateException | IllegalMoveException | RemoteException e1) {
@@ -377,7 +383,7 @@ public final class SwingClient implements RemoteClient, Runnable {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					try {
-						server.action(instance, new Forfeit(players.get(playerIndex)));
+						server.action(instance, new Forfeit(ownPlayers.get(playerIndex)));
 					} catch (IllegalStateException | IllegalMoveException | RemoteException e1) {
 						e1.printStackTrace();
 					}
@@ -385,8 +391,8 @@ public final class SwingClient implements RemoteClient, Runnable {
 			});
 			buttons.add(forfeit);
 			gui.pack();
-			statusBar.setText(players.get(playerIndex).getName() + "'"
-					+ (endsWithSSound(players.get(playerIndex).getName()) ? "" : "s") + " turn!");
+			statusBar.setText(ownPlayers.get(playerIndex).getName() + "'"
+					+ (endsWithSSound(ownPlayers.get(playerIndex).getName()) ? "" : "s") + " turn!");
 			// everything after this point is handled in ActionListeners
 		} catch (final Throwable t) { // I will catch Throwable whenever I feel like it and nobody can forbid it.
 			System.out.println("WHOOPS! An internal error occured. I'm so sorry.");
@@ -409,7 +415,7 @@ public final class SwingClient implements RemoteClient, Runnable {
 		do {
 			id++;
 			isUsed = false;
-			for (Player p : players)
+			for (Player p : ownPlayers)
 				if (p.getID() == id) {
 					isUsed = true;
 					break;
