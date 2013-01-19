@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -27,6 +28,8 @@ import de.lucaswerkmeister.code.fiar.framework.Player;
  * @version 1.0
  */
 public class GameFrame extends JFrame {
+	private static final long serialVersionUID = -8649428295633759928L;
+
 	/**
 	 * A {@link BoardListener} receives board events from the {@link GameFrame}.
 	 * 
@@ -69,7 +72,7 @@ public class GameFrame extends JFrame {
 		fields = new Field[b.getWidth()][b.getHeight()];
 		for (int x = 0; x < b.getWidth(); x++)
 			for (int y = 0; y < b.getHeight(); y++) {
-				final Field f = new Field(null, FIELD_SIZE);
+				final Field f = new Field(null, FIELD_SIZE, new Point(x, y));
 				f.addMouseListener(new MouseAdapter() {
 					@Override
 					public void mouseClicked(final MouseEvent e) {
@@ -160,6 +163,56 @@ public class GameFrame extends JFrame {
 	}
 
 	/**
+	 * Sets the player at the specified field.
+	 * 
+	 * @param xy
+	 *            The coordinates of the field.
+	 * @param p
+	 *            The player.
+	 */
+	public void setPlayerAt(Point xy, Player p) {
+		setPlayerAt(xy.x, xy.y, p);
+	}
+
+	/**
+	 * Enables or disables the specified field.
+	 * 
+	 * @param x
+	 *            The x coordinate of the field.
+	 * @param y
+	 *            The y coordinate of the field.
+	 * @param enabled
+	 *            If the field is enabled or not.
+	 */
+	public void setEnabled(int x, int y, boolean enabled) {
+		fields[x][y].setEnabled(enabled);
+	}
+
+	/**
+	 * Enables or disables the specified field.
+	 * 
+	 * @param xy
+	 *            The coordinates of the field.
+	 * @param enabled
+	 *            If the field is enabled or not.
+	 */
+	public void setEnabled(Point xy, boolean enabled) {
+		setEnabled(xy.x, xy.y, enabled);
+	}
+
+	/**
+	 * Enables or disables all fields.
+	 * 
+	 * @param enabled
+	 *            If the fields are enabled or not.
+	 */
+	public void setEnabledAll(boolean enabled) {
+		for (int x = 0; x < fields.length; x++)
+			for (int y = 0; y < fields[x].length; y++)
+				setEnabled(x, y, enabled);
+	}
+
+	/**
 	 * Adds an action listener to this {@link GameFrame}.
 	 * <p>
 	 * The action listener is notified whenever any of the buttons is clicked, with an {@link ActionEvent} where the
@@ -188,6 +241,14 @@ public class GameFrame extends JFrame {
 	}
 
 	/**
+	 * Removes all registered {@link ActionListener}s.
+	 */
+	public void removeAllActionListeners() {
+		for (ActionListener l : actionListeners)
+			removeActionListener(l);
+	}
+
+	/**
 	 * Adds a board listener to this {@link GameFrame}.
 	 * <p>
 	 * The board listener is notified of clicks on the game board.
@@ -209,6 +270,14 @@ public class GameFrame extends JFrame {
 	 */
 	public void removeBoardListener(BoardListener l) {
 		boardListeners.remove(l);
+	}
+
+	/**
+	 * Removes all registered {@link BoardListener}s.
+	 */
+	public void removeAllBoardListeners() {
+		for (BoardListener l : boardListeners)
+			removeBoardListener(l);
 	}
 
 	/**

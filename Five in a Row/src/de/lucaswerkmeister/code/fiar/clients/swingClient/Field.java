@@ -20,6 +20,7 @@ package de.lucaswerkmeister.code.fiar.clients.swingClient;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Point;
 
 import javax.swing.JComponent;
 
@@ -35,9 +36,10 @@ import de.lucaswerkmeister.code.fiar.framework.Player;
  * @version 1.0
  */
 public class Field extends JComponent {
-	private static final long serialVersionUID = 1004050893930330880L;
+	private static final long serialVersionUID = -1716687517822009845L;
 	private Player player;
 	private final Dimension size;
+	private final Point field;
 
 	/**
 	 * A new {@link Field} occupied by the specified player, of the specified size.
@@ -46,13 +48,16 @@ public class Field extends JComponent {
 	 *            The player occupying this field, or <code>null</code> if this field is still free.
 	 * @param size
 	 *            The size of the field.
+	 * @param field
+	 *            The coordinates of this field.
 	 */
-	public Field(final Player player, final Dimension size) {
+	public Field(final Player player, final Dimension size, Point field) {
 		setPlayer(player);
 		this.size = size;
 		setPreferredSize(size);
 		setMinimumSize(size);
 		setMaximumSize(size);
+		this.field = field;
 	}
 
 	@Override
@@ -93,5 +98,14 @@ public class Field extends JComponent {
 		} else
 			setToolTipText(null);
 		repaint();
+	}
+
+	/**
+	 * Gets the coordinates of this {@link Field}.
+	 * 
+	 * @return The coordinates of this field.
+	 */
+	public Point getField() {
+		return field;
 	}
 }

@@ -17,18 +17,14 @@
  */
 package de.lucaswerkmeister.code.fiar.clients.swingClient;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.rmi.AccessException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -44,12 +40,12 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.WindowConstants;
 
+import de.lucaswerkmeister.code.fiar.clients.swingClient.GameFrame.BoardListener;
 import de.lucaswerkmeister.code.fiar.framework.Block;
 import de.lucaswerkmeister.code.fiar.framework.Client;
 import de.lucaswerkmeister.code.fiar.framework.Hoster;
@@ -88,12 +84,8 @@ public final class SwingClient implements RemoteClient, Runnable {
 	private final Hoster hoster;
 	private final List<Player> ownPlayers; // note that the contents of the list are not final
 	private final List<Player> allPlayers;
-	private final JFrame gui;
+	private GameFrame gui;
 	private final Queue<GameEvent> events;
-	private final JPanel board;
-	private final JPanel buttons;
-	private final JLabel statusBar;
-	private Field[][] fields;
 	private int playerIndex = 0;
 	private static JDialog addPlayerDialog;
 
@@ -103,8 +95,9 @@ public final class SwingClient implements RemoteClient, Runnable {
 	public SwingClient() {
 		instance = this;
 		hoster = null;
-		gui = new JFrame((Server.IN_A_ROW == 5 ? "Five" : Server.IN_A_ROW) + " in a Row");
-		gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		// TODO insert further down
+		// gui = new JFrame((Server.IN_A_ROW == 5 ? "Five" : Server.IN_A_ROW) + " in a Row");
 		ownPlayers = new LinkedList<>();
 		ownPlayers.add(showAddPlayerDialog(true, 1, gui));
 		Player player = showAddPlayerDialog(true, 2, gui);
@@ -116,14 +109,6 @@ public final class SwingClient implements RemoteClient, Runnable {
 		allPlayers = new LinkedList<>(ownPlayers);
 		server = new FixedServer(new Client[] {this }, new Player[][] {ownPlayers.toArray(new Player[] {}) });
 		events = new LinkedList<>();
-		final JPanel content = new JPanel(new BorderLayout());
-		board = new JPanel();
-		content.add(board, BorderLayout.CENTER);
-		buttons = new JPanel();
-		content.add(buttons, BorderLayout.EAST);
-		statusBar = new JLabel("Ready");
-		content.add(statusBar, BorderLayout.SOUTH);
-		gui.setContentPane(content);
 	}
 
 	/**
@@ -148,17 +133,8 @@ public final class SwingClient implements RemoteClient, Runnable {
 		ownPlayers = new LinkedList<>();
 		allPlayers = new LinkedList<>();
 		hoster.addClient(this);
-		gui = new JFrame((Server.IN_A_ROW == 5 ? "Five" : Server.IN_A_ROW) + " in a Row");
-		gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		// gui = new JFrame((Server.IN_A_ROW == 5 ? "Five" : Server.IN_A_ROW) + " in a Row");
 		events = new LinkedList<>();
-		final JPanel content = new JPanel(new BorderLayout());
-		board = new JPanel();
-		content.add(board, BorderLayout.CENTER);
-		buttons = new JPanel();
-		content.add(buttons, BorderLayout.EAST);
-		statusBar = new JLabel("Ready");
-		content.add(statusBar, BorderLayout.SOUTH);
-		gui.setContentPane(content);
 	}
 
 	@Override
@@ -196,19 +172,18 @@ public final class SwingClient implements RemoteClient, Runnable {
 			allPlayers.remove(p);
 			if (playerIndex == index) {
 				playerIndex %= allPlayers.size();
-				statusBar.setText(allPlayers.get(playerIndex).getName() + "'"
+				gui.setStatus(allPlayers.get(playerIndex).getName() + "'"
 						+ (endsWithSSound(allPlayers.get(playerIndex).getName()) ? "" : "s") + " turn!");
 			} else if (playerIndex > index)
 				playerIndex--;
 		}
 		if (e instanceof GameEnd) {
-			statusBar.setText("Game ended");
-			buttons.removeAll();
-			gui.pack();
+			gui.setStatus("Game ended");
+			gui.setButtons(new String[0]);
 		}
 		if (e instanceof FieldAction) {
 			final FieldAction fa = (FieldAction) e;
-			fields[fa.getField().x][fa.getField().y].setPlayer(server.getCurrentBoard(this).getPlayerAt(fa.getField()));
+			gui.setPlayerAt(fa.getField().x, fa.getField().y, server.getCurrentBoard(this).getPlayerAt(fa.getField()));
 		}
 		events.add(e);
 	}
@@ -241,79 +216,60 @@ public final class SwingClient implements RemoteClient, Runnable {
 			}
 			events.poll(); // PhaseChange
 
-			board.setLayout(new GridLayout(boardSize.width, boardSize.height, 0, 0));
-			fields = new Field[boardSize.width][boardSize.height];
-			final Dimension fieldSize = new Dimension(10, 10);
-			for (int x = 0; x < boardSize.width; x++)
-				for (int y = 0; y < boardSize.height; y++) {
-					final Field f = new Field(null, fieldSize);
-					final Point xy = new Point(x, y);
-					// @formatter:off The formatter keeps inserting more and more blank lines before the @Override
-					f.addMouseListener(new MouseAdapter() {
-						@Override
-						// @formatter:on
-								public
-								void mouseClicked(final MouseEvent e) {
-							if (f.isEnabled()) // disabled lightweight components still receive MouseEvents
-								try {
-									final int[] phase = server.getPhase(instance);
-									if (phase[0] == 0 && phase[1] == 1) {
-										// blocking
-										server.action(instance,
-												server.getCurrentBoard(instance).getPlayerAt(xy) == NoPlayer
-														.getInstance() ? new BlockField(ownPlayers.get(0), xy)
-														: new UnblockField(ownPlayers.get(0), xy));
-										events.poll(); // BlockField / UnblockField
-									} else if (phase[0] == 0 && phase[1] == 2) {
-										// jokers
-										server.action(instance,
-												server.getCurrentBoard(instance).getPlayerAt(xy) == NoPlayer
-														.getInstance() ? new JokerField(ownPlayers.get(0), xy)
-														: new UnjokerField(ownPlayers.get(0), xy));
-										events.poll(); // JokerField / UnjokerField
-									} else if (phase[0] == 1 && phase[1] == 1) {
-										// move
-										server.action(instance, new PlaceStone(ownPlayers.get(playerIndex), xy));
-										events.poll(); // PlaceStone
-										playerIndex = (playerIndex + 1) % ownPlayers.size();
-										if (events.isEmpty())
-											statusBar
-													.setText(ownPlayers.get(playerIndex).getName()
-															+ "'"
-															+ (endsWithSSound(ownPlayers.get(playerIndex).getName())
-																	? "" : "s") + " turn!");
-										else {
-											final GameEvent event = events.poll();
-											if (event instanceof PlayerVictory) {
-												//@formatter:off
-												final String message
-													= ((PlayerVictory) event).getWinningPlayer().getName() + " wins!";
-												//@formatter:on
-												JOptionPane.showMessageDialog(gui, message);
-												statusBar.setText(message);
-											}
-											if (event instanceof GameEnd)
-												for (int x = 0; x < boardSize.width; x++)
-													for (int y = 0; y < boardSize.height; y++)
-														fields[x][y].setEnabled(false);
-										}
-									}
-								} catch (IllegalStateException | IllegalMoveException | RemoteException e1) {
-									e1.printStackTrace();
+			gui =
+					new GameFrame(server.getCurrentBoard(this), (Server.IN_A_ROW == 5 ? "Five" : Server.IN_A_ROW)
+							+ " in a Row");
+			gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			gui.addBoardListener(new BoardListener() {
+
+				@Override
+				public void fieldClicked(Field field) {
+					try {
+						final int[] phase = server.getPhase(instance);
+						final Point xy = field.getField();
+						if (phase[0] == 0 && phase[1] == 1) {
+							// blocking
+							server.action(instance, server.getCurrentBoard(instance).getPlayerAt(xy) == NoPlayer
+									.getInstance() ? new BlockField(ownPlayers.get(0), xy) : new UnblockField(
+									ownPlayers.get(0), xy));
+							events.poll(); // BlockField / UnblockField
+						} else if (phase[0] == 0 && phase[1] == 2) {
+							// jokers
+							server.action(instance, server.getCurrentBoard(instance).getPlayerAt(xy) == NoPlayer
+									.getInstance() ? new JokerField(ownPlayers.get(0), xy) : new UnjokerField(
+									ownPlayers.get(0), xy));
+							events.poll(); // JokerField / UnjokerField
+						} else if (phase[0] == 1 && phase[1] == 1) {
+							// move
+							server.action(instance, new PlaceStone(ownPlayers.get(playerIndex), xy));
+							events.poll(); // PlaceStone
+							playerIndex = (playerIndex + 1) % ownPlayers.size();
+							if (events.isEmpty())
+								gui.setStatus(ownPlayers.get(playerIndex).getName() + "'"
+										+ (endsWithSSound(ownPlayers.get(playerIndex).getName()) ? "" : "s") + " turn!");
+							else {
+								final GameEvent event = events.poll();
+								if (event instanceof PlayerVictory) {
+									final String message =
+											((PlayerVictory) event).getWinningPlayer().getName() + " wins!";
+									JOptionPane.showMessageDialog(gui, message);
+									gui.setStatus(message);
 								}
+								if (event instanceof GameEnd)
+									gui.setEnabledAll(false);
+							}
 						}
-					});
-					fields[x][y] = f;
-					board.add(f);
+					} catch (IllegalStateException | IllegalMoveException | RemoteException e1) {
+						e1.printStackTrace();
+					}
 				}
-			gui.add(board);
+			});
 
 			// blocks
-			statusBar.setText("Select blocked fields");
-			buttons.removeAll();
-			final JButton doneBlocks = new JButton("Done setting blocked fields");
-			doneBlocks.addActionListener(new ActionListener() {
-
+			gui.setStatus("Select blocked fields");
+			gui.setButtons(new String[] {"Done setting blocked fields" });
+			gui.removeAllActionListeners();
+			gui.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					for (final Player p : ownPlayers) {
@@ -330,24 +286,21 @@ public final class SwingClient implements RemoteClient, Runnable {
 					}
 				}
 			});
-			buttons.add(doneBlocks);
-			gui.pack();
 			gui.setVisible(true);
 			synchronized (this) {
 				wait();
 			}
+			gui.removeAllActionListeners();
 			// disable blocked fields
 			for (int x = 0; x < boardSize.width; x++)
 				for (int y = 0; y < boardSize.height; y++)
 					if (server.getCurrentBoard(this).getPlayerAt(x, y) == Block.getInstance())
-						fields[x][y].setEnabled(false);
+						gui.setEnabled(x, y, false);
 
 			// jokers
-			statusBar.setText("Select joker fields");
-			buttons.removeAll();
-			final JButton doneJokers = new JButton("Done setting joker fields");
-			doneJokers.addActionListener(new ActionListener() {
-
+			gui.setStatus("Select joker fields");
+			gui.setButtons(new String[] {"Done setting joker fields" });
+			gui.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					for (final Player p : ownPlayers) {
@@ -364,22 +317,19 @@ public final class SwingClient implements RemoteClient, Runnable {
 					}
 				}
 			});
-			buttons.add(doneJokers);
-			gui.pack();
 			synchronized (this) {
 				wait();
 			}
+			gui.removeAllActionListeners();
 			// disable blocked fields
 			for (int x = 0; x < boardSize.width; x++)
 				for (int y = 0; y < boardSize.height; y++)
 					if (server.getCurrentBoard(this).getPlayerAt(x, y) == Joker.getInstance())
-						fields[x][y].setEnabled(false);
+						gui.setEnabled(x, y, false);
 
 			// normal gameplay
-			buttons.removeAll();
-			final JButton forfeit = new JButton("Forfeit");
-			forfeit.addActionListener(new ActionListener() {
-
+			gui.setButtons(new String[] {"Forfeit" });
+			gui.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					try {
@@ -389,18 +339,24 @@ public final class SwingClient implements RemoteClient, Runnable {
 					}
 				}
 			});
-			buttons.add(forfeit);
-			gui.pack();
-			statusBar.setText(ownPlayers.get(playerIndex).getName() + "'"
+			gui.setStatus(ownPlayers.get(playerIndex).getName() + "'"
 					+ (endsWithSSound(ownPlayers.get(playerIndex).getName()) ? "" : "s") + " turn!");
 			// everything after this point is handled in ActionListeners
 		} catch (final Throwable t) { // I will catch Throwable whenever I feel like it and nobody can forbid it.
+			// I always want the user to see this message before the confusing log starts
 			System.out.println("WHOOPS! An internal error occured. I'm so sorry.");
-			System.out.println("If you want to report this to the developer, please include the information below: ");
-			t.printStackTrace(System.out);
-			// unneccessary because the thread exits anyways
-			// if (t instanceof ThreadDeath || t instanceof VirtualMachineError)
-			// throw (Error) t; // OutOfMemoryExceptions etc.
+			System.out.println("If you want to report this to the developer, please include the information below:");
+			// VMErrors and ThreadDeaths should always be re-thrown;
+			// for ThreadDeaths, the stack trace normally isn't printed,
+			// so I do that manually here.
+			// For all other exceptions, I print the stack trace and don't re-throw them.
+			if (t instanceof VirtualMachineError)
+				throw (VirtualMachineError) t;
+			else if (t instanceof ThreadDeath) {
+				t.printStackTrace();
+				throw (ThreadDeath) t;
+			}
+			t.printStackTrace();
 		}
 	}
 
