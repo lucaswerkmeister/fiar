@@ -76,10 +76,10 @@ import de.lucaswerkmeister.code.fiar.servers.FixedServer;
  * @author Lucas Werkmeister
  * @version 1.0
  */
-public final class SwingClient implements RemoteClient, Runnable {
+public final class LocalClient implements RemoteClient, Runnable {
 	private static final long serialVersionUID = -742632519403100569L;
 	private static final Random random = new Random();
-	private static SwingClient instance;
+	private static LocalClient instance;
 	private Server server;
 	private final Hoster hoster;
 	private final List<Player> ownPlayers; // note that the contents of the list are not final
@@ -90,9 +90,9 @@ public final class SwingClient implements RemoteClient, Runnable {
 	private static JDialog addPlayerDialog;
 
 	/**
-	 * Creates a new {@link SwingClient} that starts an own local server.
+	 * Creates a new {@link LocalClient} that starts an own local server.
 	 */
-	public SwingClient() {
+	public LocalClient() {
 		instance = this;
 		hoster = null;
 
@@ -112,7 +112,7 @@ public final class SwingClient implements RemoteClient, Runnable {
 	}
 
 	/**
-	 * Creates a new {@link SwingClient} running on the specified remote server.
+	 * Creates a new {@link LocalClient} running on the specified remote server.
 	 * 
 	 * @param host
 	 *            The host address of the remote server.
@@ -125,7 +125,7 @@ public final class SwingClient implements RemoteClient, Runnable {
 	 * @throws AccessException
 	 *             If the remote server can't be accessed.
 	 */
-	public SwingClient(String host, int port) throws AccessException, RemoteException, NotBoundException {
+	public LocalClient(String host, int port) throws AccessException, RemoteException, NotBoundException {
 		super(); // avoid call to this()
 		instance = this;
 		hoster = (Hoster) LocateRegistry.getRegistry(host, port).lookup("hoster");
@@ -221,7 +221,6 @@ public final class SwingClient implements RemoteClient, Runnable {
 							+ " in a Row");
 			gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			gui.addBoardListener(new BoardListener() {
-
 				@Override
 				public void fieldClicked(Field field) {
 					try {
@@ -532,8 +531,8 @@ public final class SwingClient implements RemoteClient, Runnable {
 	 * @param args
 	 *            The arguments.
 	 *            <ul>
-	 *            <li>If <code>args.length == 0</code>, the SwingClient runs on a local server.</li>
-	 *            <li>If <code>args.length == 2</code>, the SwingClient runs on the specified remote server (arguments:
+	 *            <li>If <code>args.length == 0</code>, the LocalClient runs on a local server.</li>
+	 *            <li>If <code>args.length == 2</code>, the LocalClient runs on the specified remote server (arguments:
 	 *            host + port).</li>
 	 *            </ul>
 	 */
@@ -541,11 +540,11 @@ public final class SwingClient implements RemoteClient, Runnable {
 		if (instance == null) {
 			switch (args.length) {
 			case 0:
-				instance = new SwingClient();
+				instance = new LocalClient();
 				break;
 			case 2:
 				try {
-					instance = new SwingClient(args[0], Integer.parseInt(args[1]));
+					instance = new LocalClient(args[0], Integer.parseInt(args[1]));
 				} catch (NumberFormatException | RemoteException | NotBoundException e) {
 					e.printStackTrace();
 					System.exit(1);
