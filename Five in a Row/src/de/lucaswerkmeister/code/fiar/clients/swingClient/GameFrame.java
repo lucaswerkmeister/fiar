@@ -1,22 +1,31 @@
 package de.lucaswerkmeister.code.fiar.clients.swingClient;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.WindowConstants;
 
 import de.lucaswerkmeister.code.fiar.framework.Board;
 import de.lucaswerkmeister.code.fiar.framework.Player;
@@ -52,7 +61,9 @@ public class GameFrame extends JFrame {
 	private final Field[][] fields;
 	private final Set<ActionListener> actionListeners;
 	private final Set<BoardListener> boardListeners;
+	static final Random random = new Random();
 	private static final Dimension FIELD_SIZE = new Dimension(15, 15);
+	static JDialog addPlayerDialog;
 
 	/**
 	 * Creates a new {@link GameFrame} showing the specified board, with the specified window title.
@@ -301,5 +312,152 @@ public class GameFrame extends JFrame {
 	private void fireFieldClicked(Field f) {
 		for (BoardListener l : boardListeners)
 			l.fieldClicked(f);
+	}
+
+	/**
+	 * Shows the Add Player dialog and returns the player that was added.
+	 * 
+	 * @param forcePlayer
+	 *            If set to <code>true</code>, the user is forced to add a player. Otherwise, he is allowed to cancel
+	 *            the addition of more players.
+	 * @param id
+	 *            The id of the new player.
+	 * @param owner
+	 *            The owner of the dialog.
+	 * @return A {@link Player} with the user-specified name and color, or <code>null</code> if the user chose not to
+	 *         add another player.
+	 */
+	public static Player showAddPlayerDialog(final boolean forcePlayer, int id, final JFrame owner) {
+		addPlayerDialog = new JDialog(owner, "Add player", true);
+		addPlayerDialog.setLayout(new FlowLayout());
+		addPlayerDialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		addPlayerDialog.setAlwaysOnTop(true);
+
+		final JTextField name = new JTextField("Player " + id, 10);
+		name.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				addPlayerDialog.setName("Add Player");
+				addPlayerDialog.setVisible(false);
+			}
+		});
+		addPlayerDialog.add(name);
+		// This "random color" code is based on the following stackoverflow answer:
+		// http://stackoverflow.com/a/4247219/1420237
+		// @formatter:off
+		final SelectableColor color 
+			= new SelectableColor(Color.getHSBColor(random.nextFloat(), (random.nextInt(2) + 7) / 10f, 0.9f));
+		// @formatter:on
+		addPlayerDialog.add(color);
+		final JButton addPlayer = new JButton("Add Player");
+		addPlayer.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				addPlayerDialog.setName(e.getActionCommand());
+				addPlayerDialog.setVisible(false);
+			}
+		});
+		addPlayerDialog.add(addPlayer);
+		final JButton cancel = new JButton("Stop adding players");
+		cancel.addActionListener(addPlayer.getActionListeners()[0]);
+		if (forcePlayer) {
+			cancel.setEnabled(false);
+			cancel.setToolTipText("You need at least two players to play");
+		}
+		addPlayerDialog.add(cancel);
+
+		addPlayerDialog.pack();
+		addPlayerDialog.setVisible(true);
+		while (true) {
+			switch (addPlayerDialog.getName()) {
+			case "Add Player":
+				// This Easter Egg is clearly of the "WTF" type.
+				return new Player(name.getText().equals("All your base are belong to us") ? "CATS" : name.getText(),
+						color.getColor(), id);
+			case "Stop adding players":
+				return null;
+			default:
+				if (addPlayerDialog.getName().startsWith("Reload dialog:")) {
+					boolean needToReplaceName = name.getText().equals("Player " + id);
+					id = Integer.parseInt(addPlayerDialog.getName().substring("Reload dialog:".length()));
+					if (needToReplaceName)
+						name.setText("Player " + id);
+					addPlayerDialog.setVisible(true);
+					continue;
+				}
+				throw new RuntimeException("Unexpected error in Swing Client while adding player! Name was "
+						+ addPlayerDialog.getName() + " (expected: \"Add Player\" or \"Stop adding players\"");
+			}
+		}
+	}
+
+	/**
+	 * Reloads the Add Player dialog to return a player with the specified ID.
+	 * <p>
+	 * This method is intended to be used when the ID the Add Player dialog is offering was taken by a remote player in
+	 * the meantime.
+	 * 
+	 * @param id
+	 *            The new ID for the player.
+	 */
+	public static void reshowAddPlayerDialog(int id) {
+		if (addPlayerDialog != null && addPlayerDialog.isVisible()) {
+			addPlayerDialog.setName("Reload dialog:" + id);
+			addPlayerDialog.setVisible(false);
+		}
+	}
+
+	/**
+	 * Hides the Add Player dialog.
+	 */
+	public static void hideAddPlayerDialog() {
+		if (addPlayerDialog != null && addPlayerDialog.isVisible()) {
+			addPlayerDialog.setName("Stop adding players");
+			addPlayerDialog.setVisible(false);
+		}
+	}
+
+	/**
+	 * Shows the Choose Board Size dialog and returns the chosen size.
+	 * 
+	 * @param owner
+	 *            The owner of the dialog.
+	 * @return The user-chosen size.
+	 */
+	public static Dimension showChooseBoardSizeDialog(final JFrame owner) {
+		final JDialog dialog = new JDialog(owner, "Choose board size", true);
+		dialog.setLayout(new FlowLayout());
+		dialog.toFront();
+		dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+
+		final JSpinner boardWidth = new JSpinner(new SpinnerNumberModel(15, 5, Integer.MAX_VALUE, 1));
+		boardWidth.setPreferredSize(new Dimension(50, boardWidth.getPreferredSize().height));
+		((JSpinner.DefaultEditor) boardWidth.getEditor()).getTextField().addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(final KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER)
+					dialog.setVisible(false);
+			}
+		});
+		dialog.add(boardWidth);
+		dialog.add(new JLabel("×"));
+		final JSpinner boardHeight = new JSpinner(new SpinnerNumberModel(15, 5, Integer.MAX_VALUE, 1));
+		boardHeight.setPreferredSize(new Dimension(50, boardHeight.getPreferredSize().height));
+		((JSpinner.DefaultEditor) boardHeight.getEditor()).getTextField().addKeyListener(
+				((JSpinner.DefaultEditor) boardWidth.getEditor()).getTextField().getKeyListeners()[0]);
+		dialog.add(boardHeight);
+		final JButton ok = new JButton("OK");
+		ok.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				dialog.setVisible(false);
+			}
+		});
+		dialog.add(ok);
+
+		dialog.pack();
+		dialog.setVisible(true);
+		return new Dimension((Integer) boardWidth.getValue(), (Integer) boardHeight.getValue());
 	}
 }
