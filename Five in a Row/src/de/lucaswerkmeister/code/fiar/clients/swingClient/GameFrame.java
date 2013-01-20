@@ -315,6 +315,31 @@ public class GameFrame extends JFrame {
 	}
 
 	/**
+	 * Determines if a specific string ends with an "s" sound.
+	 * <p>
+	 * This is used to determine how the genitive of that string is built.
+	 * 
+	 * @param token
+	 *            The string.
+	 * @return <code>true</code> if that string ends with an "s" sound, <code>false</code> otherwise.
+	 */
+	static boolean endsWithSSound(final String token) {
+		if (token.endsWith("ques"))
+			return false;
+		if (token.endsWith("aux"))
+			return false;
+		if (token.endsWith("s"))
+			return true;
+		if (token.endsWith("x"))
+			return true;
+		if (token.endsWith("ce"))
+			return true;
+		if (token.endsWith("se"))
+			return true;
+		return false;
+	}
+
+	/**
 	 * Shows the Add Player dialog and returns the player that was added.
 	 * 
 	 * @param forcePlayer

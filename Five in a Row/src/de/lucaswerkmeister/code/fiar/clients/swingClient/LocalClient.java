@@ -92,7 +92,7 @@ public final class LocalClient implements Client, Runnable {
 			if (playerIndex == index) {
 				playerIndex %= players.size();
 				gui.setStatus(players.get(playerIndex).getName() + "'"
-						+ (endsWithSSound(players.get(playerIndex).getName()) ? "" : "s") + " turn!");
+						+ (GameFrame.endsWithSSound(players.get(playerIndex).getName()) ? "" : "s") + " turn!");
 			} else if (playerIndex > index)
 				playerIndex--;
 		}
@@ -147,7 +147,7 @@ public final class LocalClient implements Client, Runnable {
 							playerIndex = (playerIndex + 1) % players.size();
 							if (events.isEmpty())
 								gui.setStatus(players.get(playerIndex).getName() + "'"
-										+ (endsWithSSound(players.get(playerIndex).getName()) ? "" : "s") + " turn!");
+										+ (GameFrame.endsWithSSound(players.get(playerIndex).getName()) ? "" : "s") + " turn!");
 							else {
 								final GameEvent event = events.poll();
 								if (event instanceof PlayerVictory) {
@@ -241,7 +241,7 @@ public final class LocalClient implements Client, Runnable {
 				}
 			});
 			gui.setStatus(players.get(playerIndex).getName() + "'"
-					+ (endsWithSSound(players.get(playerIndex).getName()) ? "" : "s") + " turn!");
+					+ (GameFrame.endsWithSSound(players.get(playerIndex).getName()) ? "" : "s") + " turn!");
 			// everything after this point is handled in ActionListeners
 		} catch (final Throwable t) { // I will catch Throwable whenever I feel like it and nobody can forbid it.
 			// I always want the user to see this message before the confusing log starts
@@ -259,31 +259,6 @@ public final class LocalClient implements Client, Runnable {
 			}
 			t.printStackTrace();
 		}
-	}
-
-	/**
-	 * Determines if a specific string ends with an "s" sound.
-	 * <p>
-	 * This is used to determine how the genitive of that string is built.
-	 * 
-	 * @param token
-	 *            The string.
-	 * @return <code>true</code> if that string ends with an "s" sound, <code>false</code> otherwise.
-	 */
-	private static boolean endsWithSSound(final String token) {
-		if (token.endsWith("ques"))
-			return false;
-		if (token.endsWith("aux"))
-			return false;
-		if (token.endsWith("s"))
-			return true;
-		if (token.endsWith("x"))
-			return true;
-		if (token.endsWith("ce"))
-			return true;
-		if (token.endsWith("se"))
-			return true;
-		return false;
 	}
 
 	/**
