@@ -2,8 +2,11 @@ package de.lucaswerkmeister.code.fiar.clients.swingClient;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.rmi.AccessException;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
@@ -17,6 +20,7 @@ import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
 import de.lucaswerkmeister.code.fiar.framework.Hoster;
@@ -39,11 +43,23 @@ public class NetworkClient implements RemoteClient, Runnable {
 	private final List<Player> allPlayers;
 	private final Queue<GameEvent> events;
 	final NetworkClient instance; // needed for event listeners
-	private DefaultListModel<Player> playerListModel;
+	private DefaultListModel<String> playerListModel;
+	private Server server;
+	private JFrame lobby;
 
-	public NetworkClient(String hostName, int port) {
+	public NetworkClient() throws AccessException, NumberFormatException, HeadlessException, RemoteException,
+			NotBoundException {
+		this(JOptionPane.showInputDialog("Please enter the hoster address (hostname:port)"));
+	}
+
+	public NetworkClient(String address) throws AccessException, NumberFormatException, RemoteException,
+			NotBoundException {
+		this(address.substring(0, address.indexOf(':')), Integer.parseInt(address.substring(address.indexOf(':') + 1)));
+	}
+
+	public NetworkClient(String hostName, int port) throws AccessException, RemoteException, NotBoundException {
 		instance = this;
-		hoster = (Hoster) LocateRegistry.getRegistry(host, port).lookup("hoster");
+		hoster = (Hoster) LocateRegistry.getRegistry(hostName, port).lookup("hoster");
 		UnicastRemoteObject.exportObject(this, 0);
 		ownPlayers = new LinkedList<>();
 		allPlayers = new LinkedList<>();
@@ -53,7 +69,7 @@ public class NetworkClient implements RemoteClient, Runnable {
 
 	@Override
 	public void run() {
-		final JFrame lobby = new JFrame("Lobby");
+		lobby = new JFrame("Lobby");
 		lobby.setLayout(new BorderLayout());
 		JButton addPlayerButton = new JButton("Add player");
 		addPlayerButton.addActionListener(new ActionListener() {
@@ -91,18 +107,19 @@ public class NetworkClient implements RemoteClient, Runnable {
 		addPlayerPanel.add(addPlayerButton);
 		lobby.add(addPlayerPanel, BorderLayout.NORTH);
 		playerListModel = new DefaultListModel<>();
-		final JList<Player> playerList = new JList<>(playerListModel);
+		final JList<String> playerList = new JList<>(playerListModel);
 		playerList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		lobby.add(playerList, BorderLayout.CENTER);
+		lobby.add(new JScrollPane(playerList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), BorderLayout.CENTER);
 		JButton removePlayerButton = new JButton("Remove player(s)");
 		removePlayerButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				List<Player> players = playerList.getSelectedValuesList();
-				if (!players.isEmpty())
+				int[] players = playerList.getSelectedIndices();
+				if (players.length > 0)
 					try {
-						for (Player selectedPlayer : players)
-							hoster.removePlayer(selectedPlayer);
+						for (int index : players)
+							hoster.removePlayer(allPlayers.get(index));
 					} catch (UnknownPlayerException e) {
 						// This should NEVER EVER happen, so again no user-friendly shutdown
 						e.printStackTrace();
@@ -116,6 +133,11 @@ public class NetworkClient implements RemoteClient, Runnable {
 					}
 			}
 		});
+		JPanel removePlayerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		removePlayerPanel.add(removePlayerButton);
+		lobby.add(removePlayerPanel, BorderLayout.SOUTH);
+		lobby.pack();
+		lobby.setVisible(true);
 		synchronized (this) {
 			try {
 				wait();
@@ -125,6 +147,34 @@ public class NetworkClient implements RemoteClient, Runnable {
 				System.exit(1);
 			}
 		}
+	}
+
+	public void playerJoined(Player player) {
+		allPlayers.add(player);
+		playerListModel.addElement(player.getName());
+		lobby.pack();
+		GameFrame.reshowAddPlayerDialog(findID());
+	}
+
+	@Override
+	public void playerLeft(Player player) {
+		playerListModel.removeElementAt(allPlayers.indexOf(player));
+		allPlayers.remove(player);
+	}
+
+	@Override
+	public void gameStarts(Server server) {
+		GameFrame.hideAddPlayerDialog();
+		this.server = server;
+		System.out.println("STARTED");
+		synchronized (this) {
+			this.notify();
+		}
+	}
+
+	@Override
+	public void gameEvent(GameEvent e) throws RemoteException {
+		// TODO Auto-generated method stub
 	}
 
 	/**

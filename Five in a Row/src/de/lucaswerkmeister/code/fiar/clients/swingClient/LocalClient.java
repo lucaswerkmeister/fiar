@@ -21,11 +21,7 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.rmi.AccessException;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -36,11 +32,9 @@ import javax.swing.JOptionPane;
 import de.lucaswerkmeister.code.fiar.clients.swingClient.GameFrame.BoardListener;
 import de.lucaswerkmeister.code.fiar.framework.Block;
 import de.lucaswerkmeister.code.fiar.framework.Client;
-import de.lucaswerkmeister.code.fiar.framework.Hoster;
 import de.lucaswerkmeister.code.fiar.framework.Joker;
 import de.lucaswerkmeister.code.fiar.framework.NoPlayer;
 import de.lucaswerkmeister.code.fiar.framework.Player;
-import de.lucaswerkmeister.code.fiar.framework.RemoteClient;
 import de.lucaswerkmeister.code.fiar.framework.Server;
 import de.lucaswerkmeister.code.fiar.framework.event.BlockDistributionAccepted;
 import de.lucaswerkmeister.code.fiar.framework.event.BlockField;
@@ -64,13 +58,10 @@ import de.lucaswerkmeister.code.fiar.servers.FixedServer;
  * @author Lucas Werkmeister
  * @version 1.0
  */
-public final class LocalClient implements RemoteClient, Runnable {
-	private static final long serialVersionUID = -742632519403100569L;
+public final class LocalClient implements Client, Runnable {
 	private static LocalClient instance;
 	private Server server;
-	private final Hoster hoster;
-	private final List<Player> ownPlayers; // note that the contents of the list are not final
-	private final List<Player> allPlayers;
+	private final List<Player> players; // note that the contents of the list are not final
 	private GameFrame gui;
 	private final Queue<GameEvent> events;
 	private int playerIndex = 0;
@@ -80,80 +71,28 @@ public final class LocalClient implements RemoteClient, Runnable {
 	 */
 	public LocalClient() {
 		instance = this;
-		hoster = null;
-
-		// TODO insert further down
-		// gui = new JFrame((Server.IN_A_ROW == 5 ? "Five" : Server.IN_A_ROW) + " in a Row");
-		ownPlayers = new LinkedList<>();
-		ownPlayers.add(GameFrame.showAddPlayerDialog(true, 1, gui));
+		players = new LinkedList<>();
+		players.add(GameFrame.showAddPlayerDialog(true, 1, gui));
 		Player player = GameFrame.showAddPlayerDialog(true, 2, gui);
 		int id = 3;
 		while (player != null) {
-			ownPlayers.add(player);
+			players.add(player);
 			player = GameFrame.showAddPlayerDialog(false, id++, gui);
 		}
-		allPlayers = new LinkedList<>(ownPlayers);
-		server = new FixedServer(new Client[] {this }, new Player[][] {ownPlayers.toArray(new Player[] {}) });
+		server = new FixedServer(new Client[] {this }, new Player[][] {players.toArray(new Player[] {}) });
 		events = new LinkedList<>();
-	}
-
-	/**
-	 * Creates a new {@link LocalClient} running on the specified remote server.
-	 * 
-	 * @param host
-	 *            The host address of the remote server.
-	 * @param port
-	 *            The port of the remote server.
-	 * @throws NotBoundException
-	 *             If the remote server can't be found.
-	 * @throws RemoteException
-	 *             If some remote error occurs.
-	 * @throws AccessException
-	 *             If the remote server can't be accessed.
-	 */
-	public LocalClient(String host, int port) throws AccessException, RemoteException, NotBoundException {
-		super(); // avoid call to this()
-		instance = this;
-		hoster = (Hoster) LocateRegistry.getRegistry(host, port).lookup("hoster");
-		UnicastRemoteObject.exportObject(this, 0);
-		ownPlayers = new LinkedList<>();
-		allPlayers = new LinkedList<>();
-		hoster.addClient(this);
-		// gui = new JFrame((Server.IN_A_ROW == 5 ? "Five" : Server.IN_A_ROW) + " in a Row");
-		events = new LinkedList<>();
-	}
-
-	@Override
-	public void playerJoined(Player player) {
-		allPlayers.add(player);
-		GameFrame.reshowAddPlayerDialog(findID());
-	}
-
-	@Override
-	public void playerLeft(Player player) {
-		allPlayers.remove(player);
-	}
-
-	@Override
-	public void gameStarts(Server server) {
-		GameFrame.hideAddPlayerDialog();
-		this.server = server;
-		System.out.println("STARTED");
-		synchronized (this) {
-			this.notify();
-		}
 	}
 
 	@Override
 	public void gameEvent(final GameEvent e) throws RemoteException {
 		if (e instanceof Forfeit) {
 			final Player p = ((Forfeit) e).getActingPlayer();
-			final int index = allPlayers.indexOf(p);
-			allPlayers.remove(p);
+			final int index = players.indexOf(p);
+			players.remove(p);
 			if (playerIndex == index) {
-				playerIndex %= allPlayers.size();
-				gui.setStatus(allPlayers.get(playerIndex).getName() + "'"
-						+ (endsWithSSound(allPlayers.get(playerIndex).getName()) ? "" : "s") + " turn!");
+				playerIndex %= players.size();
+				gui.setStatus(players.get(playerIndex).getName() + "'"
+						+ (endsWithSSound(players.get(playerIndex).getName()) ? "" : "s") + " turn!");
 			} else if (playerIndex > index)
 				playerIndex--;
 		}
@@ -171,26 +110,9 @@ public final class LocalClient implements RemoteClient, Runnable {
 	@Override
 	public void run() {
 		try {
-			if (server == null) {
-				if (hoster == null)
-					throw new Exception("No server and no hoster! Aborting.");
-				Player player = GameFrame.showAddPlayerDialog(false, findID(), gui);
-				while (player != null) {
-					ownPlayers.add(player);
-					// allPlayers.add(player); don't add here as it will be added in playerJoined() above
-					hoster.addPlayer(this, player);
-					player = GameFrame.showAddPlayerDialog(false, findID(), gui);
-				}
-				JOptionPane.showMessageDialog(gui, "Waiting for the game to start...", "Info",
-						JOptionPane.INFORMATION_MESSAGE);
-				synchronized (this) {
-					wait();
-				}
-				System.out.println("Continuing");
-			}
 			// choose board size
 			final Dimension boardSize = GameFrame.showChooseBoardSizeDialog(gui);
-			for (final Player p : ownPlayers) {
+			for (final Player p : players) {
 				server.action(this, new BoardSizeProposal(p, boardSize));
 				events.poll(); // BoardSizeProposal
 			}
@@ -208,24 +130,24 @@ public final class LocalClient implements RemoteClient, Runnable {
 						final Point xy = field.getField();
 						if (phase[0] == 0 && phase[1] == 1) {
 							// blocking
-							server.action(instance, server.getCurrentBoard(instance).getPlayerAt(xy) == NoPlayer
-									.getInstance() ? new BlockField(ownPlayers.get(0), xy) : new UnblockField(
-									ownPlayers.get(0), xy));
+							server.action(instance,
+									server.getCurrentBoard(instance).getPlayerAt(xy) == NoPlayer.getInstance()
+											? new BlockField(players.get(0), xy) : new UnblockField(players.get(0), xy));
 							events.poll(); // BlockField / UnblockField
 						} else if (phase[0] == 0 && phase[1] == 2) {
 							// jokers
-							server.action(instance, server.getCurrentBoard(instance).getPlayerAt(xy) == NoPlayer
-									.getInstance() ? new JokerField(ownPlayers.get(0), xy) : new UnjokerField(
-									ownPlayers.get(0), xy));
+							server.action(instance,
+									server.getCurrentBoard(instance).getPlayerAt(xy) == NoPlayer.getInstance()
+											? new JokerField(players.get(0), xy) : new UnjokerField(players.get(0), xy));
 							events.poll(); // JokerField / UnjokerField
 						} else if (phase[0] == 1 && phase[1] == 1) {
 							// move
-							server.action(instance, new PlaceStone(ownPlayers.get(playerIndex), xy));
+							server.action(instance, new PlaceStone(players.get(playerIndex), xy));
 							events.poll(); // PlaceStone
-							playerIndex = (playerIndex + 1) % ownPlayers.size();
+							playerIndex = (playerIndex + 1) % players.size();
 							if (events.isEmpty())
-								gui.setStatus(ownPlayers.get(playerIndex).getName() + "'"
-										+ (endsWithSSound(ownPlayers.get(playerIndex).getName()) ? "" : "s") + " turn!");
+								gui.setStatus(players.get(playerIndex).getName() + "'"
+										+ (endsWithSSound(players.get(playerIndex).getName()) ? "" : "s") + " turn!");
 							else {
 								final GameEvent event = events.poll();
 								if (event instanceof PlayerVictory) {
@@ -251,7 +173,7 @@ public final class LocalClient implements RemoteClient, Runnable {
 			gui.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					for (final Player p : ownPlayers) {
+					for (final Player p : players) {
 						try {
 							server.action(instance, new BlockDistributionAccepted(p, server.getCurrentBoard(instance)));
 						} catch (IllegalStateException | IllegalMoveException | RemoteException e1) {
@@ -282,7 +204,7 @@ public final class LocalClient implements RemoteClient, Runnable {
 			gui.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					for (final Player p : ownPlayers) {
+					for (final Player p : players) {
 						try {
 							server.action(instance, new JokerDistributionAccepted(p, server.getCurrentBoard(instance)));
 						} catch (IllegalStateException | IllegalMoveException | RemoteException e1) {
@@ -312,14 +234,14 @@ public final class LocalClient implements RemoteClient, Runnable {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					try {
-						server.action(instance, new Forfeit(ownPlayers.get(playerIndex)));
+						server.action(instance, new Forfeit(players.get(playerIndex)));
 					} catch (IllegalStateException | IllegalMoveException | RemoteException e1) {
 						e1.printStackTrace();
 					}
 				}
 			});
-			gui.setStatus(ownPlayers.get(playerIndex).getName() + "'"
-					+ (endsWithSSound(ownPlayers.get(playerIndex).getName()) ? "" : "s") + " turn!");
+			gui.setStatus(players.get(playerIndex).getName() + "'"
+					+ (endsWithSSound(players.get(playerIndex).getName()) ? "" : "s") + " turn!");
 			// everything after this point is handled in ActionListeners
 		} catch (final Throwable t) { // I will catch Throwable whenever I feel like it and nobody can forbid it.
 			// I always want the user to see this message before the confusing log starts
@@ -337,26 +259,6 @@ public final class LocalClient implements RemoteClient, Runnable {
 			}
 			t.printStackTrace();
 		}
-	}
-
-	/**
-	 * Finds an unused ID.
-	 * 
-	 * @return An ID that is not yet used by any player known to the client.
-	 */
-	private int findID() {
-		int id = 0;
-		boolean isUsed;
-		do {
-			id++;
-			isUsed = false;
-			for (Player p : ownPlayers)
-				if (p.getID() == id) {
-					isUsed = true;
-					break;
-				}
-		} while (isUsed);
-		return id;
 	}
 
 	/**
@@ -396,25 +298,7 @@ public final class LocalClient implements RemoteClient, Runnable {
 	 *            </ul>
 	 */
 	public static void main(final String[] args) {
-		if (instance == null) {
-			switch (args.length) {
-			case 0:
-				instance = new LocalClient();
-				break;
-			case 2:
-				try {
-					instance = new LocalClient(args[0], Integer.parseInt(args[1]));
-				} catch (NumberFormatException | RemoteException | NotBoundException e) {
-					e.printStackTrace();
-					System.exit(1);
-				}
-				break;
-			default:
-				System.out
-						.println("Incorrect command line! Please specify either zero or two (host + port) arguments!");
-				System.exit(1);
-			}
-		}
+		instance = new LocalClient();
 		new Thread(instance).start();
 	}
 }

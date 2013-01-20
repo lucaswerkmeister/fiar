@@ -36,7 +36,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 
-import de.lucaswerkmeister.code.fiar.clients.swingClient.LocalClient;
+import de.lucaswerkmeister.code.fiar.clients.swingClient.NetworkClient;
 import de.lucaswerkmeister.code.fiar.framework.Hoster;
 import de.lucaswerkmeister.code.fiar.framework.Player;
 import de.lucaswerkmeister.code.fiar.framework.RemoteClient;
@@ -91,8 +91,7 @@ public class FixedHoster extends JFrame implements Hoster {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					String[] addressParts = localAddress.split(":");
-					new Thread(new LocalClient(addressParts[0], Integer.parseInt(addressParts[1]))).start();
+					new Thread(new NetworkClient(localAddress)).start();
 				} catch (NumberFormatException | RemoteException | NotBoundException exception) {
 					StringWriter sw = new StringWriter();
 					sw.write("Failed to start local client. Exception:\n");
