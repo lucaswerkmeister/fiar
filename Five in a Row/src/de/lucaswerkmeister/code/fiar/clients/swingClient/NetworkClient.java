@@ -3,7 +3,6 @@ package de.lucaswerkmeister.code.fiar.clients.swingClient;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.HeadlessException;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -49,6 +48,7 @@ import de.lucaswerkmeister.code.fiar.framework.event.UnjokerField;
 import de.lucaswerkmeister.code.fiar.framework.exception.IllegalMoveException;
 import de.lucaswerkmeister.code.fiar.framework.exception.UnknownClientException;
 import de.lucaswerkmeister.code.fiar.framework.exception.UnknownPlayerException;
+import de.lucaswerkmeister.code.fiar.hosters.FixedHoster;
 
 /**
  * A client that runs in a Swing GUI and is connected to a remote {@link Server} / {@link Hoster}.
@@ -70,17 +70,46 @@ public class NetworkClient implements RemoteClient, Runnable {
 	private volatile int currentPlayerID;
 	private String victoryMessage;
 
-	public NetworkClient() throws AccessException, NumberFormatException, HeadlessException, RemoteException,
-			NotBoundException {
+	/**
+	 * Creates a new {@link NetworkClient} that asks for the host address via a
+	 * {@link JOptionPane#showInputDialog(Object) input dialog}.
+	 * 
+	 * @throws RemoteException
+	 *             If something remotely goes wrong.
+	 * @throws NotBoundException
+	 *             If no hoster can be found at the specified address.
+	 */
+	public NetworkClient() throws AccessException, RemoteException, NotBoundException {
 		this(JOptionPane.showInputDialog("Please enter the hoster address (hostname:port)"));
 	}
 
-	public NetworkClient(String address) throws AccessException, NumberFormatException, RemoteException,
-			NotBoundException {
+	/**
+	 * Creates a new {@link NetworkClient} with the specified address.
+	 * 
+	 * @param address
+	 *            The address in the format "hostname:port".
+	 * @throws RemoteException
+	 *             If something remotely goes wrong.
+	 * @throws NotBoundException
+	 *             If no hoster can be found at the specified address.
+	 */
+	public NetworkClient(String address) throws RemoteException, NotBoundException {
 		this(address.substring(0, address.indexOf(':')), Integer.parseInt(address.substring(address.indexOf(':') + 1)));
 	}
 
-	public NetworkClient(String hostName, int port) throws AccessException, RemoteException, NotBoundException {
+	/**
+	 * Creates a new {@link NetworkClient} with the specified address.
+	 * 
+	 * @param hostName
+	 *            The host name.
+	 * @param port
+	 *            The port.
+	 * @throws RemoteException
+	 *             If something remotely goes wrong.
+	 * @throws NotBoundException
+	 *             If no hoster can be found at the specified address.
+	 */
+	public NetworkClient(String hostName, int port) throws RemoteException, NotBoundException {
 		instance = this;
 		hoster = (Hoster) LocateRegistry.getRegistry(hostName, port).lookup("hoster");
 		UnicastRemoteObject.exportObject(this, 0);
@@ -366,6 +395,7 @@ public class NetworkClient implements RemoteClient, Runnable {
 		}
 	}
 
+	@Override
 	public void playerJoined(Player player) {
 		allPlayers.put(player.getID(), player);
 		int index = Arrays.binarySearch(playerListModel.toArray(), player.getName());
@@ -453,6 +483,13 @@ public class NetworkClient implements RemoteClient, Runnable {
 		return id;
 	}
 
+	/**
+	 * Private utility method to tell the user that a {@link RemoteException} occurred,
+	 * {@link RemoteException#printStackTrace() print its stack trace}, and then {@link System#exit(int) exit}.
+	 * 
+	 * @param e
+	 *            The exception.
+	 */
 	private void failRemote(RemoteException e) {
 		JOptionPane.showMessageDialog(initFrame,
 				"An error occured while sending the information to the server. Exiting.", "Error",
@@ -461,8 +498,17 @@ public class NetworkClient implements RemoteClient, Runnable {
 		System.exit(1);
 	}
 
-	public static void main(String[] args) throws AccessException, NumberFormatException, HeadlessException,
-			RemoteException, NotBoundException {
+	/**
+	 * Utility main method to start a network client that will ask for the address (parameterless constructor).
+	 * 
+	 * @param args
+	 *            Currently ignored.
+	 * @throws RemoteException
+	 *             If something remotely goes wrong.
+	 * @throws NotBoundException
+	 *             If no hoster can be found. (To start a hoster, run {@link FixedHoster#main(String[])}.
+	 */
+	public static void main(String[] args) throws RemoteException, NotBoundException {
 		new Thread(new NetworkClient()).start();
 	}
 }

@@ -59,6 +59,17 @@ public class FixedHoster extends JFrame implements Hoster {
 	private HashMap<Player, ClientPlayerPair> pairs;
 	private DefaultListModel<String> players;
 
+	/**
+	 * Creates a new {@link FixedHoster} with the specified addresses.
+	 * <p>
+	 * The addresses are only used for display in the GUI; the hoster has to be made available under these addresses
+	 * separately.
+	 * 
+	 * @param globalAddress
+	 *            The global address.
+	 * @param localAddress
+	 *            The local address.
+	 */
 	private FixedHoster(final String globalAddress, final String localAddress) {
 		super("Hosting");
 		knownClients = new HashSet<>();
@@ -178,6 +189,12 @@ public class FixedHoster extends JFrame implements Hoster {
 		pack();
 	}
 
+	/**
+	 * Starts a new {@link FixedHoster} and publishes it.
+	 * 
+	 * @param args
+	 *            Currently ignored.
+	 */
 	public static void main(String[] args) {
 		try {
 			File policy = new File("bin/FixedHoster.policy");
