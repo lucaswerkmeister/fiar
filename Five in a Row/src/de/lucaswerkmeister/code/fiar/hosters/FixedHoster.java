@@ -118,6 +118,7 @@ public class FixedHoster extends JFrame implements Hoster {
 		startServer.addActionListener(new ActionListener() {
 
 
+
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				final Set<RemoteClient> watchingClients = new HashSet<>(knownClients);
@@ -131,7 +132,7 @@ public class FixedHoster extends JFrame implements Hoster {
 						break;
 					} catch (final RemoteException e2) {
 						// @formatter:off
-						if (JOptionPane.showOptionDialog(gui, "Failed to host server. Retry?", "Error",
+						if (JOptionPane.showOptionDialog(gui, "Failed to host server. Retry?", "Error", 
 								JOptionPane.OK_CANCEL_OPTION,JOptionPane.ERROR_MESSAGE, null, null, null)
 								== JOptionPane.OK_OPTION)
 							// @formatter:on
