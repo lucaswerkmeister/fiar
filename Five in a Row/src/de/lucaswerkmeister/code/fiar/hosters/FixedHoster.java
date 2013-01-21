@@ -36,7 +36,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 
-import de.lucaswerkmeister.code.fiar.clients.swingClient.NetworkClient;
+import de.lucaswerkmeister.code.fiar.clients.swingClients.NetworkClient;
 import de.lucaswerkmeister.code.fiar.framework.Hoster;
 import de.lucaswerkmeister.code.fiar.framework.Player;
 import de.lucaswerkmeister.code.fiar.framework.RemoteClient;

@@ -1,4 +1,4 @@
-package de.lucaswerkmeister.code.fiar.clients.swingClient;
+package de.lucaswerkmeister.code.fiar.clients.swingClients;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -25,7 +25,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import de.lucaswerkmeister.code.fiar.clients.swingClient.GameFrame.BoardListener;
+import de.lucaswerkmeister.code.fiar.clients.swingClients.GameFrame.BoardListener;
 import de.lucaswerkmeister.code.fiar.framework.Hoster;
 import de.lucaswerkmeister.code.fiar.framework.NoPlayer;
 import de.lucaswerkmeister.code.fiar.framework.Player;

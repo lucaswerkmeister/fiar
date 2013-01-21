@@ -1,4 +1,4 @@
-package de.lucaswerkmeister.code.fiar.clients.swingClient;
+package de.lucaswerkmeister.code.fiar.clients.swingClients;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

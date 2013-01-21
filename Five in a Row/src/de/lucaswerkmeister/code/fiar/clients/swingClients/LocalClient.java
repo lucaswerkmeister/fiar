@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lucaswerkmeister.code.fiar.clients.swingClient;
+package de.lucaswerkmeister.code.fiar.clients.swingClients;
 
 import java.awt.Dimension;
 import java.awt.Point;
@@ -29,7 +29,7 @@ import java.util.Queue;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import de.lucaswerkmeister.code.fiar.clients.swingClient.GameFrame.BoardListener;
+import de.lucaswerkmeister.code.fiar.clients.swingClients.GameFrame.BoardListener;
 import de.lucaswerkmeister.code.fiar.framework.Block;
 import de.lucaswerkmeister.code.fiar.framework.Client;
 import de.lucaswerkmeister.code.fiar.framework.Joker;
