@@ -16,7 +16,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.URL;
-import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -220,8 +219,8 @@ public class FixedHoster extends JFrame implements Hoster {
 					new FixedHoster(new BufferedReader(new InputStreamReader(
 							new URL("http://checkip.amazonaws.com").openStream())).readLine()
 							+ ":" + port, InetAddress.getLocalHost().getHostAddress() + ":" + port);
-			registry.bind("hoster", UnicastRemoteObject.exportObject(hoster, 0));
-		} catch (AlreadyBoundException | IOException e) {
+			registry.rebind("hoster", UnicastRemoteObject.exportObject(hoster, 0));
+		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(1);
 		}

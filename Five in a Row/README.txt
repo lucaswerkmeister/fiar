@@ -3,10 +3,13 @@ This version adds networking support over the Java Remote Method Invocation (RMI
 If you don't want to put up with reading even more code, I hereby officially grant you permission to instead rate my previous solution (Solution 9).
 The only other change is that I split up the SwingClient into client and GUI separately,
 as it proved impractical to have local client, remote client and GUI all in one class; now, they are each in their own class.
+Please note that to actually access the game remotely, you have to set up an actual server; I am writing this at 12:02 monday (1h before deadline), so I don't have time for that.
+However, the fact that you can play the game distributed over several virtual machines on the same physical machine (and I suspect that it might even work in the Local Area Network,
+but have not been able to test this) proves that the RMI part is actually working.
 
 ABOUT FIVE IN A ROW
 
-Run: src\...\clients\swingClient\SwingClient or \clients\ConsoleClient
+Run: src\...\clients\swingClients\LocalClient or \clients\ConsoleClient for local gameplay, src\...\hosters\FixedHoster for remote hosting, src\...\clients\swingClients\NetworkClient for remote playing
 Tests: test\...\ConsoleClientTest, \FixedServerTest
 
 The game is divided into Server and Client. The Server handles the game logic. The Client controls players and displays the game to them.
@@ -46,10 +49,6 @@ such as SOUTH or EXIT_ON_CLOSE; I will not rename it to capslock.
 
 *Coding
 Why should inner statements be avoided? I think they were added to Java for a reason.
-As far as I see, catching Throwable on the outermost level of Runnable.run() is no problem
-as long as ThreadDeaths and VirtualMachineErrors are handled properly,
-and because the thread is going to die anyways, doing nothing is sufficient.
+As far as I see, catching Throwable on the outermost level of Runnable.run() is no problem as long as ThreadDeaths and VirtualMachineErrors are handled properly.
 The empty statements are for loops were everything is done in the loop declaration.
 All those missing defaults are intentional: control falls through to the exception thrown below.
-I don't feel like wrapping the fields of ClientPlayerPair: The whole class is only visible to the FixedServer, and that
-knows how to handle them. Besides, any value for the fields is allowed, so the wrappers wouldn't perform any checks.
