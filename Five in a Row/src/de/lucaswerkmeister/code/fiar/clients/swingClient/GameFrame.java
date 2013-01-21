@@ -87,7 +87,7 @@ public class GameFrame extends JFrame {
 				f.addMouseListener(new MouseAdapter() {
 					@Override
 					public void mouseClicked(final MouseEvent e) {
-						if (f.isEnabled()) // disabled lightweight components still receive MouseEvents
+						if (f.isEnabled() && isEnabled()) // disabled lightweight components still receive MouseEvents
 							fireFieldClicked(f);
 					}
 				});
@@ -209,18 +209,6 @@ public class GameFrame extends JFrame {
 	 */
 	public void setEnabled(Point xy, boolean enabled) {
 		setEnabled(xy.x, xy.y, enabled);
-	}
-
-	/**
-	 * Enables or disables all fields.
-	 * 
-	 * @param enabled
-	 *            If the fields are enabled or not.
-	 */
-	public void setEnabledAll(boolean enabled) {
-		for (int x = 0; x < fields.length; x++)
-			for (int y = 0; y < fields[x].length; y++)
-				setEnabled(x, y, enabled);
 	}
 
 	/**

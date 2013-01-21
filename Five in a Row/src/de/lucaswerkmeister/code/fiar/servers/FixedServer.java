@@ -189,9 +189,11 @@ public class FixedServer implements Server {
 		if (!clientPlayerMatch(requester, action.getActingPlayer()))
 			throw new IllegalArgumentException("Client " + requester.toString() + " and player "
 					+ action.getActingPlayer().getName() + " don't match!");
-		if (!getAllowedActions(requester, action.getActingPlayer()).contains(action.getClass()))
+		if (!getAllowedActions(requester, action.getActingPlayer()).contains(action.getClass())) {
+			System.out.println(action.getClass());
 			throw new IllegalStateException("This action (" + action.toString() + ") is currently not allowed for "
 					+ action.getActingPlayer().getName() + "!");
+		}
 		try {
 			switch (phase[0]) {
 			case 0:
@@ -287,6 +289,11 @@ public class FixedServer implements Server {
 									+ board.getPlayerAt(placeStone.getField()).getName() + "!");
 						board.setPlayerAt(placeStone.getField(), placeStone.getActingPlayer());
 						occupiedFields++;
+
+						currentPlayerIndex++;
+						currentPlayerIndex %= pairs.length;
+						phase[2] = pairs[currentPlayerIndex].getPlayer().getID();
+
 						fireEvent(action);
 
 						if (board.wasWinningMove(placeStone.getField())) {
@@ -300,10 +307,6 @@ public class FixedServer implements Server {
 							fireEvent(new Tie());
 							return;
 						}
-
-						currentPlayerIndex++;
-						currentPlayerIndex %= pairs.length;
-						phase[2] = pairs[currentPlayerIndex].getPlayer().getID();
 						return;
 					}
 					break; // Let control fall through to the

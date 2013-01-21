@@ -13,10 +13,10 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Arrays;
-import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
+import java.util.Map;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -35,9 +35,13 @@ import de.lucaswerkmeister.code.fiar.framework.Server;
 import de.lucaswerkmeister.code.fiar.framework.event.BlockDistributionAccepted;
 import de.lucaswerkmeister.code.fiar.framework.event.BlockField;
 import de.lucaswerkmeister.code.fiar.framework.event.BoardSizeProposal;
+import de.lucaswerkmeister.code.fiar.framework.event.FieldAction;
+import de.lucaswerkmeister.code.fiar.framework.event.Forfeit;
 import de.lucaswerkmeister.code.fiar.framework.event.GameEnd;
 import de.lucaswerkmeister.code.fiar.framework.event.GameEvent;
+import de.lucaswerkmeister.code.fiar.framework.event.JokerDistributionAccepted;
 import de.lucaswerkmeister.code.fiar.framework.event.JokerField;
+import de.lucaswerkmeister.code.fiar.framework.event.PhaseChange;
 import de.lucaswerkmeister.code.fiar.framework.event.PlaceStone;
 import de.lucaswerkmeister.code.fiar.framework.event.PlayerVictory;
 import de.lucaswerkmeister.code.fiar.framework.event.UnblockField;
@@ -55,15 +59,16 @@ import de.lucaswerkmeister.code.fiar.framework.exception.UnknownPlayerException;
 public class NetworkClient implements RemoteClient, Runnable {
 	private final Hoster hoster;
 	private final List<Player> ownPlayers; // note that the contents of the list are not final
-	private final List<Player> allPlayers;
-	private final Queue<GameEvent> events;
+	private final Map<Integer, Player> allPlayers;
 	final NetworkClient instance; // needed for event listeners
 	private DefaultListModel<String> playerListModel;
-	private DefaultListModel<Dimension> dimensionListModel;
+	private List<Player> listPlayers;
+	private DefaultListModel<String> dimensionListModel;
 	private Server server;
 	private JFrame initFrame;
 	private GameFrame gameFrame;
-	private volatile int playerIndex;
+	private volatile int currentPlayerID;
+	private String victoryMessage;
 
 	public NetworkClient() throws AccessException, NumberFormatException, HeadlessException, RemoteException,
 			NotBoundException {
@@ -80,9 +85,8 @@ public class NetworkClient implements RemoteClient, Runnable {
 		hoster = (Hoster) LocateRegistry.getRegistry(hostName, port).lookup("hoster");
 		UnicastRemoteObject.exportObject(this, 0);
 		ownPlayers = new LinkedList<>();
-		allPlayers = new LinkedList<>();
+		allPlayers = new HashMap<>();
 		hoster.addClient(this);
-		events = new LinkedList<>();
 	}
 
 	@Override
@@ -127,6 +131,7 @@ public class NetworkClient implements RemoteClient, Runnable {
 			addPlayerPanel.add(addPlayerButton);
 			initFrame.add(addPlayerPanel, BorderLayout.NORTH);
 			playerListModel = new DefaultListModel<>();
+			listPlayers = new LinkedList<>();
 			final JList<String> playerList = new JList<>(playerListModel);
 			initFrame.add(new JScrollPane(playerList), BorderLayout.CENTER);
 			JButton removePlayerButton = new JButton("Remove player(s)");
@@ -137,7 +142,7 @@ public class NetworkClient implements RemoteClient, Runnable {
 					if (players.length > 0)
 						try {
 							for (int index : players)
-								hoster.removePlayer(allPlayers.get(index));
+								hoster.removePlayer(listPlayers.get(index));
 						} catch (UnknownPlayerException e) {
 							// This should NEVER EVER happen, so again no user-friendly shutdown
 							e.printStackTrace();
@@ -189,16 +194,20 @@ public class NetworkClient implements RemoteClient, Runnable {
 			addDimensionPanel.add(addDimensionButton);
 			initFrame.add(addDimensionPanel, BorderLayout.NORTH);
 			dimensionListModel = new DefaultListModel<>();
-			final JList<Dimension> dimensionList = new JList<>(dimensionListModel);
+			final JList<String> dimensionList = new JList<>(dimensionListModel);
 			initFrame.add(new JScrollPane(dimensionList), BorderLayout.CENTER);
 			JButton acceptDimensionButton = new JButton("Accept size(s)");
 			acceptDimensionButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent event) {
-					for (Dimension d : dimensionList.getSelectedValuesList())
+					for (String d : dimensionList.getSelectedValuesList())
 						for (Player p : ownPlayers)
 							try {
-								server.action(instance, new BoardSizeProposal(p, d));
+								String[] coords = d.split("×");
+								server.action(
+										instance,
+										new BoardSizeProposal(p, new Dimension(Integer.parseInt(coords[0]), Integer
+												.parseInt(coords[1]))));
 							} catch (IllegalStateException | IllegalMoveException e) {
 								e.printStackTrace();
 							} catch (RemoteException e) {
@@ -233,7 +242,16 @@ public class NetworkClient implements RemoteClient, Runnable {
 				public void actionPerformed(ActionEvent event) {
 					try {
 						for (Player p : ownPlayers)
-							server.action(instance, new BlockDistributionAccepted(p, server.getCurrentBoard(instance)));
+							switch (event.getActionCommand()) {
+							case "Accept current block distribution":
+								server.action(instance,
+										new BlockDistributionAccepted(p, server.getCurrentBoard(instance)));
+								break;
+							case "Accept current joker distribution":
+								server.action(instance,
+										new JokerDistributionAccepted(p, server.getCurrentBoard(instance)));
+								break;
+							}
 					} catch (RemoteException e) {
 						failRemote(e);
 					} catch (IllegalStateException | IllegalMoveException e) {
@@ -242,7 +260,6 @@ public class NetworkClient implements RemoteClient, Runnable {
 					}
 				}
 			});
-			playerIndex = 0;
 			gameFrame.addBoardListener(new BoardListener() {
 				@Override
 				public void fieldClicked(Field field) {
@@ -253,36 +270,22 @@ public class NetworkClient implements RemoteClient, Runnable {
 						final Point xy = field.getField();
 						if (phase[0] == 0 && phase[1] == 1) {
 							// blocking
-							server.action(instance, server.getCurrentBoard(instance).getPlayerAt(xy) == NoPlayer
-									.getInstance() ? new BlockField(ownPlayers.get(0), xy) : new UnblockField(
-									ownPlayers.get(0), xy));
-							events.poll(); // BlockField / UnblockField
+							server.action(
+									instance,
+									NoPlayer.getInstance().equals(server.getCurrentBoard(instance).getPlayerAt(xy))
+											? new BlockField(ownPlayers.get(0), xy) : new UnblockField(ownPlayers
+													.get(0), xy));
 						} else if (phase[0] == 0 && phase[1] == 2) {
 							// jokers
-							server.action(instance, server.getCurrentBoard(instance).getPlayerAt(xy) == NoPlayer
-									.getInstance() ? new JokerField(ownPlayers.get(0), xy) : new UnjokerField(
-									ownPlayers.get(0), xy));
-							events.poll(); // JokerField / UnjokerField
+							server.action(
+									instance,
+									NoPlayer.getInstance().equals(server.getCurrentBoard(instance).getPlayerAt(xy))
+											? new JokerField(ownPlayers.get(0), xy) : new UnjokerField(ownPlayers
+													.get(0), xy));
 						} else if (phase[0] == 1 && phase[1] == 1) {
 							// move
-							server.action(instance, new PlaceStone(allPlayers.get(playerIndex), xy));
-							events.poll(); // PlaceStone
-							playerIndex = (playerIndex + 1) % allPlayers.size();
-							if (events.isEmpty())
-								gameFrame.setStatus(allPlayers.get(playerIndex).getName() + "'"
-										+ (GameFrame.endsWithSSound(allPlayers.get(playerIndex).getName()) ? "" : "s")
-										+ " turn!");
-							else {
-								final GameEvent event = events.poll();
-								if (event instanceof PlayerVictory) {
-									final String message =
-											((PlayerVictory) event).getWinningPlayer().getName() + " wins!";
-									JOptionPane.showMessageDialog(gameFrame, message);
-									gameFrame.setStatus(message);
-								}
-								if (event instanceof GameEnd)
-									gameFrame.setEnabledAll(false);
-							}
+							if (ownPlayers.contains(allPlayers.get(currentPlayerID)))
+								server.action(instance, new PlaceStone(allPlayers.get(currentPlayerID), xy));
 						}
 					} catch (RemoteException e) {
 						failRemote(e);
@@ -292,32 +295,101 @@ public class NetworkClient implements RemoteClient, Runnable {
 					}
 				}
 			});
-			gameFrame.setStatus(allPlayers.get(playerIndex).getName() + "'"
-					+ (GameFrame.endsWithSSound(allPlayers.get(playerIndex).getName()) ? "" : "s") + " turn!");
+			gameFrame.setStatus("Choose blocked fields");
 			gameFrame.setVisible(true);
+			synchronized (this) {
+				try {
+					wait();
+				} catch (InterruptedException e) {
+					// This should never happen; wait() should be ended by notify(), never by interrupt()
+					e.printStackTrace();
+					System.exit(1);
+				}
+			}
+			gameFrame.setStatus("Choose joker fields");
+			gameFrame.setButtons(new String[] {"Accept current joker distribution" });
+			synchronized (this) {
+				try {
+					wait();
+				} catch (InterruptedException e) {
+					// This should never happen; wait() should be ended by notify(), never by interrupt()
+					e.printStackTrace();
+					System.exit(1);
+				}
+			}
+			currentPlayerID = server.getPhase(this)[2];
+			gameFrame.setStatus(allPlayers.get(currentPlayerID).getName() + "'"
+					+ (GameFrame.endsWithSSound(allPlayers.get(currentPlayerID).getName()) ? "" : "s") + " turn!");
+			gameFrame.setButtons(new String[] {"Forfeit" });
+			gameFrame.removeAllActionListeners();
+			gameFrame.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent event) {
+					try {
+						server.action(instance, new Forfeit(allPlayers.get(currentPlayerID)));
+					} catch (RemoteException e) {
+						failRemote(e);
+					} catch (IllegalStateException | IllegalMoveException e) {
+						e.printStackTrace();
+						System.exit(1);
+					}
+				}
+			});
+			synchronized (this) {
+				try {
+					wait();
+				} catch (InterruptedException e) {
+					// This should never happen; wait() should be ended by notify(), never by interrupt()
+					e.printStackTrace();
+					System.exit(1);
+				}
+			}
+
+			gameFrame.setStatus(victoryMessage);
+			gameFrame.setButtons(new String[0]);
+			gameFrame.removeAllActionListeners();
+			gameFrame.removeAllBoardListeners();
+			JOptionPane.showMessageDialog(gameFrame, victoryMessage, "Game ended", JOptionPane.INFORMATION_MESSAGE);
+			gameFrame.toFront();
+			synchronized (this) {
+				try {
+					wait();
+				} catch (InterruptedException e) {
+					// This should never happen; wait() should be ended by notify(), never by interrupt()
+					e.printStackTrace();
+					System.exit(1);
+				}
+			}
 		} catch (RemoteException e) {
 			failRemote(e);
 		}
 	}
 
 	public void playerJoined(Player player) {
-		allPlayers.add(player);
-		playerListModel.addElement(player.getName());
+		allPlayers.put(player.getID(), player);
+		int index = Arrays.binarySearch(playerListModel.toArray(), player.getName());
+		int insertIndex = -(index + 1);
+		playerListModel.add(insertIndex, player.getName());
+		listPlayers.add(insertIndex, player);
 		initFrame.pack();
 		GameFrame.reshowAddPlayerDialog(findID());
 	}
 
 	@Override
 	public void playerLeft(Player player) {
-		playerListModel.removeElementAt(allPlayers.indexOf(player));
-		allPlayers.remove(player);
+		int index = Arrays.binarySearch(playerListModel.toArray(), player.getName());
+		playerListModel.removeElementAt(index);
+		listPlayers.remove(index);
+		allPlayers.remove(player.getID());
+		if (ownPlayers.contains(player))
+			ownPlayers.remove(player);
 	}
 
 	@Override
 	public void gameStarts(Server server) {
 		GameFrame.hideAddPlayerDialog();
 		this.server = server;
-		System.out.println("STARTED");
 		synchronized (this) {
 			this.notify();
 		}
@@ -326,23 +398,39 @@ public class NetworkClient implements RemoteClient, Runnable {
 	@Override
 	public void gameEvent(GameEvent e) throws RemoteException {
 		if (e instanceof BoardSizeProposal) {
-			BoardSizeProposal b = (BoardSizeProposal) e;
-			if (!dimensionListModel.contains(b.getSize())) {
-				int index = Arrays.binarySearch(dimensionListModel.toArray(), b.getSize(), new Comparator<Object>() {
-					@Override
-					public int compare(Object o1, Object o2) {
-						Dimension d1 = (Dimension) o1;
-						Dimension d2 = (Dimension) o2;
-						int first = Integer.compare(d1.width, d2.width);
-						if (first == 0)
-							return Integer.compare(d1.height, d2.height);
-						return first;
-					}
-				});
-				dimensionListModel.add(-(index + 1), b.getSize());
+			Dimension d = ((BoardSizeProposal) e).getSize();
+			String size = d.width + "×" + d.height;
+			if (!dimensionListModel.contains(size)) {
+				int index = Arrays.binarySearch(dimensionListModel.toArray(), size);
+				int insertIndex = -(index + 1);
+				dimensionListModel.add(insertIndex, size);
+			}
+		} else if (e instanceof PhaseChange) {
+			synchronized (this) {
+				this.notify();
+			}
+		} else if (e instanceof FieldAction) {
+			FieldAction fa = (FieldAction) e;
+			gameFrame
+					.setPlayerAt(((FieldAction) e).getField(), server.getCurrentBoard(this).getPlayerAt(fa.getField()));
+			if (e instanceof PlaceStone) {
+				int[] phase = server.getPhase(instance);
+				currentPlayerID = phase[2];
+				gameFrame.setButtons(new String[] {"Forfeit" },
+						new boolean[] {ownPlayers.contains(allPlayers.get(currentPlayerID)) });
+				gameFrame.setStatus(allPlayers.get(currentPlayerID).getName() + "'"
+						+ (GameFrame.endsWithSSound(allPlayers.get(currentPlayerID).getName()) ? "" : "s") + " turn!");
+			}
+		} else if (e instanceof GameEnd) {
+			if (e instanceof PlayerVictory) {
+				victoryMessage = ((PlayerVictory) e).getWinningPlayer().getName() + " wins!";
+			} else {
+				victoryMessage = "Game ended.";
+			}
+			synchronized (this) {
+				this.notify();
 			}
 		}
-		// TODO all other events
 	}
 
 	/**
@@ -356,7 +444,7 @@ public class NetworkClient implements RemoteClient, Runnable {
 		do {
 			id++;
 			isUsed = false;
-			for (Player p : allPlayers)
+			for (Player p : allPlayers.values())
 				if (p.getID() == id) {
 					isUsed = true;
 					break;
@@ -371,5 +459,10 @@ public class NetworkClient implements RemoteClient, Runnable {
 				JOptionPane.ERROR_MESSAGE);
 		e.printStackTrace();
 		System.exit(1);
+	}
+
+	public static void main(String[] args) throws AccessException, NumberFormatException, HeadlessException,
+			RemoteException, NotBoundException {
+		new Thread(new NetworkClient()).start();
 	}
 }

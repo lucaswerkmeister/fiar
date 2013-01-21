@@ -147,7 +147,8 @@ public final class LocalClient implements Client, Runnable {
 							playerIndex = (playerIndex + 1) % players.size();
 							if (events.isEmpty())
 								gui.setStatus(players.get(playerIndex).getName() + "'"
-										+ (GameFrame.endsWithSSound(players.get(playerIndex).getName()) ? "" : "s") + " turn!");
+										+ (GameFrame.endsWithSSound(players.get(playerIndex).getName()) ? "" : "s")
+										+ " turn!");
 							else {
 								final GameEvent event = events.poll();
 								if (event instanceof PlayerVictory) {
@@ -157,7 +158,7 @@ public final class LocalClient implements Client, Runnable {
 									gui.setStatus(message);
 								}
 								if (event instanceof GameEnd)
-									gui.setEnabledAll(false);
+									gui.setEnabled(false);
 							}
 						}
 					} catch (IllegalStateException | IllegalMoveException | RemoteException e1) {
