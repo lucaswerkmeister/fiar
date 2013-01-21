@@ -61,9 +61,9 @@ public class GameFrame extends JFrame {
 	private final Field[][] fields;
 	private final Set<ActionListener> actionListeners;
 	private final Set<BoardListener> boardListeners;
-	static final Random random = new Random();
+	private static final Random random = new Random();
 	private static final Dimension FIELD_SIZE = new Dimension(15, 15);
-	static JDialog addPlayerDialog;
+	private static JDialog addPlayerDialog;
 
 	/**
 	 * Creates a new {@link GameFrame} showing the specified board, with the specified window title.
@@ -73,7 +73,7 @@ public class GameFrame extends JFrame {
 	 * @param title
 	 *            The title.
 	 */
-	public GameFrame(Board b, String title) {
+	public GameFrame(final Board b, final String title) {
 		super(title);
 		actionListeners = new HashSet<>();
 		boardListeners = new HashSet<>();
@@ -108,8 +108,8 @@ public class GameFrame extends JFrame {
 	 * @param labels
 	 *            The labels of the currently visible buttons.
 	 */
-	public void setButtons(String[] labels) {
-		boolean[] enabled = new boolean[labels.length];
+	public void setButtons(final String[] labels) {
+		final boolean[] enabled = new boolean[labels.length];
 		Arrays.fill(enabled, true);
 		setButtons(labels, enabled);
 	}
@@ -126,20 +126,20 @@ public class GameFrame extends JFrame {
 	 *             if <code>labels.length != enabled.length</code>. In this case, the {@link GameFrame} will not display
 	 *             any buttons.
 	 */
-	public void setButtons(String[] labels, boolean[] enabled) throws ArrayIndexOutOfBoundsException {
+	public void setButtons(final String[] labels, final boolean[] enabled) throws ArrayIndexOutOfBoundsException {
 		buttons.removeAll();
 		if (labels.length != enabled.length)
 			throw new ArrayIndexOutOfBoundsException("labels.length must be equal to enabled.length (" + labels.length
 					+ "!=" + enabled.length + ")");
 		buttons.setLayout(new GridLayout(labels.length, 1));
 		for (int i = 0; i < labels.length; i++) {
-			String label = labels[i];
-			JPanel p = new JPanel(new FlowLayout(FlowLayout.LEADING));
-			JButton b = new JButton(label);
+			final String label = labels[i];
+			final JPanel p = new JPanel(new FlowLayout(FlowLayout.LEADING));
+			final JButton b = new JButton(label);
 			b.setEnabled(enabled[i]);
 			b.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					fireActionEvent(e);
 				}
 			});
@@ -155,7 +155,7 @@ public class GameFrame extends JFrame {
 	 * @param status
 	 *            The status text.
 	 */
-	public void setStatus(String status) {
+	public void setStatus(final String status) {
 		statusBar.setText(status);
 	}
 
@@ -169,7 +169,7 @@ public class GameFrame extends JFrame {
 	 * @param p
 	 *            The player.
 	 */
-	public void setPlayerAt(int x, int y, Player p) {
+	public void setPlayerAt(final int x, final int y, final Player p) {
 		fields[x][y].setPlayer(p);
 	}
 
@@ -181,7 +181,7 @@ public class GameFrame extends JFrame {
 	 * @param p
 	 *            The player.
 	 */
-	public void setPlayerAt(Point xy, Player p) {
+	public void setPlayerAt(final Point xy, final Player p) {
 		setPlayerAt(xy.x, xy.y, p);
 	}
 
@@ -195,7 +195,7 @@ public class GameFrame extends JFrame {
 	 * @param enabled
 	 *            If the field is enabled or not.
 	 */
-	public void setEnabled(int x, int y, boolean enabled) {
+	public void setEnabled(final int x, final int y, final boolean enabled) {
 		fields[x][y].setEnabled(enabled);
 	}
 
@@ -207,7 +207,7 @@ public class GameFrame extends JFrame {
 	 * @param enabled
 	 *            If the field is enabled or not.
 	 */
-	public void setEnabled(Point xy, boolean enabled) {
+	public void setEnabled(final Point xy, final boolean enabled) {
 		setEnabled(xy.x, xy.y, enabled);
 	}
 
@@ -224,7 +224,7 @@ public class GameFrame extends JFrame {
 	 * @see {@link #setButtons(String[])}, {@link #setButtons(String[], boolean[])},
 	 *      {@link #removeActionListener(ActionListener)}, {@link #addBoardListener(BoardListener)}
 	 */
-	public void addActionListener(ActionListener l) {
+	public void addActionListener(final ActionListener l) {
 		actionListeners.add(l);
 	}
 
@@ -235,7 +235,7 @@ public class GameFrame extends JFrame {
 	 *            The action listener.
 	 * @see {@link #addActionListener(ActionListener)}
 	 */
-	public void removeActionListener(ActionListener l) {
+	public void removeActionListener(final ActionListener l) {
 		actionListeners.remove(l);
 	}
 
@@ -243,7 +243,7 @@ public class GameFrame extends JFrame {
 	 * Removes all registered {@link ActionListener}s.
 	 */
 	public void removeAllActionListeners() {
-		for (ActionListener l : actionListeners)
+		for (final ActionListener l : actionListeners)
 			removeActionListener(l);
 	}
 
@@ -256,7 +256,7 @@ public class GameFrame extends JFrame {
 	 *            The board listener.
 	 * @ee {@link #removeBoardListener(BoardListener)}
 	 */
-	public void addBoardListener(BoardListener l) {
+	public void addBoardListener(final BoardListener l) {
 		boardListeners.add(l);
 	}
 
@@ -267,7 +267,7 @@ public class GameFrame extends JFrame {
 	 *            The action listener.
 	 * @see {@link #addBoardListener(BoardListener)}
 	 */
-	public void removeBoardListener(BoardListener l) {
+	public void removeBoardListener(final BoardListener l) {
 		boardListeners.remove(l);
 	}
 
@@ -275,7 +275,7 @@ public class GameFrame extends JFrame {
 	 * Removes all registered {@link BoardListener}s.
 	 */
 	public void removeAllBoardListeners() {
-		for (BoardListener l : boardListeners)
+		for (final BoardListener l : boardListeners)
 			removeBoardListener(l);
 	}
 
@@ -285,8 +285,8 @@ public class GameFrame extends JFrame {
 	 * @param e
 	 *            The action event.
 	 */
-	private void fireActionEvent(ActionEvent e) {
-		for (ActionListener l : actionListeners)
+	private void fireActionEvent(final ActionEvent e) {
+		for (final ActionListener l : actionListeners)
 			l.actionPerformed(e);
 	}
 
@@ -297,8 +297,8 @@ public class GameFrame extends JFrame {
 	 * @param f
 	 *            The field.
 	 */
-	private void fireFieldClicked(Field f) {
-		for (BoardListener l : boardListeners)
+	private void fireFieldClicked(final Field f) {
+		for (final BoardListener l : boardListeners)
 			l.fieldClicked(f);
 	}
 
@@ -382,7 +382,7 @@ public class GameFrame extends JFrame {
 
 		addPlayerDialog.pack();
 		addPlayerDialog.setVisible(true);
-		while (true) {
+		while (true)
 			switch (addPlayerDialog.getName()) {
 			case "Add Player":
 				// This Easter Egg is clearly of the "WTF" type.
@@ -392,7 +392,7 @@ public class GameFrame extends JFrame {
 				return null;
 			default:
 				if (addPlayerDialog.getName().startsWith("Reload dialog:")) {
-					boolean needToReplaceName = name.getText().equals("Player " + id);
+					final boolean needToReplaceName = name.getText().equals("Player " + id);
 					id = Integer.parseInt(addPlayerDialog.getName().substring("Reload dialog:".length()));
 					if (needToReplaceName)
 						name.setText("Player " + id);
@@ -402,7 +402,6 @@ public class GameFrame extends JFrame {
 				throw new RuntimeException("Unexpected error in Swing Client while adding player! Name was "
 						+ addPlayerDialog.getName() + " (expected: \"Add Player\" or \"Stop adding players\"");
 			}
-		}
 	}
 
 	/**
@@ -414,7 +413,7 @@ public class GameFrame extends JFrame {
 	 * @param id
 	 *            The new ID for the player.
 	 */
-	public static void reshowAddPlayerDialog(int id) {
+	public static void reshowAddPlayerDialog(final int id) {
 		if (addPlayerDialog != null && addPlayerDialog.isVisible()) {
 			addPlayerDialog.setName("Reload dialog:" + id);
 			addPlayerDialog.setVisible(false);

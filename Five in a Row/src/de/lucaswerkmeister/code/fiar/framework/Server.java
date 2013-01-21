@@ -104,6 +104,8 @@ public interface Server extends Remote, Serializable {
 	 * @param requester
 	 *            The requesting client.
 	 * @return The Phases list version.
+	 * @throws RemoteException
+	 *             If some remote error occurs
 	 */
 	public int getPhasesVersion(Client requester) throws RemoteException;
 
@@ -118,6 +120,8 @@ public interface Server extends Remote, Serializable {
 	 * @param p
 	 *            The player.
 	 * @return <code>true</code> if the player can currently perform any actions, <code>false</code> otherwise.
+	 * @throws RemoteException
+	 *             If some remote error occurs
 	 */
 	public boolean canAct(final Client requester, final Player p) throws RemoteException;
 
@@ -130,6 +134,8 @@ public interface Server extends Remote, Serializable {
 	 *            The player.
 	 * @return A {@link Set} containing all classes of actions that the player, at the time of the method invocation, is
 	 *         allowed to perform.
+	 * @throws RemoteException
+	 *             If some remote error occurs
 	 */
 	public Set<Class<? extends PlayerAction>> getAllowedActions(Client requester, Player p) throws RemoteException;
 
@@ -144,6 +150,8 @@ public interface Server extends Remote, Serializable {
 	 *             If the action is currently not allowed.
 	 * @throws IllegalMoveException
 	 *             If an illegal move was made.
+	 * @throws RemoteException
+	 *             If some remote error occurs
 	 */
 	public void action(Client requester, PlayerAction action) throws IllegalStateException, IllegalMoveException,
 			RemoteException;
@@ -160,6 +168,8 @@ public interface Server extends Remote, Serializable {
 	 * @param requester
 	 *            The requesting client.
 	 * @return The current board, or <code>null</code>.
+	 * @throws RemoteException
+	 *             If some remote error occurs
 	 */
 	public Board getCurrentBoard(Client requester) throws RemoteException;
 }

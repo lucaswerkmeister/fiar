@@ -39,6 +39,8 @@ public interface RemoteClient extends Client, Remote, Serializable {
 	 * 
 	 * @param player
 	 *            The joining player.
+	 * @throws RemoteException
+	 *             If some remote error occurs
 	 */
 	public void playerJoined(Player player) throws RemoteException;
 
@@ -51,6 +53,8 @@ public interface RemoteClient extends Client, Remote, Serializable {
 	 * 
 	 * @param player
 	 *            The leaving player.
+	 * @throws RemoteException
+	 *             If some remote error occurs
 	 */
 	public void playerLeft(Player player) throws RemoteException;
 
@@ -59,6 +63,8 @@ public interface RemoteClient extends Client, Remote, Serializable {
 	 * 
 	 * @param server
 	 *            The server.
+	 * @throws RemoteException
+	 *             If some remote error occurs
 	 */
 	public void gameStarts(Server server) throws RemoteException;
 

@@ -51,7 +51,7 @@ public class Field extends JComponent {
 	 * @param field
 	 *            The coordinates of this field.
 	 */
-	public Field(final Player player, final Dimension size, Point field) {
+	public Field(final Player player, final Dimension size, final Point field) {
 		setPlayer(player);
 		this.size = size;
 		setPreferredSize(size);

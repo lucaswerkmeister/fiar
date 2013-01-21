@@ -18,7 +18,6 @@
 package de.lucaswerkmeister.code.fiar.framework;
 
 import java.rmi.RemoteException;
-import java.util.Random;
 
 import de.lucaswerkmeister.code.fiar.framework.event.GameEvent;
 import de.lucaswerkmeister.code.fiar.framework.event.PlayerAction;
@@ -30,8 +29,6 @@ import de.lucaswerkmeister.code.fiar.framework.event.PlayerAction;
  * @version 1.1
  */
 public interface Client {
-	final int mHash = new Random().nextInt();
-
 	/**
 	 * Sends a {@link GameEvent} to the client.
 	 * <p>

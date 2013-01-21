@@ -303,7 +303,7 @@ public final class ConsoleClient implements Client, Runnable {
 					System.out.println("If you were expecting ASCII Art, I'm sorry, but I have to disappoint you.");
 				else
 					System.out.println("bb is not installed - try sudo apt-get install bb.");
-			} else if (input.endsWith("apt-get install bb")) {
+			} else if (input.endsWith("apt-get install bb"))
 				if (input.equals("sudo apt-get install bb"))
 					if (bbInstalled)
 						System.out.println("bb is already installed!");
@@ -313,15 +313,14 @@ public final class ConsoleClient implements Client, Runnable {
 					}
 				else
 					System.out.println("Error: can't install bb");
-			}
-			do {
+			do
 				try {
 					ret.addAll(parseCoordinates(inputReader.readLine(), inputReader));
 					break;
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					continue;
 				}
-			} while (true);
+			while (true);
 		}
 		return ret;
 	}

@@ -60,7 +60,7 @@ import de.lucaswerkmeister.code.fiar.servers.FixedServer;
  */
 public final class LocalClient implements Client, Runnable {
 	private static LocalClient instance;
-	private Server server;
+	private final Server server;
 	private final List<Player> players; // note that the contents of the list are not final
 	private GameFrame gui;
 	private final Queue<GameEvent> events;
@@ -118,27 +118,35 @@ public final class LocalClient implements Client, Runnable {
 			}
 			events.poll(); // PhaseChange
 
-			gui =
-					new GameFrame(server.getCurrentBoard(this), (Server.IN_A_ROW == 5 ? "Five" : Server.IN_A_ROW)
-							+ " in a Row");
+			// @formatter:off
+			gui = new GameFrame(
+					server.getCurrentBoard(this), (Server.IN_A_ROW == 5 ? "Five" : Server.IN_A_ROW) + " in a Row");
+			// @formatter:on
 			gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			gui.addBoardListener(new BoardListener() {
+
 				@Override
-				public void fieldClicked(Field field) {
+				public void fieldClicked(final Field field) {
 					try {
 						final int[] phase = server.getPhase(instance);
 						final Point xy = field.getField();
 						if (phase[0] == 0 && phase[1] == 1) {
 							// blocking
+							// @formatter:off
 							server.action(instance,
 									server.getCurrentBoard(instance).getPlayerAt(xy) == NoPlayer.getInstance()
-											? new BlockField(players.get(0), xy) : new UnblockField(players.get(0), xy));
+											? new BlockField(players.get(0), xy)
+											: new UnblockField(players.get(0), xy));
+							// @formatter:on
 							events.poll(); // BlockField / UnblockField
 						} else if (phase[0] == 0 && phase[1] == 2) {
 							// jokers
+							// @formatter:off
 							server.action(instance,
 									server.getCurrentBoard(instance).getPlayerAt(xy) == NoPlayer.getInstance()
-											? new JokerField(players.get(0), xy) : new UnjokerField(players.get(0), xy));
+											? new JokerField(players.get(0), xy)
+											: new UnjokerField(players.get(0), xy));
+							// @formatter:on
 							events.poll(); // JokerField / UnjokerField
 						} else if (phase[0] == 1 && phase[1] == 1) {
 							// move
@@ -152,8 +160,10 @@ public final class LocalClient implements Client, Runnable {
 							else {
 								final GameEvent event = events.poll();
 								if (event instanceof PlayerVictory) {
-									final String message =
-											((PlayerVictory) event).getWinningPlayer().getName() + " wins!";
+									// @formatter:off
+									final String message
+										= ((PlayerVictory) event).getWinningPlayer().getName() + " wins!";
+									// @formatter:on
 									JOptionPane.showMessageDialog(gui, message);
 									gui.setStatus(message);
 								}

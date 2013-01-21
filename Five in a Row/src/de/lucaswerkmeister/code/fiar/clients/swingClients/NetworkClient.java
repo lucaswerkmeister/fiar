@@ -6,7 +6,6 @@ import java.awt.FlowLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.rmi.AccessException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -57,10 +56,11 @@ import de.lucaswerkmeister.code.fiar.hosters.FixedHoster;
  * @version 1.0
  */
 public class NetworkClient implements RemoteClient, Runnable {
+	private static final long serialVersionUID = 2228474887736398898L;
 	private final Hoster hoster;
 	private final List<Player> ownPlayers; // note that the contents of the list are not final
 	private final Map<Integer, Player> allPlayers;
-	final NetworkClient instance; // needed for event listeners
+	private final NetworkClient instance; // needed for event listeners
 	private DefaultListModel<String> playerListModel;
 	private List<Player> listPlayers;
 	private DefaultListModel<String> dimensionListModel;
@@ -79,7 +79,7 @@ public class NetworkClient implements RemoteClient, Runnable {
 	 * @throws NotBoundException
 	 *             If no hoster can be found at the specified address.
 	 */
-	public NetworkClient() throws AccessException, RemoteException, NotBoundException {
+	public NetworkClient() throws RemoteException, NotBoundException {
 		this(JOptionPane.showInputDialog("Please enter the hoster address (hostname:port)"));
 	}
 
@@ -93,7 +93,7 @@ public class NetworkClient implements RemoteClient, Runnable {
 	 * @throws NotBoundException
 	 *             If no hoster can be found at the specified address.
 	 */
-	public NetworkClient(String address) throws RemoteException, NotBoundException {
+	public NetworkClient(final String address) throws RemoteException, NotBoundException {
 		this(address.substring(0, address.indexOf(':')), Integer.parseInt(address.substring(address.indexOf(':') + 1)));
 	}
 
@@ -109,7 +109,7 @@ public class NetworkClient implements RemoteClient, Runnable {
 	 * @throws NotBoundException
 	 *             If no hoster can be found at the specified address.
 	 */
-	public NetworkClient(String hostName, int port) throws RemoteException, NotBoundException {
+	public NetworkClient(final String hostName, final int port) throws RemoteException, NotBoundException {
 		instance = this;
 		hoster = (Hoster) LocateRegistry.getRegistry(hostName, port).lookup("hoster");
 		UnicastRemoteObject.exportObject(this, 0);
@@ -123,21 +123,21 @@ public class NetworkClient implements RemoteClient, Runnable {
 		try {
 			initFrame = new JFrame("Lobby");
 			initFrame.setLayout(new BorderLayout());
-			JButton addPlayerButton = new JButton("Add players");
+			final JButton addPlayerButton = new JButton("Add players");
 			addPlayerButton.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(ActionEvent event) {
+				public void actionPerformed(final ActionEvent event) {
 					Player player = GameFrame.showAddPlayerDialog(false, findID(), initFrame);
-					while (player != null) {
+					while (player != null)
 						try {
 							hoster.addPlayer(instance, player);
 							ownPlayers.add(player);
 							player = GameFrame.showAddPlayerDialog(false, findID(), initFrame);
-						} catch (UnknownClientException e) {
+						} catch (final UnknownClientException e) {
 							e.printStackTrace();
 							System.exit(1); // this should never happen, I can afford a user-unfriendly shutdown here
-						} catch (IllegalArgumentException e) {
-							int option =
+						} catch (final IllegalArgumentException e) {
+							final int option =
 									JOptionPane.showConfirmDialog(initFrame,
 											"Player could not be added. Add another player?", "Error",
 											JOptionPane.YES_NO_OPTION);
@@ -146,37 +146,36 @@ public class NetworkClient implements RemoteClient, Runnable {
 							else
 								player = null;
 							e.printStackTrace();
-						} catch (RemoteException e) {
+						} catch (final RemoteException e) {
 							JOptionPane.showMessageDialog(initFrame,
 									"An error occured while sending the information to the hoster. Exiting.", "Error",
 									JOptionPane.ERROR_MESSAGE);
 							e.printStackTrace();
 							System.exit(1);
 						}
-					}
 				}
 			});
-			JPanel addPlayerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+			final JPanel addPlayerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 			addPlayerPanel.add(addPlayerButton);
 			initFrame.add(addPlayerPanel, BorderLayout.NORTH);
 			playerListModel = new DefaultListModel<>();
 			listPlayers = new LinkedList<>();
 			final JList<String> playerList = new JList<>(playerListModel);
 			initFrame.add(new JScrollPane(playerList), BorderLayout.CENTER);
-			JButton removePlayerButton = new JButton("Remove player(s)");
+			final JButton removePlayerButton = new JButton("Remove player(s)");
 			removePlayerButton.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(ActionEvent event) {
-					int[] players = playerList.getSelectedIndices();
+				public void actionPerformed(final ActionEvent event) {
+					final int[] players = playerList.getSelectedIndices();
 					if (players.length > 0)
 						try {
-							for (int index : players)
+							for (final int index : players)
 								hoster.removePlayer(listPlayers.get(index));
-						} catch (UnknownPlayerException e) {
+						} catch (final UnknownPlayerException e) {
 							// This should NEVER EVER happen, so again no user-friendly shutdown
 							e.printStackTrace();
 							System.exit(1);
-						} catch (RemoteException e) {
+						} catch (final RemoteException e) {
 							JOptionPane.showMessageDialog(initFrame,
 									"An error occured while sending the information to the hoster. Exiting.", "Error",
 									JOptionPane.ERROR_MESSAGE);
@@ -185,7 +184,7 @@ public class NetworkClient implements RemoteClient, Runnable {
 						}
 				}
 			});
-			JPanel removePlayerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+			final JPanel removePlayerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 			removePlayerPanel.add(removePlayerButton);
 			initFrame.add(removePlayerPanel, BorderLayout.SOUTH);
 			initFrame.pack();
@@ -193,7 +192,7 @@ public class NetworkClient implements RemoteClient, Runnable {
 			synchronized (this) {
 				try {
 					wait();
-				} catch (InterruptedException e) {
+				} catch (final InterruptedException e) {
 					// This should never happen; wait() should be ended by notify(), never by interrupt()
 					e.printStackTrace();
 					System.exit(1);
@@ -204,47 +203,47 @@ public class NetworkClient implements RemoteClient, Runnable {
 
 			initFrame = new JFrame("Board size");
 			initFrame.setLayout(new BorderLayout());
-			JButton addDimensionButton = new JButton("Add size");
+			final JButton addDimensionButton = new JButton("Add size");
 			addDimensionButton.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(ActionEvent event) {
-					Dimension size = GameFrame.showChooseBoardSizeDialog(initFrame);
-					for (Player p : ownPlayers)
+				public void actionPerformed(final ActionEvent event) {
+					final Dimension size = GameFrame.showChooseBoardSizeDialog(initFrame);
+					for (final Player p : ownPlayers)
 						try {
 							server.action(instance, new BoardSizeProposal(p, size));
 						} catch (IllegalStateException | IllegalMoveException e) {
 							e.printStackTrace();
-						} catch (RemoteException e) {
+						} catch (final RemoteException e) {
 							failRemote(e);
 						}
 				}
 			});
-			JPanel addDimensionPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+			final JPanel addDimensionPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 			addDimensionPanel.add(addDimensionButton);
 			initFrame.add(addDimensionPanel, BorderLayout.NORTH);
 			dimensionListModel = new DefaultListModel<>();
 			final JList<String> dimensionList = new JList<>(dimensionListModel);
 			initFrame.add(new JScrollPane(dimensionList), BorderLayout.CENTER);
-			JButton acceptDimensionButton = new JButton("Accept size(s)");
+			final JButton acceptDimensionButton = new JButton("Accept size(s)");
 			acceptDimensionButton.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(ActionEvent event) {
-					for (String d : dimensionList.getSelectedValuesList())
-						for (Player p : ownPlayers)
+				public void actionPerformed(final ActionEvent event) {
+					for (final String d : dimensionList.getSelectedValuesList())
+						for (final Player p : ownPlayers)
 							try {
-								String[] coords = d.split("×");
+								final String[] coords = d.split("×");
 								server.action(
 										instance,
 										new BoardSizeProposal(p, new Dimension(Integer.parseInt(coords[0]), Integer
 												.parseInt(coords[1]))));
 							} catch (IllegalStateException | IllegalMoveException e) {
 								e.printStackTrace();
-							} catch (RemoteException e) {
+							} catch (final RemoteException e) {
 								failRemote(e);
 							}
 				}
 			});
-			JPanel acceptDimensionPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+			final JPanel acceptDimensionPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 			acceptDimensionPanel.add(acceptDimensionButton);
 			initFrame.add(acceptDimensionPanel, BorderLayout.SOUTH);
 			initFrame.pack();
@@ -252,7 +251,7 @@ public class NetworkClient implements RemoteClient, Runnable {
 			synchronized (this) {
 				try {
 					wait();
-				} catch (InterruptedException e) {
+				} catch (final InterruptedException e) {
 					// This should never happen; wait() should be ended by notify(), never by interrupt()
 					e.printStackTrace();
 					System.exit(1);
@@ -268,9 +267,9 @@ public class NetworkClient implements RemoteClient, Runnable {
 			gameFrame.setButtons(new String[] {"Accept current block distribution" });
 			gameFrame.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(ActionEvent event) {
+				public void actionPerformed(final ActionEvent event) {
 					try {
-						for (Player p : ownPlayers)
+						for (final Player p : ownPlayers)
 							switch (event.getActionCommand()) {
 							case "Accept current block distribution":
 								server.action(instance,
@@ -281,7 +280,7 @@ public class NetworkClient implements RemoteClient, Runnable {
 										new JokerDistributionAccepted(p, server.getCurrentBoard(instance)));
 								break;
 							}
-					} catch (RemoteException e) {
+					} catch (final RemoteException e) {
 						failRemote(e);
 					} catch (IllegalStateException | IllegalMoveException e) {
 						e.printStackTrace();
@@ -291,34 +290,33 @@ public class NetworkClient implements RemoteClient, Runnable {
 			});
 			gameFrame.addBoardListener(new BoardListener() {
 				@Override
-				public void fieldClicked(Field field) {
+				public void fieldClicked(final Field field) {
 					try {
 						// This board listener is going to stay in place for the rest of the game, so it doesn't just
 						// handle blocking
 						final int[] phase = server.getPhase(instance);
 						final Point xy = field.getField();
-						if (phase[0] == 0 && phase[1] == 1) {
+						if (phase[0] == 0 && phase[1] == 1)
 							// blocking
 							server.action(
 									instance,
 									NoPlayer.getInstance().equals(server.getCurrentBoard(instance).getPlayerAt(xy))
 											? new BlockField(ownPlayers.get(0), xy) : new UnblockField(ownPlayers
 													.get(0), xy));
-						} else if (phase[0] == 0 && phase[1] == 2) {
+						else if (phase[0] == 0 && phase[1] == 2)
 							// jokers
 							server.action(
 									instance,
 									NoPlayer.getInstance().equals(server.getCurrentBoard(instance).getPlayerAt(xy))
 											? new JokerField(ownPlayers.get(0), xy) : new UnjokerField(ownPlayers
 													.get(0), xy));
-						} else if (phase[0] == 1 && phase[1] == 1) {
+						else if (phase[0] == 1 && phase[1] == 1)
 							// move
 							if (ownPlayers.contains(allPlayers.get(currentPlayerID)))
 								server.action(instance, new PlaceStone(allPlayers.get(currentPlayerID), xy));
-						}
-					} catch (RemoteException e) {
+					} catch (final RemoteException e) {
 						failRemote(e);
-					} catch (IllegalMoveException e) {
+					} catch (final IllegalMoveException e) {
 						e.printStackTrace();
 						System.exit(1);
 					}
@@ -329,7 +327,7 @@ public class NetworkClient implements RemoteClient, Runnable {
 			synchronized (this) {
 				try {
 					wait();
-				} catch (InterruptedException e) {
+				} catch (final InterruptedException e) {
 					// This should never happen; wait() should be ended by notify(), never by interrupt()
 					e.printStackTrace();
 					System.exit(1);
@@ -340,7 +338,7 @@ public class NetworkClient implements RemoteClient, Runnable {
 			synchronized (this) {
 				try {
 					wait();
-				} catch (InterruptedException e) {
+				} catch (final InterruptedException e) {
 					// This should never happen; wait() should be ended by notify(), never by interrupt()
 					e.printStackTrace();
 					System.exit(1);
@@ -354,10 +352,10 @@ public class NetworkClient implements RemoteClient, Runnable {
 			gameFrame.addActionListener(new ActionListener() {
 
 				@Override
-				public void actionPerformed(ActionEvent event) {
+				public void actionPerformed(final ActionEvent event) {
 					try {
 						server.action(instance, new Forfeit(allPlayers.get(currentPlayerID)));
-					} catch (RemoteException e) {
+					} catch (final RemoteException e) {
 						failRemote(e);
 					} catch (IllegalStateException | IllegalMoveException e) {
 						e.printStackTrace();
@@ -368,7 +366,7 @@ public class NetworkClient implements RemoteClient, Runnable {
 			synchronized (this) {
 				try {
 					wait();
-				} catch (InterruptedException e) {
+				} catch (final InterruptedException e) {
 					// This should never happen; wait() should be ended by notify(), never by interrupt()
 					e.printStackTrace();
 					System.exit(1);
@@ -384,22 +382,22 @@ public class NetworkClient implements RemoteClient, Runnable {
 			synchronized (this) {
 				try {
 					wait();
-				} catch (InterruptedException e) {
+				} catch (final InterruptedException e) {
 					// This should never happen; wait() should be ended by notify(), never by interrupt()
 					e.printStackTrace();
 					System.exit(1);
 				}
 			}
-		} catch (RemoteException e) {
+		} catch (final RemoteException e) {
 			failRemote(e);
 		}
 	}
 
 	@Override
-	public void playerJoined(Player player) {
+	public void playerJoined(final Player player) {
 		allPlayers.put(player.getID(), player);
-		int index = Arrays.binarySearch(playerListModel.toArray(), player.getName());
-		int insertIndex = -(index + 1);
+		final int index = Arrays.binarySearch(playerListModel.toArray(), player.getName());
+		final int insertIndex = -(index + 1);
 		playerListModel.add(insertIndex, player.getName());
 		listPlayers.add(insertIndex, player);
 		initFrame.pack();
@@ -407,8 +405,8 @@ public class NetworkClient implements RemoteClient, Runnable {
 	}
 
 	@Override
-	public void playerLeft(Player player) {
-		int index = Arrays.binarySearch(playerListModel.toArray(), player.getName());
+	public void playerLeft(final Player player) {
+		final int index = Arrays.binarySearch(playerListModel.toArray(), player.getName());
 		playerListModel.removeElementAt(index);
 		listPlayers.remove(index);
 		allPlayers.remove(player.getID());
@@ -417,7 +415,7 @@ public class NetworkClient implements RemoteClient, Runnable {
 	}
 
 	@Override
-	public void gameStarts(Server server) {
+	public void gameStarts(final Server server) {
 		GameFrame.hideAddPlayerDialog();
 		this.server = server;
 		synchronized (this) {
@@ -426,25 +424,25 @@ public class NetworkClient implements RemoteClient, Runnable {
 	}
 
 	@Override
-	public void gameEvent(GameEvent e) throws RemoteException {
+	public void gameEvent(final GameEvent e) throws RemoteException {
 		if (e instanceof BoardSizeProposal) {
-			Dimension d = ((BoardSizeProposal) e).getSize();
-			String size = d.width + "×" + d.height;
+			final Dimension d = ((BoardSizeProposal) e).getSize();
+			final String size = d.width + "×" + d.height;
 			if (!dimensionListModel.contains(size)) {
-				int index = Arrays.binarySearch(dimensionListModel.toArray(), size);
-				int insertIndex = -(index + 1);
+				final int index = Arrays.binarySearch(dimensionListModel.toArray(), size);
+				final int insertIndex = -(index + 1);
 				dimensionListModel.add(insertIndex, size);
 			}
-		} else if (e instanceof PhaseChange) {
+		} else if (e instanceof PhaseChange)
 			synchronized (this) {
 				this.notify();
 			}
-		} else if (e instanceof FieldAction) {
-			FieldAction fa = (FieldAction) e;
+		else if (e instanceof FieldAction) {
+			final FieldAction fa = (FieldAction) e;
 			gameFrame
 					.setPlayerAt(((FieldAction) e).getField(), server.getCurrentBoard(this).getPlayerAt(fa.getField()));
 			if (e instanceof PlaceStone) {
-				int[] phase = server.getPhase(instance);
+				final int[] phase = server.getPhase(instance);
 				currentPlayerID = phase[2];
 				gameFrame.setButtons(new String[] {"Forfeit" },
 						new boolean[] {ownPlayers.contains(allPlayers.get(currentPlayerID)) });
@@ -452,11 +450,10 @@ public class NetworkClient implements RemoteClient, Runnable {
 						+ (GameFrame.endsWithSSound(allPlayers.get(currentPlayerID).getName()) ? "" : "s") + " turn!");
 			}
 		} else if (e instanceof GameEnd) {
-			if (e instanceof PlayerVictory) {
+			if (e instanceof PlayerVictory)
 				victoryMessage = ((PlayerVictory) e).getWinningPlayer().getName() + " wins!";
-			} else {
+			else
 				victoryMessage = "Game ended.";
-			}
 			synchronized (this) {
 				this.notify();
 			}
@@ -474,7 +471,7 @@ public class NetworkClient implements RemoteClient, Runnable {
 		do {
 			id++;
 			isUsed = false;
-			for (Player p : allPlayers.values())
+			for (final Player p : allPlayers.values())
 				if (p.getID() == id) {
 					isUsed = true;
 					break;
@@ -490,7 +487,7 @@ public class NetworkClient implements RemoteClient, Runnable {
 	 * @param e
 	 *            The exception.
 	 */
-	private void failRemote(RemoteException e) {
+	private void failRemote(final RemoteException e) {
 		JOptionPane.showMessageDialog(initFrame,
 				"An error occured while sending the information to the server. Exiting.", "Error",
 				JOptionPane.ERROR_MESSAGE);
@@ -508,7 +505,7 @@ public class NetworkClient implements RemoteClient, Runnable {
 	 * @throws NotBoundException
 	 *             If no hoster can be found. (To start a hoster, run {@link FixedHoster#main(String[])}.
 	 */
-	public static void main(String[] args) throws RemoteException, NotBoundException {
+	public static void main(final String[] args) throws RemoteException, NotBoundException {
 		new Thread(new NetworkClient()).start();
 	}
 }

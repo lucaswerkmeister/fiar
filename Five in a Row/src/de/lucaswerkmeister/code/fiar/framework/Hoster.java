@@ -22,6 +22,8 @@ public interface Hoster extends Remote, Serializable {
 	 * 
 	 * @param client
 	 *            The client.
+	 * @throws RemoteException
+	 *             If some remote error occurs
 	 */
 	public void addClient(RemoteClient client) throws RemoteException;
 
@@ -34,6 +36,8 @@ public interface Hoster extends Remote, Serializable {
 	 * 
 	 * @param client
 	 *            The client.
+	 * @throws RemoteException
+	 *             If some remote error occurs
 	 */
 	public void removeClient(RemoteClient client) throws RemoteException;
 
@@ -51,6 +55,8 @@ public interface Hoster extends Remote, Serializable {
 	 *             If the client has not yet been {@link #addClient(RemoteClient) added} to this hoster.
 	 * @throws IllegalArgumentException
 	 *             If the player is already controlled by another client.
+	 * @throws RemoteException
+	 *             If some remote error occurs
 	 */
 	public void addPlayer(RemoteClient controller, Player player) throws UnknownClientException,
 			IllegalArgumentException, RemoteException;
@@ -64,6 +70,8 @@ public interface Hoster extends Remote, Serializable {
 	 *            The player.
 	 * @throws UnknownPlayerException
 	 *             If the player has not been previously {@link #addPlayer(RemoteClient, Player) added} to this hoster.
+	 * @throws RemoteException
+	 *             If some remote error occurs
 	 */
 	public void removePlayer(Player player) throws UnknownPlayerException, RemoteException;
 }

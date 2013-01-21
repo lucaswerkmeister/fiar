@@ -109,10 +109,10 @@ public class FixedServer implements Server {
 	 * @param additionalClients
 	 *            Additional clients that aren't bound to any players.
 	 */
-	public FixedServer(Set<ClientPlayerPair> pairs, Set<? extends Client> additionalClients) {
+	public FixedServer(final Set<ClientPlayerPair> pairs, final Set<? extends Client> additionalClients) {
 		this.pairs = pairs.toArray(new ClientPlayerPair[] {});
-		Set<Client> allClients = new HashSet<>(additionalClients);
-		for (ClientPlayerPair pair : pairs)
+		final Set<Client> allClients = new HashSet<>(additionalClients);
+		for (final ClientPlayerPair pair : pairs)
 			allClients.add(pair.getClient());
 		this.allClients = allClients.toArray(new Client[] {});
 		phase = new int[] {0, 0 };
