@@ -92,6 +92,8 @@ public interface Server extends Remote, Serializable {
 	 * @param requester
 	 *            The requesting client.
 	 * @return The current phase.
+	 * @throws RemoteException
+	 *             If some remote error occurs
 	 */
 	public int[] getPhase(Client requester) throws RemoteException;
 

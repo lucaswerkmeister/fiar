@@ -116,6 +116,8 @@ public class FixedHoster extends JFrame implements Hoster {
 		final JPanel startServerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		final JButton startServer = new JButton("Start server");
 		startServer.addActionListener(new ActionListener() {
+
+
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				final Set<RemoteClient> watchingClients = new HashSet<>(knownClients);
@@ -128,8 +130,11 @@ public class FixedHoster extends JFrame implements Hoster {
 						UnicastRemoteObject.exportObject(server, 0);
 						break;
 					} catch (final RemoteException e2) {
+						// @formatter:off
 						if (JOptionPane.showOptionDialog(gui, "Failed to host server. Retry?", "Error",
-								JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null) == JOptionPane.OK_OPTION)
+								JOptionPane.OK_CANCEL_OPTION,JOptionPane.ERROR_MESSAGE, null, null, null)
+								== JOptionPane.OK_OPTION)
+							// @formatter:on
 							continue;
 						System.exit(1);
 					}
@@ -216,10 +221,12 @@ public class FixedHoster extends JFrame implements Hoster {
 			final int port = Registry.REGISTRY_PORT;
 			final Registry registry = LocateRegistry.createRegistry(port);
 			// We get our public IP from checkip.amazonaws.com
-			final Hoster hoster =
-					new FixedHoster(new BufferedReader(new InputStreamReader(
+			// @formatter:off
+			final Hoster hoster = new FixedHoster(
+							new BufferedReader(new InputStreamReader(
 							new URL("http://checkip.amazonaws.com").openStream())).readLine()
 							+ ":" + port, InetAddress.getLocalHost().getHostAddress() + ":" + port);
+			// @formatter:on
 			registry.rebind("hoster", UnicastRemoteObject.exportObject(hoster, 0));
 		} catch (final IOException e) {
 			e.printStackTrace();

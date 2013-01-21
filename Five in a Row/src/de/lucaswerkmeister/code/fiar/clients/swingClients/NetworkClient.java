@@ -137,10 +137,12 @@ public class NetworkClient implements RemoteClient, Runnable {
 							e.printStackTrace();
 							System.exit(1); // this should never happen, I can afford a user-unfriendly shutdown here
 						} catch (final IllegalArgumentException e) {
-							final int option =
-									JOptionPane.showConfirmDialog(initFrame,
+							// @formatter:off
+							final int option = JOptionPane.showConfirmDialog(
+											initFrame,
 											"Player could not be added. Add another player?", "Error",
 											JOptionPane.YES_NO_OPTION);
+							// @formatteR:on
 							if (option == JOptionPane.YES_OPTION)
 								player = GameFrame.showAddPlayerDialog(false, findID(), initFrame);
 							else
@@ -261,9 +263,10 @@ public class NetworkClient implements RemoteClient, Runnable {
 			initFrame.dispose();
 			initFrame = null;
 
-			gameFrame =
-					new GameFrame(server.getCurrentBoard(this), (Server.IN_A_ROW == 5 ? "Five" : Server.IN_A_ROW)
-							+ " in a Row");
+			// @formatter:off
+			gameFrame = new GameFrame(
+					server.getCurrentBoard(this), (Server.IN_A_ROW == 5 ? "Five" : Server.IN_A_ROW) + " in a Row");
+			// @formatteR:on
 			gameFrame.setButtons(new String[] {"Accept current block distribution" });
 			gameFrame.addActionListener(new ActionListener() {
 				@Override
